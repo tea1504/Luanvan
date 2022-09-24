@@ -10,7 +10,7 @@ var usersRouter = require("./routes/users");
 var v1Router = require("./src/api/v1/routers");
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");
-const swaggerJsDoc = YAML.load("./v1.yml");
+const swaggerJsDoc = YAML.load("./src/api/v1/v1.yml");
 
 var app = express();
 
