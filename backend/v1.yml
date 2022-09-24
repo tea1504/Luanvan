@@ -1,0 +1,272 @@
+openapi: "3.0.2"
+info:
+  title: API Title
+  version: "1.0"
+servers:
+  - url: http://10.10.34.200:5000/v1
+  - url: http://localhost:5000/v1
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-key
+  schemas:
+    Book:
+      type: object
+      required:
+        - bookId
+        - bookTitle
+        - bookAuthor
+      properties:
+        _id:
+          type: string
+        bookId:
+          type: string
+          description: ID của sách
+        bookTitle:
+          type: string
+          description: Tên sách
+        bookAuthor:
+          type: string
+          description: Tên tác giả
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        __v:
+          type: number
+      example:
+        _id: "757365723030303030303032"
+        bookId: "TVH15042000"
+        bookTitle: "Tran Van Hoa 1"
+        bookAuthor: "Tran Van Hoa"
+        createdAt: ISODate("2022-09-14T08:36:15.989Z")
+        updatedAt: ISODate("2022-09-14T08:36:15.989Z")
+        __v: 0
+    User:
+      type: object
+      required:
+        - userName
+        - userPassword
+        - userRole
+      properties:
+        _id:
+          type: string
+        userName:
+          type: string
+        userPassword:
+          type: string
+        userRole:
+          type: number
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        __v:
+          type: number
+      example:
+        _id: "757365723030303030303032"
+        userName: "TranVanBinh"
+        userPassword: "$2b$10$sTS2ADM7iVE4YClVrIi5NuR.MX5q50/QXBb0wixNUkDIdy0hTAXNy"
+        userRole: 1
+        createdAt: ISODate("2022-09-14T08:36:15.989Z")
+        updatedAt: ISODate("2022-09-14T08:36:15.989Z")
+        __v: 0
+security:
+  - ApiKeyAuth: []
+tags:
+  - name: Books
+    description: The book managing API
+  - name: User
+    description: The user managing API
+paths:
+  /books:
+    get:
+      summary: Returns the list of all the books
+      security:
+        - ApiKeyAuth: []
+      tags:
+        - Books
+      responses:
+        200:
+          description: The list of the books
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                  next:
+                    type: object
+                    properties:
+                      pageNumber:
+                        type: number
+                      limit:
+                        type: number
+                  previous:
+                    type: object
+                    properties:
+                      pageNumber:
+                        type: number
+                      limit:
+                        type: number
+                  rowsPerPage:
+                    type: number
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Book"
+        500:
+          description: Lỗi server
+    post:
+      summary: Return the created book
+      tags:
+        - Books
+      requestBody:
+        description: Thông tin sách
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Book"
+      responses:
+        200:
+          description: Tạo thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Book"
+        500:
+          description: Lỗi server
+  /books/{id}:
+    get:
+      summary: Lấy thông tin sách theo ID
+      tags:
+        - Books
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID sách
+      responses:
+        200:
+          description: Thông tin sách
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Book"
+        404:
+          description: Không tìm thấy sách
+        500:
+          description: Lỗi server
+    put:
+      summary: Cập nhật thông tin sách
+      tags:
+        - Books
+      requestBody:
+        description: Thông tin sách
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Book"
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID sách
+      responses:
+        200:
+          description: OK
+    delete:
+      summary: Xóa thông tin sách
+      tags:
+        - Books
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID sách
+      responses:
+        200:
+          description: Thông tin sách
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Book"
+        404:
+          description: Không tìm thấy sách
+        500:
+          description: Lỗi server
+  /user:
+    get:
+      summary: Lấy thông tin user
+      tags:
+        - User
+      responses:
+        200:
+          description: OK
+  /user/login:
+    post:
+      summary: Đăng nhập vào hệ thống
+      tags:
+        - User
+      requestBody:
+        description: Tài khoản và mật khẩu
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userName:
+                  type: string
+                  default: "TranVanHoa"
+                userPassword:
+                  type: string
+                  default: "12345"
+      responses:
+        200:
+          description: Đăng nhập thành công
+  /user/update: 
+    post: 
+      summary: Cập nhật thông tin user
+      tags:
+        - User
+      requestBody:
+        description: Thông tin cập nhật
+        required: true
+        content:
+          application/json:
+            schema: 
+              type: object 
+              properties:
+                userName:
+                  type: string
+                  default: "TranVanHoa"
+                userPassword:
+                  type: string
+                  default: "12345"
+                confirmPassword:
+                  type: string
+                  default: "12345"
+      responses:
+        200: 
+          description: OK
