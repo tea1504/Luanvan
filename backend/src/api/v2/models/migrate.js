@@ -7,6 +7,7 @@ const _priority = require("./priority.model");
 const _right = require("./right.model");
 const _officerStatus = require("./officerStatus.model");
 const _organization = require("./organization.model");
+const _officer = require("./officer.model");
 
 async function start() {
   console.log("Preparing ...");
@@ -73,21 +74,41 @@ async function start() {
       _id: "organ0000001",
       name: "organization 1",
       code: "1",
-      email: "o1.@gmail.com",
+      emailAddress: "o1.@gmail.com",
       phoneNumber: "0939259664",
     });
     await _organization.create({
       _id: "organ0000002",
       name: "organization 2",
       code: "2",
-      email: "o2.@gmail.com",
+      emailAddress: "o2.@gmail.com",
       phoneNumber: "0939259665",
       organ: "organ0000001",
     });
   }
 
-  var res = await _organization.find({ organ: { $eq: "organ0000001" } });
-  console.log(res);
+  console.log("Migrate Officer");
+  const password = await bcrypt.hash("12345", parseInt(process.env.SALT));
+  {
+    await _officer.deleteMany();
+    await _officer.create({
+      _id: "officer00001",
+      code: "000001",
+      position: "Admin",
+      firstName: "Hòa",
+      lastName: "Trần Văn",
+      emailAddress: "hoa@gmail.com",
+      phoneNumber: "0786882888",
+      password: [{ _id: "officer1pass", value: password }],
+      organ: "organ0000001",
+      file: {
+        name: "123",
+        path: "123",
+      },
+      status: "officerSta01",
+      right: "right0000001",
+    });
+  }
 
   console.log("Done");
 }
