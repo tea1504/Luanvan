@@ -29,6 +29,11 @@ const languageSchema = new mongoose.Schema(
       maxLength: 7,
       default: Constants.Styles.LIGHT_BLUE_COLOR,
     },
+    deleted: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
   },
   { collection: "languages", timestamps: true }
 );
