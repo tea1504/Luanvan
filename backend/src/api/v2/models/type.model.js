@@ -1,7 +1,8 @@
 require("dotenv").config();
 var mongoose = require("mongoose");
+const databaseConfig = require("../../../config/database.config");
 
-mongoose.connect(process.env.DATABASE);
+mongoose.connect(databaseConfig.v2.path);
 
 const typeSchema = new mongoose.Schema(
   {
