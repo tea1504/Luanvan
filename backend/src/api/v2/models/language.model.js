@@ -1,6 +1,7 @@
 require("dotenv").config();
 var mongoose = require("mongoose");
 var databaseConfig = require("../../../config/database.config");
+const Constants = require("../constants");
 
 mongoose.connect(databaseConfig.v2.path);
 
@@ -26,7 +27,7 @@ const languageSchema = new mongoose.Schema(
       required: true,
       minLength: 7,
       maxLength: 7,
-      default: "#7ed6df",
+      default: Constants.Styles.LIGHT_BLUE_COLOR,
     },
   },
   { collection: "languages", timestamps: true }
