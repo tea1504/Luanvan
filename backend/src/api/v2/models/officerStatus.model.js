@@ -9,20 +9,46 @@ const officerStatusSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
-      maxLength: 100,
+      required: [
+        true,
+        Constants.String.Message.REQUIRED(Constants.String.OfficerStatus.NAME),
+      ],
+      maxLength: [
+        100,
+        Constants.String.Message.MAX_LENGTH(
+          Constants.String.OfficerStatus.NAME
+        ),
+      ],
     },
     description: {
       type: String,
-      required: false,
-      maxLength: 1000,
+      maxLength: [
+        1000,
+        Constants.String.Message.MAX_LENGTH(
+          Constants.String.OfficerStatus.DESCRIPTION
+        ),
+      ],
     },
     color: {
       type: String,
-      required: true,
-      minLength: 7,
-      maxLength: 7,
+      required: [
+        true,
+        Constants.String.Message.REQUIRED(Constants.String.Status.COLOR),
+      ],
+      minLength: [
+        7,
+        Constants.String.Message.MIN_LENGTH(Constants.String.Status.COLOR),
+      ],
+      maxLength: [
+        7,
+        Constants.String.Message.MAX_LENGTH(Constants.String.Status.COLOR),
+      ],
       default: Constants.Styles.LIGHT_BLUE_COLOR,
+    },
+    deleted: {
+      type: Boolean,
+      required: true,
+      default: false,
     },
   },
   { collection: "officerStatus", timestamps: true }

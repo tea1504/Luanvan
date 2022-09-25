@@ -9,25 +9,54 @@ const typeSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
-      maxLength: 100,
+      required: [
+        true,
+        Constants.String.Message.REQUIRED(Constants.String.Type.NAME),
+      ],
+      maxLength: [
+        100,
+        Constants.String.Message.MAX_LENGTH(Constants.String.Type.NAME),
+      ],
     },
     notation: {
       type: String,
-      required: true,
-      maxLength: 10,
+      required: [
+        true,
+        Constants.String.Message.REQUIRED(Constants.String.Type.NOTATION),
+      ],
+      maxLength: [
+        10,
+        Constants.String.Message.MAX_LENGTH(Constants.String.Type.NOTATION),
+      ],
     },
     description: {
       type: String,
       required: false,
-      maxLength: 1000,
+      maxLength: [
+        1000,
+        Constants.String.Message.MAX_LENGTH(Constants.String.Type.DESCRIPTION),
+      ],
     },
     color: {
       type: String,
-      required: true,
-      minLength: 7,
-      maxLength: 7,
+      required: [
+        true,
+        Constants.String.Message.REQUIRED(Constants.String.Type.COLOR),
+      ],
+      minLength: [
+        7,
+        Constants.String.Message.MIN_LENGTH(Constants.String.Type.COLOR),
+      ],
+      maxLength: [
+        7,
+        Constants.String.Message.MAX_LENGTH(Constants.String.Type.COLOR),
+      ],
       default: Constants.Styles.LIGHT_BLUE_COLOR,
+    },
+    deleted: {
+      type: Boolean,
+      required: true,
+      default: false,
     },
   },
   { collection: "types", timestamps: true }
