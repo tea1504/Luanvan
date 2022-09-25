@@ -8,6 +8,7 @@ var app = require("../app");
 var debug = require("debug")("backend:server");
 var http = require("http");
 const mongoose = require("mongoose");
+const databaseConfig = require("../src/config/database.config");
 require("dotenv").config();
 
 /**
@@ -28,9 +29,9 @@ var server = http.createServer(app);
  */
 
 mongoose
-  .connect(process.env.DATABASE)
+  .connect(databaseConfig.v2.path)
   .then(() => console.log("Connected Successfully"))
-  .catch((err) => console.error("Not Connected"));
+  .catch((err) => console.error("Not Connected", err));
 
 /**
  * Listen on provided port, on all network interfaces.
