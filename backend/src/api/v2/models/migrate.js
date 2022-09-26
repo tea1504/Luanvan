@@ -10,6 +10,7 @@ const _organization = require("./organization.model");
 const _officer = require("./officer.model");
 const _status = require("./status.model");
 const _IOD = require("./incomingOfficialDispatch.model");
+const _ODT = require("./officialDispatchTravel.model");
 
 async function start() {
   console.log("Preparing ...");
@@ -169,6 +170,29 @@ async function start() {
           path: "123",
         },
       ],
+    });
+  }
+
+  console.log("Migrate Official Dispatch Travel");
+  {
+    await _ODT.deleteMany();
+    await _ODT.create({
+      _id: "ODT000000001",
+      code: 1,
+      issuedDate: Date.now(),
+      subject: "Subject",
+      type: "type00000001",
+      language: "language0001",
+      pageAmount: 1,
+      signerInfoName: "Tên Người Ký",
+      signerInfoPosition: "Giám đốc",
+      dueDate: Date.now(),
+      issuedAmount: 1,
+      priority: "priority0001",
+      security: "security0001",
+      organ: "organ0000001",
+      approver: "officer00001",
+      importer: "officer00001",
     });
   }
 
