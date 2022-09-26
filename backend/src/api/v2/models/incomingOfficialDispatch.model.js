@@ -182,16 +182,16 @@ const incomingOfficialDispatchSchema = new mongoose.Schema(
               Constants.String.IOD.TRACE_HEADER_LIST.COMMAND
             ),
           ],
-          date: {
-            type: Date,
-            required: [
-              true,
-              Constants.String.Message.REQUIRED(
-                Constants.String.IOD.TRACE_HEADER_LIST.DATE
-              ),
-            ],
-            default: Date.now,
-          },
+        },
+        date: {
+          type: Date,
+          required: [
+            true,
+            Constants.String.Message.REQUIRED(
+              Constants.String.IOD.TRACE_HEADER_LIST.DATE
+            ),
+          ],
+          default: Date.now,
         },
         header: {
           type: String,
