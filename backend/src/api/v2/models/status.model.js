@@ -20,10 +20,7 @@ const statusSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      required: [
-        true,
-        Constants.String.Message.REQUIRED(Constants.String.Status.DESCRIPTION),
-      ],
+      required: false,
       maxLength: [
         1000,
         Constants.String.Message.MAX_LENGTH(
