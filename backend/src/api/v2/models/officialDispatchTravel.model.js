@@ -5,7 +5,7 @@ const Constants = require("../constants");
 
 mongoose.connect(databaseConfig.v2.path);
 
-const statusSchema = new mongoose.Schema(
+const officialDispatchTravelSchema = new mongoose.Schema(
   {
     code: {
       type: Number,
@@ -188,7 +188,10 @@ const statusSchema = new mongoose.Schema(
       default: false,
     },
   },
-  { collection: "officialDispatchTravel", timestamps: true }
+  { collection: "officialDispatchTravels", timestamps: true }
 );
 
-module.exports = mongoose.model("status", statusSchema);
+module.exports = mongoose.model(
+  "officialDispatchTravels",
+  officialDispatchTravelSchema
+);
