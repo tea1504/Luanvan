@@ -11,18 +11,18 @@ const routes = [
   { path: '/', exact: true, name: { vi: 'Trang chủ', en: 'Home' } },
   { path: '/dashboard', name: { vi: 'Trang chủ', en: 'Dashboard' }, element: Dashboard },
   { path: '/cn1', name: { vi: 'Chức năng 1', en: 'Function 1' }, element: Test, exact: true },
-  { path: '/cn1/cn11', name: { vi: 'Chức năng con 1', en: 'Sub function 1' }, element: Test, role: [1, 2] },
+  { path: '/cn1/cn11', name: { vi: 'Chức năng con 1', en: 'Sub function 1' }, element: Test, role: [0, 2] },
   {
     path: '/cn1/cn12',
     name: { vi: 'Chức năng con 2', en: 'Sub function 2' },
     element: Dashboard,
-    role: [1],
+    role: [0],
   },
   {
     path: Screens.BOOK,
     name: { vi: 'Sách', en: 'Book' },
     element: Book,
-    role: [1, 2],
+    role: [0, 2],
   },
   {
     path: Screens.BOOK_DETAIL(),
