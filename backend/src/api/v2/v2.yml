@@ -3,8 +3,8 @@ info:
   title: E-Office API's Document
   version: "1.0.0"
 servers:
-  - url: http://10.10.34.126:5000/v2
   - url: http://localhost:5000/v2
+  - url: http://192.168.228.232:5000/v2
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -92,7 +92,7 @@ components:
           type: string
         __v:
           type: number
-    Type: 
+    Type:
       type: object
       required:
         - name
@@ -121,32 +121,7 @@ components:
           type: string
         __v:
           type: number
-    Status: 
-      type: object 
-      required:
-        - name
-      properties:
-        _id:
-          type: string
-        name:
-          type: string
-          maxLength: 100
-        description:
-          type: string
-          maxLength: 1000
-        color:
-          type: string
-          default: "#12B7BC"
-        deleted:
-          type: boolean
-          default: false
-        createdAt:
-          type: string
-        updatedAt:
-          type: string
-        __v:
-          type: number
-    Security: 
+    Status:
       type: object
       required:
         - name
@@ -171,7 +146,7 @@ components:
           type: string
         __v:
           type: number
-    Priority: 
+    Security:
       type: object
       required:
         - name
@@ -196,17 +171,42 @@ components:
           type: string
         __v:
           type: number
-    Right: 
+    Priority:
+      type: object
+      required:
+        - name
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 1000
+        color:
+          type: string
+          default: "#12B7BC"
+        deleted:
+          type: boolean
+          default: false
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        __v:
+          type: number
+    Right:
       type: object
       required:
         - code
         - name
       properties:
         _id:
-          type: string 
+          type: string
         code:
           type: number
-        name: 
+        name:
           type: string
           maxLength: 20
         createOD:
@@ -259,7 +259,7 @@ components:
         - emailAddress
         - phoneNumber
       properties:
-        _id: 
+        _id:
           type: string
         name:
           type: string
@@ -290,7 +290,7 @@ components:
         - name
         - notation
       properties:
-        _id: 
+        _id:
           type: string
         name:
           type: string
@@ -315,7 +315,7 @@ components:
       required:
         - name
       properties:
-        _id: 
+        _id:
           type: string
         name:
           type: string
@@ -342,14 +342,14 @@ components:
       properties:
         _id:
           type: string
-        officer: 
+        officer:
           $ref: "#/components/schemas/Officer"
         command:
           type: string
           maxLength: 1000
-        date: 
+        date:
           type: string
-        header: 
+        header:
           type: string
           maxLength: 1000
     IncomingOfficialDispatch:
@@ -371,7 +371,7 @@ components:
         - organ
         - importer
       properties:
-        _id: 
+        _id:
           type: string
         code:
           type: number
@@ -442,7 +442,7 @@ components:
         - organ
         - importer
       properties:
-        _id: 
+        _id:
           type: string
         code:
           type: number
@@ -511,7 +511,7 @@ tags:
     description: Công văn đến
   - name: Language
     description: Ngôn ngữ
-  - name: Officer Status 
+  - name: Officer Status
     description: Trạng thái cán bộ
   - name: Official Dispatch Travel
     description: Công văn đi
@@ -519,9 +519,9 @@ tags:
     description: Tổ chức
   - name: Priority
     description: Độ khẩn
-  - name: Right 
+  - name: Right
     description: Quyền
-  - name: Security 
+  - name: Security
     description: Độ mật
   - name: Status
     description: Trạng thái công văn
@@ -558,6 +558,8 @@ paths:
                     properties:
                       token:
                         type: string
+        400:
+          description: Cú pháp không hợp lệ
         403:
           description: Sai mật khẩu
         404:
@@ -608,11 +610,10 @@ paths:
                       file:
                         type: object
                         $ref: "#/components/schemas/File"
-
         401:
           description: Phiên đăng nhập hết hạn
         404:
-          description: Không tìm thấy người dùng
+          description: Không tìm thấy người dùng hoặc liên kết
         500:
           description: Lỗi hệ thống
   /types:
@@ -620,12 +621,27 @@ paths:
       summary: Lấy danh sách loại văn bản
       tags:
         - Type
+      parameters:
+        - in: query 
+          name: limit
+          schema: 
+            type: integer
+            default: 2
+          required: true
+          description: Số lượng bản ghi
+        - in: query 
+          name: pageNumber
+          schema: 
+            type: integer
+            default: 1
+          required: true
+          description: Trang
       responses:
         200:
-          description: Thành công
+          description: Truy vấn thành công
           content:
             application/json:
-              schema: 
+              schema:
                 type: object
                 properties:
                   code:
@@ -633,8 +649,133 @@ paths:
                     default: 200
                   message:
                     type: string
-                    default: thành công
+                    default: truy vấn thành công
                   data:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Type"
+                    type: object
+                    properties:
+                      total:
+                        type: number
+                      previous:
+                        type: object
+                        properties:
+                          pageNumber:
+                            type: number
+                          limit:
+                            type: number
+                      next:
+                        type: object
+                        properties:
+                          pageNumber:
+                            type: number
+                          limit:
+                            type: number
+                      rowsPerPage:
+                        type: number
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Type"
+        401:
+          description: Phiên đăng nhập hết hạn
+        404:
+          description: Không tìm thấy liên kết
+        500:
+          description: Lỗi hệ thống
+    post:
+      summary: Thêm mới loại văn bản
+      tags:
+        - Type
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Type"
+      responses:
+        200:
+          description: OK
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        404:
+          description: Không tìm thấy liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+  /types/{id}:
+    get:
+      summary: Lấy thông tin 1 loại văn bản theo id
+      tags:
+        - Type
+      parameters:
+        - in: path
+          name: id 
+          schema: 
+            type: string
+          required: true
+          description: id 
+      responses:
+        200:
+          description: OK
+        401:
+          description: Phiên đăng nhập hết hạn
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+    put:
+      summary: Cập nhật thông tin 1 loại văn bản theo id
+      tags:
+        - Type
+      parameters:
+        - in: path
+          name: id 
+          schema: 
+            type: string
+          required: true
+          description: id 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Type"
+      responses:
+        200:
+          description: OK
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+    delete:
+      summary: Xóa thông tin 1 loại văn bản theo id
+      tags:
+        - Type
+      parameters:
+        - in: path
+          name: id 
+          schema: 
+            type: string
+          required: true
+          description: id 
+      responses:
+        200:
+          description: OK
+        401:
+          description: Phiên đăng nhập hết hạn
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống

@@ -27,6 +27,9 @@ const Constants = {
     Type: {
       ROOT: "/types",
       GET_TYPES: "/",
+      GET_TYPE: "/:id",
+      PUT_TYPE: "/:id",
+      DELETE_TYPE: "/:id",
     },
   },
 
@@ -123,7 +126,10 @@ const Constants = {
       MIN_LENGTH: (m = "") => `${m} quá ngắn`,
       UNIQUE: (m = "") => `${m} bị trùng`,
       MATCH: (m = "") => `${m} không hợp lệ`,
+      ERR_400: (m = "") => `thiếu trường ${m}`,
       ERR_401: "mã thông báo hết hạn",
+      ERR_403: "không có quyền truy cập",
+      ERR_406: "dữ liệu không được chấp nhận",
       ERR_500: "lỗi hệ thống",
     },
     Organization: {
@@ -169,14 +175,14 @@ const Constants = {
       COLOR: "màu trạng thái cán bộ",
     },
     Officer: {
-      CODE: "",
+      CODE: "mã cán bộ",
       POSITION: "",
       FIRST_NAME: "",
       LAST_NAME: "",
       EMAIL_ADDRESS: "",
       PHONE_NUMBER: "",
       PASSWORD: {
-        VALUE: "",
+        VALUE: "mật khẩu",
         TIME: "",
       },
       ORGAN: "",
