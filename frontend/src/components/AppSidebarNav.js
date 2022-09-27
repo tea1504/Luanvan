@@ -29,7 +29,7 @@ export const AppSidebarNav = ({ items }) => {
 
   const navItem = (item, index) => {
     const { component, name, badge, icon, role, ...rest } = item
-    if (!role || role.includes(user.right.code)) {
+    if (!role || role.includes(user ? user.right.code : -1)) {
       const Component = component
       return (
         <Component
@@ -47,7 +47,7 @@ export const AppSidebarNav = ({ items }) => {
   }
   const navGroup = (item, index) => {
     const { component, name, icon, to, role, ...rest } = item
-    if (!role || role.includes(user.right.code)) {
+    if (!role || role.includes(user ? user.right.code : -1)) {
       const Component = component
       return (
         <Component
