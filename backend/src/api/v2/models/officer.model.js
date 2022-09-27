@@ -2,6 +2,9 @@ require("dotenv").config();
 var mongoose = require("mongoose");
 var databaseConfig = require("../../../config/database.config");
 const Constants = require("../constants");
+const rightModel = require("./right.model");
+const officerStatus = require("./officerStatus.model");
+const organizationModel = require("./organization.model");
 
 mongoose.connect(databaseConfig.v2.path);
 
@@ -126,7 +129,7 @@ const officerSchema = new mongoose.Schema(
     ],
     organ: {
       type: mongoose.ObjectId,
-      ref: "organizations",
+      ref: organizationModel,
       required: [
         true,
         Constants.String.Message.REQUIRED(Constants.String.Officer.ORGAN),
@@ -177,7 +180,7 @@ const officerSchema = new mongoose.Schema(
     },
     status: {
       type: mongoose.ObjectId,
-      ref: "officerStatus",
+      ref: officerStatus,
       required: [
         true,
         Constants.String.Message.REQUIRED(Constants.String.Officer.STATUS),
@@ -185,7 +188,7 @@ const officerSchema = new mongoose.Schema(
     },
     right: {
       type: mongoose.ObjectId,
-      ref: "rights",
+      ref: rightModel,
       required: [
         true,
         Constants.String.Message.REQUIRED(Constants.String.Officer.RIGHT),
