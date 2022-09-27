@@ -22,6 +22,7 @@ const _nav = [
       vi: 'Chức năng quản trị',
       en: "Admin's functions",
     },
+    role: [0],
   },
   {
     component: CNavGroup,
@@ -29,6 +30,7 @@ const _nav = [
       vi: 'Chức năng 1',
       en: 'Function 1',
     },
+    role: [0],
     to: '/cn1',
     icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
     items: [
@@ -38,6 +40,7 @@ const _nav = [
           vi: 'Tiểu chức năng 1',
           en: 'Sub function 1',
         },
+        role: [0],
         to: '/cn1/cn11',
       },
       {
@@ -46,6 +49,7 @@ const _nav = [
           vi: 'Tiểu chức năng 2',
           en: 'Sub function 2',
         },
+        role: [0],
         to: '/cn1/cn12',
       },
     ],
@@ -56,6 +60,7 @@ const _nav = [
       vi: 'Widgets',
       en: 'Widgets',
     },
+    role: [0],
     to: '/widgets',
     icon: <CIcon icon={cilCalculator} customClassName="nav-icon" />,
     badge: {
@@ -70,6 +75,7 @@ const _nav = [
       vi: vn.Book.NAME,
       en: en.Book.NAME,
     },
+    role: [0],
     to: Screens.BOOK,
   },
 ]
