@@ -3,6 +3,7 @@ info:
   title: E-Office API's Document
   version: "1.0.0"
 servers:
+  - url: http://10.10.34.126:5000/v2
   - url: http://localhost:5000/v2
 components:
   securitySchemes:
@@ -11,6 +12,479 @@ components:
       in: header
       name: X-API-key
   schemas:
+    File:
+      type: object
+      required:
+        - name
+        - path
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+          maxLength: 200
+          description: tên file
+        path:
+          type: string
+          maxLength: 200
+          description: đường dẫn lưu file
+        typeFile:
+          type: string
+          maxLength: 10
+          description: loại file
+        size:
+          type: number
+          description: kích thước file (byte)
+    Officer:
+      type: object
+      required:
+        - code
+        - position
+        - firstName
+        - lastName
+        - emailAddress
+        - phoneNumber
+        - organ
+        - status
+        - right
+        - deleted
+      properties:
+        code:
+          type: string
+          maxLength: 10
+          description: mã cán bộ
+        position:
+          type: string
+          maxLength: 100
+          description: chức vụ cán bộ
+        firstName:
+          type: string
+          maxLength: 10
+          description: tên cán bộ
+        lastName:
+          type: string
+          maxLength: 40
+          description: họ và tên lót cán bộ
+        emailAddress:
+          type: string
+          maxLength: 200
+          description: địa chỉ email
+        phoneNumber:
+          type: string
+          maxLength: 10
+          minLength: 10
+          description: số điện thoại
+        organ:
+          $ref: "#/components/schemas/Organization"
+        file:
+          $ref: "#/components/schemas/File"
+        status:
+          $ref: "#/components/schemas/OfficerStatus"
+        right:
+          $ref: "#/components/schemas/Right"
+        deleted:
+          type: boolean
+          description: đã xóa
+          default: false
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        __v:
+          type: number
+    Type: 
+      type: object
+      required:
+        - name
+        - notation
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+          maxLength: 10
+        notation:
+          type: string
+          maxLength: 10
+        description:
+          type: string
+          maxLength: 1000
+        color:
+          type: string
+          default: "#12B7BC"
+        deleted:
+          type: boolean
+          default: false
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        __v:
+          type: number
+    Status: 
+      type: object 
+      required:
+        - name
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 1000
+        color:
+          type: string
+          default: "#12B7BC"
+        deleted:
+          type: boolean
+          default: false
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        __v:
+          type: number
+    Security: 
+      type: object
+      required:
+        - name
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 1000
+        color:
+          type: string
+          default: "#12B7BC"
+        deleted:
+          type: boolean
+          default: false
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        __v:
+          type: number
+    Priority: 
+      type: object
+      required:
+        - name
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 1000
+        color:
+          type: string
+          default: "#12B7BC"
+        deleted:
+          type: boolean
+          default: false
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        __v:
+          type: number
+    Right: 
+      type: object
+      required:
+        - code
+        - name
+      properties:
+        _id:
+          type: string 
+        code:
+          type: number
+        name: 
+          type: string
+          maxLength: 20
+        createOD:
+          type: boolean
+          default: false
+        updateOD:
+          type: boolean
+          default: false
+        deleteOD:
+          type: boolean
+          default: false
+        approveOD:
+          type: boolean
+          default: false
+        createOfficer:
+          type: boolean
+          default: false
+        updateOfficer:
+          type: boolean
+          default: false
+        deleteOfficer:
+          type: boolean
+          default: false
+        createCategories:
+          type: boolean
+          default: false
+        updateCategories:
+          type: boolean
+          default: false
+        deleteCategories:
+          type: boolean
+          default: false
+        scope:
+          type: number
+          default: 0
+        deleted:
+          type: boolean
+          default: false
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        __v:
+          type: number
+    Organization:
+      type: object
+      required:
+        - name
+        - code
+        - emailAddress
+        - phoneNumber
+      properties:
+        _id: 
+          type: string
+        name:
+          type: string
+          maxLength: 200
+        code:
+          type: string
+          maxLength: 10
+        emailAddress:
+          type: string
+          maxLength: 200
+        phoneNumber:
+          type: string
+          maxLength: 10
+        organ:
+          $ref: "#/components/schemas/Organization"
+        deleted:
+          type: boolean
+          default: false
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        __v:
+          type: number
+    Language:
+      type: object
+      required:
+        - name
+        - notation
+      properties:
+        _id: 
+          type: string
+        name:
+          type: string
+          maxLength: 100
+        notation:
+          type: string
+          maxLength: 10
+        description:
+          type: string
+          maxLength: 1000
+        deleted:
+          type: boolean
+          default: false
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        __v:
+          type: number
+    OfficerStatus:
+      type: object
+      required:
+        - name
+      properties:
+        _id: 
+          type: string
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 1000
+        deleted:
+          type: boolean
+          default: false
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        __v:
+          type: number
+    TraceHeaderList:
+      type: object
+      required:
+        - officer
+        - command
+        - date
+        - header
+      properties:
+        _id:
+          type: string
+        officer: 
+          $ref: "#/components/schemas/Officer"
+        command:
+          type: string
+          maxLength: 1000
+        date: 
+          type: string
+        header: 
+          type: string
+          maxLength: 1000
+    IncomingOfficialDispatch:
+      type: object
+      required:
+        - code
+        - issuedDate
+        - subject
+        - type
+        - language
+        - pageAmount
+        - signerInfoName
+        - signerInfoPosition
+        - dueDate
+        - arrivalNumber
+        - arrivalDate
+        - priority
+        - security
+        - organ
+        - importer
+      properties:
+        _id: 
+          type: string
+        code:
+          type: number
+        issuedDate:
+          type: string
+        subject:
+          type: string
+        type:
+          $ref: "#/components/schemas/Type"
+        language:
+          $ref: "#/components/schemas/Language"
+        pageAmount:
+          type: string
+        description:
+          type: string
+        signerInfoName:
+          type: string
+        signerInfoPosition:
+          type: string
+        dueDate:
+          type: string
+        arrivalNumber:
+          type: number
+        arrivalDate:
+          type: string
+        priority:
+          $ref: "#/components/schemas/Priority"
+        security:
+          $ref: "#/components/schemas/Security"
+        organ:
+          $ref: "#/components/schemas/Organization"
+        approver:
+          $ref: "#/components/schemas/Officer"
+        importer:
+          $ref: "#/components/schemas/Officer"
+        handler:
+          type: array
+          items:
+            $ref: "#/components/schemas/Officer"
+        traceHeaderList:
+          $ref: "#/components/schemas/TraceHeaderList"
+        file:
+          $ref: "#/components/schemas/File"
+        deleted:
+          type: boolean
+          default: false
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        __v:
+          type: number
+    OfficialDispatchTravel:
+      type: object
+      required:
+        - code
+        - issuedDate
+        - subject
+        - type
+        - language
+        - pageAmount
+        - signerInfoName
+        - signerInfoPosition
+        - dueDate
+        - issuedAmount
+        - priority
+        - security
+        - organ
+        - importer
+      properties:
+        _id: 
+          type: string
+        code:
+          type: number
+        issuedDate:
+          type: string
+        subject:
+          type: string
+        type:
+          $ref: "#/components/schemas/Type"
+        language:
+          $ref: "#/components/schemas/Language"
+        pageAmount:
+          type: string
+        description:
+          type: string
+        signerInfoName:
+          type: string
+        signerInfoPosition:
+          type: string
+        dueDate:
+          type: string
+        issuedAmount:
+          type: number
+        priority:
+          $ref: "#/components/schemas/Priority"
+        security:
+          $ref: "#/components/schemas/Security"
+        organ:
+          $ref: "#/components/schemas/Organization"
+        importer:
+          $ref: "#/components/schemas/Officer"
+        file:
+          $ref: "#/components/schemas/File"
+        deleted:
+          type: boolean
+          default: false
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        __v:
+          type: number
     Login:
       type: object
       required:
@@ -31,6 +505,26 @@ tags:
     description: Xác thực người dùng
   - name: Officer
     description: Cán bộ
+  - name: Type
+    description: Loại văn bản
+  - name: Incoming Official Dispatch
+    description: Công văn đến
+  - name: Language
+    description: Ngôn ngữ
+  - name: Officer Status 
+    description: Trạng thái cán bộ
+  - name: Official Dispatch Travel
+    description: Công văn đi
+  - name: Organization
+    description: Tổ chức
+  - name: Priority
+    description: Độ khẩn
+  - name: Right 
+    description: Quyền
+  - name: Security 
+    description: Độ mật
+  - name: Status
+    description: Trạng thái công văn
 paths:
   /login:
     post:
@@ -48,23 +542,99 @@ paths:
       responses:
         200:
           description: Đăng nhập thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    default: 200
+                  message:
+                    type: string
+                    default: đăng nhập thành công
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: string
         403:
           description: Sai mật khẩu
         404:
           description: Không tìm thấy người dùng
         500:
-          description: Không tìm thấy người dùng
+          description: Lỗi hệ thống
   /officer:
     get:
-      summary: alo
+      summary: Lấy thông tin cán bộ đang đăng nhập
       tags:
         - Authentication
       responses:
         200:
           description: Lấy thông tin thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    default: 200
+                  message:
+                    type: string
+                    default: thành công
+                  data:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                      position:
+                        type: string
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      emailAddress:
+                        type: string
+                      phoneNumber:
+                        type: string
+                      right:
+                        type: object
+                        properties:
+                          code:
+                            type: string
+                          name:
+                            type: string
+                      file:
+                        type: object
+                        $ref: "#/components/schemas/File"
+
         401:
           description: Phiên đăng nhập hết hạn
         404:
           description: Không tìm thấy người dùng
         500:
-          description: Không tìm thấy người dùng
+          description: Lỗi hệ thống
+  /types:
+    get:
+      summary: Lấy danh sách loại văn bản
+      tags:
+        - Type
+      responses:
+        200:
+          description: Thành công
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  code:
+                    type: number
+                    default: 200
+                  message:
+                    type: string
+                    default: thành công
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Type"
