@@ -102,7 +102,10 @@ async function start() {
       lastName: "Trần Văn",
       emailAddress: "hoa@gmail.com",
       phoneNumber: "0786882888",
-      password: [{ _id: "officer1pass", value: password }],
+      password: [
+        { _id: "officer1pass", value: password },
+        { time: new Date("2022-09-25T12:54:45.880Z"), value: password },
+      ],
       organ: "organ0000001",
       file: {
         name: "123",
