@@ -1,0 +1,70 @@
+openapi: "3.0.2"
+info:
+  title: E-Office API's Document
+  version: "1.0.0"
+servers:
+  - url: http://localhost:5000/v2
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-key
+  schemas:
+    Login:
+      type: object
+      required:
+        - code
+        - password
+      properties:
+        code:
+          type: string
+        password:
+          type: string
+      example:
+        code: "000001"
+        password: "12345"
+security:
+  - ApiKeyAuth: []
+tags:
+  - name: Authentication
+    description: Xác thực người dùng
+  - name: Officer
+    description: Cán bộ
+paths:
+  /login:
+    post:
+      summary: Đăng nhập
+      description: Nhận mã cán bộ và trả về token
+      tags:
+        - Authentication
+      requestBody:
+        description: Tài khoản và mật khẩu
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Login"
+      responses:
+        200:
+          description: Đăng nhập thành công
+        403:
+          description: Sai mật khẩu
+        404:
+          description: Không tìm thấy người dùng
+        500:
+          description: Không tìm thấy người dùng
+  /officer:
+    get:
+      summary: alo
+      tags:
+        - Authentication
+      responses:
+        200:
+          description: Lấy thông tin thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        404:
+          description: Không tìm thấy người dùng
+        500:
+          description: Không tìm thấy người dùng
