@@ -7,6 +7,10 @@ mongoose.connect(databaseConfig.v2.path);
 
 const rightSchema = new mongoose.Schema(
   {
+    code: {
+      type: Number,
+      required: [true, Constants.String.Message.REQUIRED(Constants.String.Right.CODE),]
+    },
     name: {
       type: String,
       required: [
