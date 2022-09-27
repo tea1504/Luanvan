@@ -14,7 +14,17 @@ const Constants = {
     UNKNOWN_NETWORK: "UNKNOWN_NETWORK",
   },
 
-  ApiPath: {},
+  ApiPath: {
+    Auth: {
+      ROOT: "/",
+      LOGIN: "/login",
+      GET_INFO: "/officer",
+    },
+    Officer: {
+      ROOT: "/officers",
+      GET_OFFICERS: "/",
+    },
+  },
 
   /**
    * Styles for app.
@@ -109,6 +119,8 @@ const Constants = {
       MIN_LENGTH: (m = "") => `${m} quá ngắn`,
       UNIQUE: (m = "") => `${m} bị trùng`,
       MATCH: (m = "") => `${m} không hợp lệ`,
+      ERR_401: "mã thông báo hết hạn",
+      ERR_500: "lỗi hệ thống",
     },
     Organization: {
       NAME: "tên tổ chức",
