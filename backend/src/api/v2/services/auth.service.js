@@ -12,7 +12,10 @@ var authService = {
    */
   login: async (code, password) => {
     try {
-      const officer = await officerModel.findOne({ code: code });
+      const officer = await officerModel.findOne({
+        code: code,
+        deleted: false,
+      });
 
       if (!officer) return { code: 404, message: "không tìm thấy người dùng" };
       passwordOfficer = officer.password.sort((a, b) => {
@@ -46,10 +49,11 @@ var authService = {
   getInfo: async (id) => {
     try {
       const officer = await officerModel
-        .findById(id, "-_id -password -deleted -createdAt -updatedAt -__v")
-        .populate("right")
-        .populate("organ")
-        .populate("status");
+        .findById(
+          id,
+          "-_id -password -status -organ -deleted -createdAt -updatedAt -__v"
+        )
+        .populate("right", "-_id code name");
       if (!officer) return { code: 404, message: "không tìm thấy thông tin" };
       return { code: 200, message: "thành công", data: officer };
     } catch (error) {
