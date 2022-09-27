@@ -1,3 +1,4 @@
+const Constants = require("../constants");
 const authService = require("./../services/auth.service");
 
 const authController = {
@@ -9,6 +10,22 @@ const authController = {
   login: async (req, res, next) => {
     try {
       const { code, password } = req.body;
+      if (!code)
+        res.status(400).json({
+          code: 400,
+          message: Constants.String.Message.ERR_400(
+            Constants.String.Officer.CODE
+          ),
+        });
+      if (!password)
+        res
+          .status(400)
+          .json({
+            code: 400,
+            message: Constants.String.Message.ERR_400(
+              Constants.String.Officer.PASSWORD.VALUE
+            ),
+          });
       const result = await authService.login(code, password);
       res.status(result.code).json(result);
     } catch (error) {
