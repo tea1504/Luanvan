@@ -56,7 +56,24 @@ async function start() {
   {
     await _right.deleteMany();
     await _right.create({
+      _id: "right0000000",
+      code: 0,
+      name: "Super User",
+      createCategories: true,
+      createOD: true,
+      createOfficer: true,
+      updateCategories: true,
+      updateOD: true,
+      updateOfficer: true,
+      deleteCategories: true,
+      deleteOD: true,
+      deleteOfficer: true,
+      approveOD: true,
+      scope: 0,
+    });
+    await _right.create({
       _id: "right0000001",
+      code: 1,
       name: "right 1",
     });
   }
@@ -94,26 +111,48 @@ async function start() {
   const password = await bcrypt.hash("12345", parseInt(process.env.SALT));
   {
     await _officer.deleteMany();
-    await _officer.create({
-      _id: "officer00001",
-      code: "000001",
-      position: "Admin",
-      firstName: "Hòa",
-      lastName: "Trần Văn",
-      emailAddress: "hoa@gmail.com",
-      phoneNumber: "0786882888",
-      password: [
-        { _id: "officer1pass", value: password },
-        { time: new Date("2022-09-25T12:54:45.880Z"), value: password },
-      ],
-      organ: "organ0000001",
-      file: {
-        name: "123",
-        path: "123",
+    await _officer.create(
+      {
+        _id: "officer00001",
+        code: "000001",
+        position: "Admin",
+        firstName: "Hòa",
+        lastName: "Trần Văn",
+        emailAddress: "hoa@gmail.com",
+        phoneNumber: "0786882888",
+        password: [
+          { _id: "officer1pass", value: password },
+          { time: new Date("2022-09-25T12:54:45.880Z"), value: password },
+        ],
+        organ: "organ0000001",
+        file: {
+          name: "123",
+          path: "123",
+        },
+        status: "officerSta01",
+        right: "right0000000",
       },
-      status: "officerSta01",
-      right: "right0000001",
-    });
+      {
+        _id: "officer00002",
+        code: "000002",
+        position: "Admin",
+        firstName: "Hòa",
+        lastName: "Trần Văn",
+        emailAddress: "hoa2@gmail.com",
+        phoneNumber: "0786882882",
+        password: [
+          { _id: "officer3pass", value: password },
+          { time: new Date("2022-09-25T12:54:45.880Z"), value: password },
+        ],
+        organ: "organ0000001",
+        file: {
+          name: "123",
+          path: "123",
+        },
+        status: "officerSta01",
+        right: "right0000001",
+      }
+    );
   }
 
   console.log("Migrate Status");

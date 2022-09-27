@@ -5,10 +5,14 @@ import PropTypes from 'prop-types'
 import { CBadge } from '@coreui/react'
 import Constants from 'src/constants'
 import { useSelector } from 'react-redux'
+import Helpers from 'src/commons/helpers'
 
 export const AppSidebarNav = ({ items }) => {
   const location = useLocation()
   const language = useSelector((state) => state.config.language) || 'vi'
+  let user = useSelector((state) => state.user.user)
+  if (Helpers.isObjectEmpty(user))
+    user = JSON.parse(localStorage.getItem(Constants.StorageKeys.USER_INFO))
   const navLink = (name, icon, badge) => {
     return (
       <>
@@ -24,37 +28,41 @@ export const AppSidebarNav = ({ items }) => {
   }
 
   const navItem = (item, index) => {
-    const { component, name, badge, icon, ...rest } = item
-    const Component = component
-    return (
-      <Component
-        {...(rest.to &&
-          !rest.items && {
-            component: NavLink,
-          })}
-        key={index}
-        {...rest}
-      >
-        {navLink(name, icon, badge)}
-      </Component>
-    )
+    const { component, name, badge, icon, role, ...rest } = item
+    if (!role || role.includes(user.right.code)) {
+      const Component = component
+      return (
+        <Component
+          {...(rest.to &&
+            !rest.items && {
+              component: NavLink,
+            })}
+          key={index}
+          {...rest}
+        >
+          {navLink(name, icon, badge)}
+        </Component>
+      )
+    }
   }
   const navGroup = (item, index) => {
-    const { component, name, icon, to, ...rest } = item
-    const Component = component
-    return (
-      <Component
-        idx={String(index)}
-        key={index}
-        toggler={navLink(name, icon)}
-        visible={location.pathname.startsWith(to)}
-        {...rest}
-      >
-        {item.items?.map((item, index) =>
-          item.items ? navGroup(item, index) : navItem(item, index),
-        )}
-      </Component>
-    )
+    const { component, name, icon, to, role, ...rest } = item
+    if (!role || role.includes(user.right.code)) {
+      const Component = component
+      return (
+        <Component
+          idx={String(index)}
+          key={index}
+          toggler={navLink(name, icon)}
+          visible={location.pathname.startsWith(to)}
+          {...rest}
+        >
+          {item.items?.map((item, index) =>
+            item.items ? navGroup(item, index) : navItem(item, index),
+          )}
+        </Component>
+      )
+    }
   }
 
   return (

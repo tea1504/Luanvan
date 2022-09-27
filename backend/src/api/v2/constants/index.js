@@ -24,6 +24,10 @@ const Constants = {
       ROOT: "/officers",
       GET_OFFICERS: "/",
     },
+    Type: {
+      ROOT: "/types",
+      GET_TYPES: "/",
+    },
   },
 
   /**
@@ -140,6 +144,7 @@ const Constants = {
       COLOR: "màu độ mật",
     },
     Right: {
+      CODE: "mã quyền",
       NAME: "tên quyền",
       CREATE_OFFICIAL_DISPATCH: "quyền tạo mới công văn",
       UPDATE_OFFICIAL_DISPATCH: "quyền cập nhật thông tin công văn",

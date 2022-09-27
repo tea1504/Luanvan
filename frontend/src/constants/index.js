@@ -2,7 +2,7 @@ const DOMAIN = process.env.REACT_APP_BASE_URL
 
 const Constants = {
   Api: {
-    BASE_URL: `${DOMAIN}/v1/`,
+    BASE_URL: `${DOMAIN}/v2/`,
     TIMEOUT: 25 * 1000,
   },
 
@@ -33,8 +33,8 @@ const Constants = {
     DELETE_BOOK: (id) => '/books/' + id,
 
     // User
-    GET_USER: '/user',
-    LOGIN: '/user/login',
+    GET_USER: '/officer',
+    LOGIN: '/login',
   },
 
   /**

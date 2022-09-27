@@ -18,6 +18,7 @@ const AppContent = () => {
       <Suspense fallback={<CSpinner color="primary" />}>
         <Routes>
           {routes.map((route, idx) => {
+            console.log(route)
             return (
               route.element && (
                 <Route
@@ -27,7 +28,7 @@ const AppContent = () => {
                   name={route.name}
                   element={
                     localStorage.getItem(Constants.StorageKeys.ACCESS_TOKEN) !== null ? (
-                      !route.role || route.role.includes(user.userRole) ? (
+                      !route.role || route.role.includes(user.right.code) ? (
                         <route.element />
                       ) : (
                         <Navigate to="/403" />
