@@ -17,7 +17,7 @@ var authService = {
         deleted: false,
       });
 
-      if (!officer) return { code: 404, message: "không tìm thấy người dùng" };
+      if (!officer) return { status: 404, message: "không tìm thấy người dùng" };
       passwordOfficer = officer.password.sort((a, b) => {
         var d1 = new Date(a.time),
           d2 = new Date(b.time);
@@ -31,12 +31,12 @@ var authService = {
         var token = jwt.sign({ id: officer._id }, process.env.PRIVATEKEY, {
           expiresIn: "2h",
         });
-        return { code: 200, message: "đăng nhập thành công", data: { token } };
+        return { status: 200, message: "đăng nhập thành công", data: { token } };
       }
-      return { code: 403, message: "mật khẩu sai" };
+      return { status: 403, message: "mật khẩu sai" };
     } catch (error) {
       return {
-        code: 500,
+        status: 500,
         message: Constants.String.Message.ERR_500,
         data: { error: error.message },
       };
@@ -54,11 +54,11 @@ var authService = {
           "-_id -password -status -organ -deleted -createdAt -updatedAt -__v"
         )
         .populate("right", "-_id code name");
-      if (!officer) return { code: 404, message: "không tìm thấy thông tin" };
-      return { code: 200, message: "thành công", data: officer };
+      if (!officer) return { status: 404, message: "không tìm thấy thông tin" };
+      return { status: 200, message: "thành công", data: officer };
     } catch (error) {
       return {
-        code: 500,
+        status: 500,
         message: Constants.String.Message.ERR_500,
         data: { error: error.message },
       };

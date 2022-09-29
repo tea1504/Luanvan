@@ -6,7 +6,7 @@ export default {
       rangeSeparatorText: 'trong',
     },
     fixedHeader: true,
-    fixedHeaderScrollHeight: '65vh',
+    fixedHeaderScrollHeight: '60vh',
     highlightOnHover: true,
     customStyles: {
       headRow: {
@@ -46,5 +46,6 @@ export default {
     },
     paginationServer: true,
     paginationRowsPerPageOptions: [5, 10, 15, 20, 25],
+    selectableRows: true,
   },
 }

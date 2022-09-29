@@ -30,7 +30,6 @@ const AppHeader = () => {
   const handleHeaderToggle = () => {
     localStorage.setItem(Constants.StorageKeys.CONFIG_SIDEBAR_SHOW, !sidebarShow)
     dispatch(setSidebarShow(!sidebarShow))
-    console.log(!sidebarShow)
   }
 
   return (

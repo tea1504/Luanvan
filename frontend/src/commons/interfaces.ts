@@ -1,8 +1,9 @@
 export interface IResult {
   response: any;
   data: {
-    data: any,
-    response: any,
+    status: Number;
+    data?: any;
+    message: String;
   };
 }
 

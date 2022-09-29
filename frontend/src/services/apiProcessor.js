@@ -128,7 +128,6 @@ class ApiProcessor {
     else {
       delete ApiProcessor.instance.config.onDownloadProgress
     }
-    console.log(request.config);
     return new Promise((resolve, reject) => {
       request.onSuccess = (result) => {
         resolve(result)
@@ -335,10 +334,7 @@ class ApiProcessor {
           }
           if (Helpers.isFunction(request.onError)) {
             const message = response.data?.message
-            request.onError({
-              code: response.status || Constants.ApiCode.INTERNAL_SERVER,
-              message: message,
-            })
+            request.onError(response.data)
           }
           return
         }

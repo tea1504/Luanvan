@@ -9,7 +9,6 @@ const Strings = new LocalizedStrings({
 })
 
 const language = localStorage.getItem(Constants.StorageKeys.LANGUAGE)
-console.log(language)
 if (language) Strings.setLanguage(language)
 else Strings.setLanguage(Constants.DefaultLanguage)
 

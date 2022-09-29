@@ -12,24 +12,24 @@ const verifyToken = async (req, res, next) => {
   if (!token) {
     res
       .status(403)
-      .send({ code: 403, message: Constants.String.Message.ERR_403 });
+      .send({ status: 403, message: Constants.String.Message.ERR_403 });
   }
   try {
     const decoded = jwt.verify(token, process.env.PRIVATEKEY);
     req.userID = decoded.id;
   } catch (error) {
     if (error.message === "jwt expired")
-      res.status(401).send({
-        code: 401,
+      return res.status(401).send({
+        status: 401,
         message: Constants.String.Message.ERR_401,
       });
-    res.status(500).send({
-      code: 500,
+    return res.status(500).send({
+      status: 500,
       message: Constants.String.Message.ERR_500,
       data: { error: error.message },
     });
   }
-  next();
+  return next();
 };
 
 module.exports = verifyToken;

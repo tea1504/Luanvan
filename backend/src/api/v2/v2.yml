@@ -3,8 +3,8 @@ info:
   title: E-Office API's Document
   version: "1.0.0"
 servers:
+  - url: http://10.10.34.104:5000/v2
   - url: http://localhost:5000/v2
-  - url: http://192.168.228.232:5000/v2
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -622,20 +622,26 @@ paths:
       tags:
         - Type
       parameters:
-        - in: query 
+        - in: query
           name: limit
-          schema: 
+          schema:
             type: integer
             default: 2
           required: true
           description: Số lượng bản ghi
-        - in: query 
+        - in: query
           name: pageNumber
-          schema: 
+          schema:
             type: integer
             default: 1
           required: true
           description: Trang
+        - in: query
+          name: filter
+          schema:
+            type: string
+          required: false
+          description: Lọc kết quả
       responses:
         200:
           description: Truy vấn thành công
@@ -704,6 +710,22 @@ paths:
           description: Dữ liệu không được chấp nhận
         500:
           description: Lỗi hệ thống
+    delete:
+      summary: Xóa nhiều loại văn bản
+      tags:
+        - Type
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+      responses:
+        200:
+          description: ok
+
   /types/{id}:
     get:
       summary: Lấy thông tin 1 loại văn bản theo id
@@ -711,11 +733,11 @@ paths:
         - Type
       parameters:
         - in: path
-          name: id 
-          schema: 
+          name: id
+          schema:
             type: string
           required: true
-          description: id 
+          description: id
       responses:
         200:
           description: OK
@@ -733,11 +755,11 @@ paths:
         - Type
       parameters:
         - in: path
-          name: id 
-          schema: 
+          name: id
+          schema:
             type: string
           required: true
-          description: id 
+          description: id
       requestBody:
         required: true
         content:
@@ -763,11 +785,11 @@ paths:
         - Type
       parameters:
         - in: path
-          name: id 
-          schema: 
+          name: id
+          schema:
             type: string
           required: true
-          description: id 
+          description: id
       responses:
         200:
           description: OK

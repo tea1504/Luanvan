@@ -10,9 +10,9 @@ const officerController = {
     try {
       const id = req.userID;
       const result = await officerService.getOfficer(id);
-      res.status(result.code).json(result);
+      res.status(result.status).json(result);
     } catch (error) {
-      next(error);
+      return next(error);
     }
   },
 };

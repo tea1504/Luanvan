@@ -30,6 +30,7 @@ const Constants = {
       GET_TYPE: "/:id",
       PUT_TYPE: "/:id",
       DELETE_TYPE: "/:id",
+      DELETE_TYPES: "/",
     },
   },
 

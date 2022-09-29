@@ -11,25 +11,25 @@ const authController = {
     try {
       const { code, password } = req.body;
       if (!code)
-        res.status(400).json({
-          code: 400,
+        return res.status(400).json({
+          status: 400,
           message: Constants.String.Message.ERR_400(
-            Constants.String.Officer.CODE
+            Constants.String.Officer.status
           ),
         });
       if (!password)
         res
           .status(400)
           .json({
-            code: 400,
+            status: 400,
             message: Constants.String.Message.ERR_400(
               Constants.String.Officer.PASSWORD.VALUE
             ),
           });
       const result = await authService.login(code, password);
-      res.status(result.code).json(result);
+      return res.status(result.status).json(result);
     } catch (error) {
-      next(error);
+      return next(error);
     }
   },
   /**
@@ -41,9 +41,9 @@ const authController = {
     try {
       const id = req.userID;
       const result = await authService.getInfo(id);
-      res.status(result.code).json(result);
+      return res.status(result.status).json(result);
     } catch (error) {
-      next(error);
+      return next(error);
     }
   },
 };
