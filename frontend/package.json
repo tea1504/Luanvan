@@ -26,6 +26,8 @@
     "coreui_library_short_version": "4.1"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^35.1.0",
+    "@ckeditor/ckeditor5-react": "^5.0.2",
     "@coreui/chartjs": "^3.0.0",
     "@coreui/coreui": "^4.1.2",
     "@coreui/icons": "^2.1.0",
