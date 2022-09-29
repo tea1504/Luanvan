@@ -6,12 +6,13 @@ var typeService = {
   /**
    * @param {number} size
    * @param {number} page
+   * @param {string} filter
    * @returns {import("./../interfaces").ResponseResult}
    */
-  getTypes: async (limit = 10, pageNumber = 1) => {
+  getTypes: async (limit = 10, pageNumber = 1, filter = "") => {
     try {
       const result = {};
-      const totalTypes = await typeModel.countDocuments();
+      const totalTypes = await typeModel.countDocuments({ deleted: false });
       let startIndex = (pageNumber - 1) * limit;
       let endIndex = pageNumber * limit;
       result.total = totalTypes;
@@ -29,14 +30,21 @@ var typeService = {
       }
       result.rowsPerPage = limit;
       result.data = await typeModel
-        .find({ deleted: false })
+        .find({
+          deleted: false,
+          $or: [
+            { name: { $regex: filter } },
+            { notation: { $regex: filter } },
+            { description: { $regex: filter } },
+          ],
+        })
         .skip(startIndex)
         .limit(limit)
-        .sort("_id");
-      return { code: 200, message: "truy vấn thành công", data: result };
+        .sort({ createdAt: -1 });
+      return { status: 200, message: "truy vấn thành công", data: result };
     } catch (error) {
       return {
-        code: 500,
+        status: 500,
         message: Constants.String.Message.ERR_500,
         data: { error: error.message },
       };
@@ -48,9 +56,29 @@ var typeService = {
    */
   post: async (type) => {
     try {
+      const typeName = await typeModel.findOne({
+        name: type.name,
+        deleted: false,
+      });
+      if (typeName)
+        return {
+          status: 406,
+          message: Constants.String.Message.UNIQUE(Constants.String.Type.NAME),
+        };
+      const typeNotation = await typeModel.findOne({
+        notation: type.notation,
+        deleted: false,
+      });
+      if (typeNotation)
+        return {
+          status: 406,
+          message: Constants.String.Message.UNIQUE(
+            Constants.String.Type.NOTATION
+          ),
+        };
       const newType = await typeModel.create(type);
       return {
-        code: 200,
+        status: 200,
         message: "thêm mới loại văn bản thành công",
         data: newType,
       };
@@ -58,19 +86,19 @@ var typeService = {
       switch (error.name) {
         case "ValidationError":
           return {
-            code: 406,
+            status: 406,
             message: Constants.String.Message.ERR_406,
             data: { error: error.errors },
           };
         case "MongoServerError":
           return {
-            code: 406,
+            status: 406,
             message: Constants.String.Message.ERR_406,
             data: { error: error.message },
           };
         default:
           return {
-            code: 500,
+            status: 500,
             message: Constants.String.Message.ERR_500,
             data: { error: error.message },
           };
@@ -84,19 +112,23 @@ var typeService = {
   getType: async (id) => {
     try {
       const type = await typeModel.findOne({ _id: id, deleted: false });
-      if (!type) return { code: 404, message: "không tìm thấy loại văn bản" };
-      return { code: 200, message: "tìm loại văn bản thành công", data: type };
+      if (!type) return { status: 404, message: "không tìm thấy loại văn bản" };
+      return {
+        status: 200,
+        message: "tìm loại văn bản thành công",
+        data: type,
+      };
     } catch (error) {
       switch (error.name) {
         case "CastError":
           return {
-            code: 406,
+            status: 406,
             message: Constants.String.Message.ERR_406,
             data: { error: error.message },
           };
         default:
           return {
-            code: 500,
+            status: 500,
             message: Constants.String.Message.ERR_500,
             data: { error: error.message },
           };
@@ -110,15 +142,37 @@ var typeService = {
    */
   putType: async (id, type) => {
     try {
+      const typeName = await typeModel.findOne({
+        _id: { $ne: id },
+        name: type.name,
+        deleted: false,
+      });
+      if (typeName)
+        return {
+          status: 406,
+          message: Constants.String.Message.UNIQUE(Constants.String.Type.NAME),
+        };
+      const typeNotation = await typeModel.findOne({
+        _id: { $ne: id },
+        notation: type.notation,
+        deleted: false,
+      });
+      if (typeNotation)
+        return {
+          status: 406,
+          message: Constants.String.Message.UNIQUE(
+            Constants.String.Type.NOTATION
+          ),
+        };
       const updatedType = await typeModel.findOneAndUpdate(
         { _id: id, deleted: false },
         type
       );
       if (!updatedType)
-        return { code: 404, message: "không tìm thấy loại văn bản" };
+        return { status: 404, message: "không tìm thấy loại văn bản" };
       const result = await typeModel.findOne({ _id: id });
       return {
-        code: 200,
+        status: 200,
         message: "cập nhật loại văn bản thành công",
         data: result,
       };
@@ -126,20 +180,20 @@ var typeService = {
       switch (error.name) {
         case "ValidationError":
           return {
-            code: 406,
+            status: 406,
             message: Constants.String.Message.ERR_406,
             data: { error: error.errors },
           };
         case "CastError":
         case "MongoServerError":
           return {
-            code: 406,
+            status: 406,
             message: Constants.String.Message.ERR_406,
             data: { error: error.message },
           };
         default:
           return {
-            code: 500,
+            status: 500,
             message: Constants.String.Message.ERR_500,
             data: { error: error.message },
           };
@@ -157,9 +211,9 @@ var typeService = {
         { deleted: true }
       );
       if (!deletedType)
-        return { code: 404, message: "không tìm thấy loại văn bản" };
+        return { status: 404, message: "không tìm thấy loại văn bản" };
       return {
-        code: 200,
+        status: 200,
         message: "xóa loại văn bản thành công",
         data: deletedType,
       };
@@ -167,13 +221,46 @@ var typeService = {
       switch (error.name) {
         case "CastError":
           return {
-            code: 406,
+            status: 406,
             message: Constants.String.Message.ERR_406,
             data: { error: error.message },
           };
         default:
           return {
-            code: 500,
+            status: 500,
+            message: Constants.String.Message.ERR_500,
+            data: { error: error.message },
+          };
+      }
+    }
+  },
+  /**
+   * @param {object[]} types
+   * @returns {import("./../interfaces").ResponseResult}
+   */ deleteTypes: async (types) => {
+    try {
+      const deletedTypes = await typeModel.updateMany(
+        { _id: { $in: types } },
+        { deleted: true }
+      );
+      if (deletedTypes.deletedCount === 0)
+        return { status: 404, message: "không tìm thấy loại văn bản" };
+      return {
+        status: 200,
+        message: "xóa loại văn bản thành công",
+        data: deletedTypes,
+      };
+    } catch (error) {
+      switch (error.name) {
+        case "CastError":
+          return {
+            status: 406,
+            message: Constants.String.Message.ERR_406,
+            data: { error: error.message },
+          };
+        default:
+          return {
+            status: 500,
             message: Constants.String.Message.ERR_500,
             data: { error: error.message },
           };
