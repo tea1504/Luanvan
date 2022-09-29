@@ -29,13 +29,13 @@ var typeController = {
     try {
       const { name, notation, description, color } = req.body;
       if (!name)
-        return res.status(400).json({
-          status: 400,
+        return res.status(Constants.ApiCode.BAD_REQUEST).json({
+          status: Constants.ApiCode.BAD_REQUEST,
           message: Constants.String.Message.ERR_400(Constants.String.Type.NAME),
         });
       if (!notation)
-        return res.status(400).json({
-          status: 400,
+        return res.status(Constants.ApiCode.BAD_REQUEST).json({
+          status: Constants.ApiCode.BAD_REQUEST,
           message: Constants.String.Message.ERR_400(
             Constants.String.Type.NOTATION
           ),
@@ -77,13 +77,13 @@ var typeController = {
       list = id.split(".");
       const { name, notation, description, color } = req.body;
       if (!name)
-        return res.status(400).json({
-          status: 400,
+        return res.status(Constants.ApiCode.BAD_REQUEST).json({
+          status: Constants.ApiCode.BAD_REQUEST,
           message: Constants.String.Message.ERR_400(Constants.String.Type.NAME),
         });
       if (!notation)
-        return res.status(400).json({
-          status: 400,
+        return res.status(Constants.ApiCode.BAD_REQUEST).json({
+          status: Constants.ApiCode.BAD_REQUEST,
           message: Constants.String.Message.ERR_400(
             Constants.String.Type.NOTATION
           ),

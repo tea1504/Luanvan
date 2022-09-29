@@ -3,8 +3,8 @@ info:
   title: E-Office API's Document
   version: "1.0.0"
 servers:
-  - url: http://10.10.34.104:5000/v2
   - url: http://localhost:5000/v2
+  - url: http://10.10.34.104:5000/v2
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -568,12 +568,12 @@ paths:
           description: Lỗi hệ thống
   /officer:
     get:
-      summary: Lấy thông tin cán bộ đang đăng nhập
+      summary: Lấy bản ghi cán bộ đang đăng nhập
       tags:
         - Authentication
       responses:
         200:
-          description: Lấy thông tin thành công
+          description: Lấy bản ghi thành công
           content:
             application/json:
               schema:
@@ -612,6 +612,8 @@ paths:
                         $ref: "#/components/schemas/File"
         401:
           description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
         404:
           description: Không tìm thấy người dùng hoặc liên kết
         500:
@@ -626,7 +628,7 @@ paths:
           name: limit
           schema:
             type: integer
-            default: 2
+            default: 10
           required: true
           description: Số lượng bản ghi
         - in: query
@@ -645,44 +647,10 @@ paths:
       responses:
         200:
           description: Truy vấn thành công
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: number
-                    default: 200
-                  message:
-                    type: string
-                    default: truy vấn thành công
-                  data:
-                    type: object
-                    properties:
-                      total:
-                        type: number
-                      previous:
-                        type: object
-                        properties:
-                          pageNumber:
-                            type: number
-                          limit:
-                            type: number
-                      next:
-                        type: object
-                        properties:
-                          pageNumber:
-                            type: number
-                          limit:
-                            type: number
-                      rowsPerPage:
-                        type: number
-                      data:
-                        type: array
-                        items:
-                          $ref: "#/components/schemas/Type"
         401:
           description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
         404:
           description: Không tìm thấy liên kết
         500:
@@ -704,6 +672,8 @@ paths:
           description: Cú pháp không hợp lệ
         401:
           description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
         404:
           description: Không tìm thấy liên kết
         406:
@@ -719,16 +689,28 @@ paths:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                type: string
+              type: object
+              properties:
+                ids:
+                  type: array
+                  items:
+                    type: string
       responses:
         200:
-          description: ok
-
+          description: Xóa thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
   /types/{id}:
     get:
-      summary: Lấy thông tin 1 loại văn bản theo id
+      summary: Lấy bản ghi 1 loại văn bản theo id
       tags:
         - Type
       parameters:
@@ -743,6 +725,8 @@ paths:
           description: OK
         401:
           description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
         404:
           description: Không tìm thấy loại văn bản hoặc liên kết
         406:
@@ -750,7 +734,7 @@ paths:
         500:
           description: Lỗi hệ thống
     put:
-      summary: Cập nhật thông tin 1 loại văn bản theo id
+      summary: Cập nhật bản ghi 1 loại văn bản theo id
       tags:
         - Type
       parameters:
@@ -773,6 +757,8 @@ paths:
           description: Cú pháp không hợp lệ
         401:
           description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
         404:
           description: Không tìm thấy loại văn bản hoặc liên kết
         406:
@@ -780,7 +766,7 @@ paths:
         500:
           description: Lỗi hệ thống
     delete:
-      summary: Xóa thông tin 1 loại văn bản theo id
+      summary: Xóa bản ghi 1 loại văn bản theo id
       tags:
         - Type
       parameters:
@@ -792,9 +778,860 @@ paths:
           description: id
       responses:
         200:
-          description: OK
+          description: Xóa thành công
         401:
           description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+  /statuses:
+    get:
+      summary: Lấy danh sách trạng thái văn bản
+      tags:
+        - Status
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          required: true
+          description: Số lượng bản ghi
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+            default: 1
+          required: true
+          description: Trang
+        - in: query
+          name: filter
+          schema:
+            type: string
+          required: false
+          description: Lọc kết quả
+      responses:
+        200:
+          description: Truy vấn thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        500:
+          description: Lỗi hệ thống
+    post:
+      summary: Thêm mới trạng thái văn bản
+      tags:
+        - Status
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Status"
+      responses:
+        200:
+          description: Thêm mới trạng thái văn bản thành công
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+    delete:
+      summary: Xóa nhiều trạng thái văn bản
+      tags:
+        - Status
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        200:
+          description: Xóa thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+  /statuses/{id}:
+    get:
+      summary: Lấy bản ghi 1 loại trạng thái theo id
+      tags:
+        - Status
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      responses:
+        200:
+          description: Truy vấn thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        500:
+          description: Lỗi hệ thống
+    put:
+      summary: Cập nhật bản ghi theo id
+      tags:
+        - Status
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Status"
+      responses:
+        200:
+          description: Cập nhật thành công
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+    delete:
+      summary: Xóa bản ghi theo id
+      tags:
+        - Status
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      responses:
+        200:
+          description: Xóa thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+  /securities:
+    get:
+      summary: Lấy danh sách bản ghi
+      tags:
+        - Security
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          required: true
+          description: Số lượng bản ghi
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+            default: 1
+          required: true
+          description: Trang
+        - in: query
+          name: filter
+          schema:
+            type: string
+          required: false
+          description: Lọc kết quả
+      responses:
+        200:
+          description: Truy vấn thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        500:
+          description: Lỗi hệ thống
+    post:
+      summary: Thêm mới bản ghi
+      tags:
+        - Security
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Security"
+      responses:
+        200:
+          description: Thêm mới thành công
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+    delete:
+      summary: Xóa nhiều bản ghi
+      tags:
+        - Security
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        200:
+          description: Xóa thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+  /securities/{id}:
+    get:
+      summary: Lấy bản ghi theo id
+      tags:
+        - Security
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      responses:
+        200:
+          description: Truy vấn thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        500:
+          description: Lỗi hệ thống
+    put:
+      summary: Cập nhật bản ghi theo id
+      tags:
+        - Security
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Security"
+      responses:
+        200:
+          description: Cập nhật thành công
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+    delete:
+      summary: Xóa bản ghi theo id
+      tags:
+        - Security
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      responses:
+        200:
+          description: Xóa thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+  /priorities:
+    get:
+      summary: Lấy danh sách bản ghi
+      tags:
+        - Priority
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          required: true
+          description: Số lượng bản ghi
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+            default: 1
+          required: true
+          description: Trang
+        - in: query
+          name: filter
+          schema:
+            type: string
+          required: false
+          description: Lọc kết quả
+      responses:
+        200:
+          description: Truy vấn thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        500:
+          description: Lỗi hệ thống
+    post:
+      summary: Thêm mới bản ghi
+      tags:
+        - Priority
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Priority"
+      responses:
+        200:
+          description: Thêm mới thành công
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+    delete:
+      summary: Xóa nhiều bản ghi
+      tags:
+        - Priority
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        200:
+          description: Xóa thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+  /priorities/{id}:
+    get:
+      summary: Lấy bản ghi theo id
+      tags:
+        - Priority
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      responses:
+        200:
+          description: Truy vấn thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        500:
+          description: Lỗi hệ thống
+    put:
+      summary: Cập nhật bản ghi theo id
+      tags:
+        - Priority
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Priority"
+      responses:
+        200:
+          description: Cập nhật thành công
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+    delete:
+      summary: Xóa bản ghi theo id
+      tags:
+        - Priority
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      responses:
+        200:
+          description: Xóa thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+  /languages:
+    get:
+      summary: Lấy danh sách bản ghi
+      tags:
+        - Language
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          required: true
+          description: Số lượng bản ghi
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+            default: 1
+          required: true
+          description: Trang
+        - in: query
+          name: filter
+          schema:
+            type: string
+          required: false
+          description: Lọc kết quả
+      responses:
+        200:
+          description: Truy vấn thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        500:
+          description: Lỗi hệ thống
+    post:
+      summary: Thêm mới bản ghi
+      tags:
+        - Language
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Language"
+      responses:
+        200:
+          description: Thêm mới thành công
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+    delete:
+      summary: Xóa nhiều bản ghi
+      tags:
+        - Language
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        200:
+          description: Xóa thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+  /languages/{id}:
+    get:
+      summary: Lấy bản ghi theo id
+      tags:
+        - Language
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      responses:
+        200:
+          description: Lấy bản ghi thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+    put:
+      summary: Cập nhật bản ghi theo id
+      tags:
+        - Language
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OfficerStatus"
+      responses:
+        200:
+          description: Thành công
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+    delete:
+      summary: Xóa bản ghi theo id
+      tags:
+        - Language
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      responses:
+        200:
+          description: Thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+  /officerStatuses:
+    get:
+      summary: Lấy danh sách bản ghi
+      tags:
+        - Officer Status
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          required: true
+          description: Số lượng bản ghi
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+            default: 1
+          required: true
+          description: Trang
+        - in: query
+          name: filter
+          schema:
+            type: string
+          required: false
+          description: Lọc kết quả
+      responses:
+        200:
+          description: Truy vấn thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        500:
+          description: Lỗi hệ thống
+    post:
+      summary: Thêm mới bản ghi
+      tags:
+        - Officer Status
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OfficerStatus"
+      responses:
+        200:
+          description: Thêm mới thành công
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+    delete:
+      summary: Xóa nhiều bản ghi
+      tags:
+        - Officer Status
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        200:
+          description: Xóa thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+  /officerStatuses/{id}:
+    get:
+      summary: Lấy bản ghi theo id
+      tags:
+        - Officer Status
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      responses:
+        200:
+          description: Lấy bản ghi thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+    put:
+      summary: Cập nhật bản ghi theo id
+      tags:
+        - Officer Status
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OfficerStatus"
+      responses:
+        200:
+          description: Thành công
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+    delete:
+      summary: Xóa bản ghi theo id
+      tags:
+        - Officer Status
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      responses:
+        200:
+          description: Thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
         404:
           description: Không tìm thấy loại văn bản hoặc liên kết
         406:

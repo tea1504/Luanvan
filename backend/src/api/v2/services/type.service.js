@@ -41,10 +41,14 @@ var typeService = {
         .skip(startIndex)
         .limit(limit)
         .sort({ createdAt: -1 });
-      return { status: 200, message: "truy vấn thành công", data: result };
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.GET_200(Constants.String.Type._),
+        data: result,
+      };
     } catch (error) {
       return {
-        status: 500,
+        status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
         message: Constants.String.Message.ERR_500,
         data: { error: error.message },
       };
@@ -62,7 +66,7 @@ var typeService = {
       });
       if (typeName)
         return {
-          status: 406,
+          status: Constants.ApiCode.NOT_ACCEPTABLE,
           message: Constants.String.Message.UNIQUE(Constants.String.Type.NAME),
         };
       const typeNotation = await typeModel.findOne({
@@ -71,34 +75,34 @@ var typeService = {
       });
       if (typeNotation)
         return {
-          status: 406,
+          status: Constants.ApiCode.NOT_ACCEPTABLE,
           message: Constants.String.Message.UNIQUE(
             Constants.String.Type.NOTATION
           ),
         };
       const newType = await typeModel.create(type);
       return {
-        status: 200,
-        message: "thêm mới loại văn bản thành công",
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.POST_200(Constants.String.Type._),
         data: newType,
       };
     } catch (error) {
       switch (error.name) {
         case "ValidationError":
           return {
-            status: 406,
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
             message: Constants.String.Message.ERR_406,
             data: { error: error.errors },
           };
         case "MongoServerError":
           return {
-            status: 406,
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
             message: Constants.String.Message.ERR_406,
             data: { error: error.message },
           };
         default:
           return {
-            status: 500,
+            status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
             message: Constants.String.Message.ERR_500,
             data: { error: error.message },
           };
@@ -112,23 +116,27 @@ var typeService = {
   getType: async (id) => {
     try {
       const type = await typeModel.findOne({ _id: id, deleted: false });
-      if (!type) return { status: 404, message: "không tìm thấy loại văn bản" };
+      if (!type)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Type._),
+        };
       return {
-        status: 200,
-        message: "tìm loại văn bản thành công",
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.GET_200(Constants.String.Type._),
         data: type,
       };
     } catch (error) {
       switch (error.name) {
         case "CastError":
           return {
-            status: 406,
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
             message: Constants.String.Message.ERR_406,
             data: { error: error.message },
           };
         default:
           return {
-            status: 500,
+            status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
             message: Constants.String.Message.ERR_500,
             data: { error: error.message },
           };
@@ -142,6 +150,12 @@ var typeService = {
    */
   putType: async (id, type) => {
     try {
+      const findType = await typeModel.findOne({ _id: id, deleted: false });
+      if (!findType)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: "không tìm thấy loại văn bản",
+        };
       const typeName = await typeModel.findOne({
         _id: { $ne: id },
         name: type.name,
@@ -149,7 +163,7 @@ var typeService = {
       });
       if (typeName)
         return {
-          status: 406,
+          status: Constants.ApiCode.NOT_ACCEPTABLE,
           message: Constants.String.Message.UNIQUE(Constants.String.Type.NAME),
         };
       const typeNotation = await typeModel.findOne({
@@ -159,7 +173,7 @@ var typeService = {
       });
       if (typeNotation)
         return {
-          status: 406,
+          status: Constants.ApiCode.NOT_ACCEPTABLE,
           message: Constants.String.Message.UNIQUE(
             Constants.String.Type.NOTATION
           ),
@@ -168,32 +182,30 @@ var typeService = {
         { _id: id, deleted: false },
         type
       );
-      if (!updatedType)
-        return { status: 404, message: "không tìm thấy loại văn bản" };
       const result = await typeModel.findOne({ _id: id });
       return {
-        status: 200,
-        message: "cập nhật loại văn bản thành công",
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.PUT_200(Constants.String.Type._),
         data: result,
       };
     } catch (error) {
       switch (error.name) {
         case "ValidationError":
           return {
-            status: 406,
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
             message: Constants.String.Message.ERR_406,
             data: { error: error.errors },
           };
         case "CastError":
         case "MongoServerError":
           return {
-            status: 406,
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
             message: Constants.String.Message.ERR_406,
             data: { error: error.message },
           };
         default:
           return {
-            status: 500,
+            status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
             message: Constants.String.Message.ERR_500,
             data: { error: error.message },
           };
@@ -211,23 +223,26 @@ var typeService = {
         { deleted: true }
       );
       if (!deletedType)
-        return { status: 404, message: "không tìm thấy loại văn bản" };
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Type._),
+        };
       return {
-        status: 200,
-        message: "xóa loại văn bản thành công",
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.DELETE_200(Constants.String.Type._),
         data: deletedType,
       };
     } catch (error) {
       switch (error.name) {
         case "CastError":
           return {
-            status: 406,
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
             message: Constants.String.Message.ERR_406,
             data: { error: error.message },
           };
         default:
           return {
-            status: 500,
+            status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
             message: Constants.String.Message.ERR_500,
             data: { error: error.message },
           };
@@ -235,32 +250,36 @@ var typeService = {
     }
   },
   /**
-   * @param {object[]} types
+   * @param {string[]} ids
    * @returns {import("./../interfaces").ResponseResult}
-   */ deleteTypes: async (types) => {
+   */
+  deleteTypes: async (ids) => {
     try {
       const deletedTypes = await typeModel.updateMany(
-        { _id: { $in: types } },
+        { _id: { $in: ids }, deleted: false },
         { deleted: true }
       );
-      if (deletedTypes.deletedCount === 0)
-        return { status: 404, message: "không tìm thấy loại văn bản" };
+      if (deletedTypes.modifiedCount === 0)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Type._),
+        };
       return {
-        status: 200,
-        message: "xóa loại văn bản thành công",
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.DELETE_200(Constants.String.Type._),
         data: deletedTypes,
       };
     } catch (error) {
       switch (error.name) {
         case "CastError":
           return {
-            status: 406,
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
             message: Constants.String.Message.ERR_406,
             data: { error: error.message },
           };
         default:
           return {
-            status: 500,
+            status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
             message: Constants.String.Message.ERR_500,
             data: { error: error.message },
           };
