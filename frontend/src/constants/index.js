@@ -35,6 +35,15 @@ const Constants = {
     // User
     GET_USER: '/officer',
     LOGIN: '/login',
+
+    // Type
+    GET_TYPES: (limit = 10, pageNumber = 1, filter = '') =>
+      `/types?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+    GET_TYPE: (id) => `/types/` + id,
+    CREATE_TYPE: '/types',
+    UPDATE_TYPE: (id) => '/types/' + id,
+    DELETE_TYPE: (id) => '/types/' + id,
+    DELETE_TYPES: '/types',
   },
 
   /**
