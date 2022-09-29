@@ -9,12 +9,15 @@ var typeController = {
    */
   getTypes: async (req, res, next) => {
     try {
-      const pageNumber = parseInt(req.query.pageNumber) || 1;
-      const limit = parseInt(req.query.limit) || 2;
-      const result = await typeService.getTypes(limit, pageNumber);
-      res.status(result.code).json(result);
+      const { pageNumber, limit, filter } = req.query;
+      const result = await typeService.getTypes(
+        parseInt(limit),
+        parseInt(pageNumber),
+        filter
+      );
+      return res.status(result.status).json(result);
     } catch (error) {
-      next(error);
+      return next(error);
     }
   },
   /**
@@ -26,13 +29,13 @@ var typeController = {
     try {
       const { name, notation, description, color } = req.body;
       if (!name)
-        res.status(400).json({
-          code: 400,
+        return res.status(400).json({
+          status: 400,
           message: Constants.String.Message.ERR_400(Constants.String.Type.NAME),
         });
       if (!notation)
-        res.status(400).json({
-          code: 400,
+        return res.status(400).json({
+          status: 400,
           message: Constants.String.Message.ERR_400(
             Constants.String.Type.NOTATION
           ),
@@ -43,9 +46,9 @@ var typeController = {
         description,
         color,
       });
-      res.status(result.code).json(result);
+      return res.status(result.status).json(result);
     } catch (error) {
-      next(error);
+      return next(error);
     }
   },
   /**
@@ -58,9 +61,9 @@ var typeController = {
       const { id } = req.params;
       list = id.split(".");
       const result = await typeService.getType(list[list.length - 1]);
-      res.status(result.code).json(result);
+      return res.status(result.status).json(result);
     } catch (error) {
-      next(error);
+      return next(error);
     }
   },
   /**
@@ -74,13 +77,13 @@ var typeController = {
       list = id.split(".");
       const { name, notation, description, color } = req.body;
       if (!name)
-        res.status(400).json({
-          code: 400,
+        return res.status(400).json({
+          status: 400,
           message: Constants.String.Message.ERR_400(Constants.String.Type.NAME),
         });
       if (!notation)
-        res.status(400).json({
-          code: 400,
+        return res.status(400).json({
+          status: 400,
           message: Constants.String.Message.ERR_400(
             Constants.String.Type.NOTATION
           ),
@@ -91,9 +94,9 @@ var typeController = {
         description,
         color,
       });
-      res.status(result.code).json(result);
+      return res.status(result.status).json(result);
     } catch (error) {
-      next(error);
+      return next(error);
     }
   },
   /**
@@ -106,9 +109,23 @@ var typeController = {
       const { id } = req.params;
       list = id.split(".");
       const result = await typeService.deleteType(list[list.length - 1]);
-      res.status(result.code).json(result);
+      return res.status(result.status).json(result);
     } catch (error) {
-      next(error);
+      return next(error);
+    }
+  },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
+  deleteTypes: async (req, res, next) => {
+    try {
+      const { ids } = req.body;
+      const result = await typeService.deleteTypes(ids);
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
     }
   },
 };
