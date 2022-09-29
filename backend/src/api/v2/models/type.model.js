@@ -17,10 +17,6 @@ const typeSchema = new mongoose.Schema(
         100,
         Constants.String.Message.MAX_LENGTH(Constants.String.Type.NAME),
       ],
-      unique: [
-        true,
-        Constants.String.Message.UNIQUE(Constants.String.Type.NAME),
-      ],
     },
     notation: {
       type: String,
@@ -31,10 +27,6 @@ const typeSchema = new mongoose.Schema(
       maxLength: [
         10,
         Constants.String.Message.MAX_LENGTH(Constants.String.Type.NOTATION),
-      ],
-      unique: [
-        true,
-        Constants.String.Message.UNIQUE(Constants.String.Type.NOTATION),
       ],
     },
     description: {
