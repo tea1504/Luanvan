@@ -424,6 +424,97 @@ const Helpers = {
   // stringToHTML: (text) => {
   //   return parse(text);
   // },
+
+  formatDateFromString: (dateString = '') => {
+    var date = new Date(dateString)
+    var options = {
+      weekday: 'long',
+      year: 'numeric',
+      month: '2-digit',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    }
+    const language = localStorage.getItem(Constants.StorageKeys.LANGUAGE)
+    if (language) return date.toLocaleDateString(language, options)
+    return date.toLocaleDateString(Constants.DefaultLanguage, options)
+  },
+  /**
+   * @param {string} str
+   * @returns {string}
+   */
+  toSlug: (str) => {
+    // Chuyển hết sang chữ thường
+    str = str.toLowerCase()
+
+    // xóa dấu
+    str = str.replace(/(à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ)/g, 'a')
+    str = str.replace(/(è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ)/g, 'e')
+    str = str.replace(/(ì|í|ị|ỉ|ĩ)/g, 'i')
+    str = str.replace(/(ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ)/g, 'o')
+    str = str.replace(/(ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ)/g, 'u')
+    str = str.replace(/(ỳ|ý|ỵ|ỷ|ỹ)/g, 'y')
+    str = str.replace(/(đ)/g, 'd')
+
+    // Xóa ký tự đặc biệt
+    str = str.replace(/([^0-9a-z-\s])/g, '')
+
+    // Xóa khoảng trắng thay bằng ký tự -
+    str = str.replace(/(\s+)/g, '-')
+
+    // Xóa ký tự - liên tiếp
+    str = str.replace(/-+/g, '-')
+
+    // xóa phần dự - ở đầu
+    str = str.replace(/^-+/g, '')
+
+    // xóa phần dư - ở cuối
+    str = str.replace(/-+$/g, '')
+
+    // return
+    return str
+  },
+  /**
+   * @param {object} prop
+   * @param {keyof object} value
+   * @returns {string}
+   */
+  propName: function propName(prop, value) {
+    for (var i in prop) {
+      if (typeof prop[i] == 'object') {
+        if (propName(prop[i], value)) {
+          return propName(prop[i], value)
+        }
+      } else {
+        if (prop[i] == value) {
+          return i
+        }
+      }
+    }
+    return undefined
+  },
+  /**
+   *
+   * @param {string} input
+   * @returns {string}
+   */
+  htmlDecode: (input) => {
+    if (!input) return
+    var doc = new DOMParser().parseFromString(input, 'text/html')
+    return doc.documentElement.textContent
+  },
+  /**
+   *
+   * @param {string} str
+   * @param {number} len
+   * @returns {string}
+   */
+  trimString: (str, len) => {
+    if (!str || len < 5) return
+    if (str.length <= len) return str
+    return str.slice(0, (len - 3) / 2) + '...' + str.slice(str.length - len + (len - 3) / 2)
+  },
 }
 
 export default Helpers
