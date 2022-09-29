@@ -8,5 +8,6 @@ route.post(Constants.ApiPath.Type.GET_TYPES, typeController.post);
 route.get(Constants.ApiPath.Type.GET_TYPE, typeController.getType);
 route.put(Constants.ApiPath.Type.PUT_TYPE, typeController.putType);
 route.delete(Constants.ApiPath.Type.DELETE_TYPE, typeController.deleteType);
+route.delete(Constants.ApiPath.Type.DELETE_TYPES, typeController.deleteTypes);
 
 module.exports = route;
