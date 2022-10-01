@@ -4,7 +4,7 @@ info:
   version: "1.0.0"
 servers:
   - url: http://localhost:5000/v2
-  - url: http://10.10.34.104:5000/v2
+  - url: http://10.10.34.217:5000/v2
 components:
   securitySchemes:
     ApiKeyAuth:

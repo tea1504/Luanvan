@@ -6,12 +6,14 @@ import userSlice from './slice/user.slice'
 import configSlice from './slice/config.slice'
 import bookSlide from './slice/book.slide'
 import typeSlide from './slice/type.slide'
+import languageSlide from './slice/language.slide'
 
 const reducers = combineReducers({
   user: userSlice,
   config: configSlice,
   book: bookSlide,
   type: typeSlide,
+  language: languageSlide,
 })
 
 const persistConfig = {

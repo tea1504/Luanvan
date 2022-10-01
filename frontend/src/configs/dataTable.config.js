@@ -4,6 +4,8 @@ export default {
     paginationComponentOptions: {
       rowsPerPageText: 'Số dòng mỗi trang:',
       rangeSeparatorText: 'trong',
+      selectAllRowsItem: true,
+      selectAllRowsItemText: 'Tất cả',
     },
     fixedHeader: true,
     fixedHeaderScrollHeight: '60vh',

@@ -1,6 +1,8 @@
 require("dotenv").config();
 const Constants = require("../constants");
 const typeModel = require("./../models/type.model");
+const { parse } = require("csv-parse/sync");
+const assert = require("assert");
 
 var typeService = {
   /**
@@ -12,7 +14,14 @@ var typeService = {
   getTypes: async (limit = 10, pageNumber = 1, filter = "") => {
     try {
       const result = {};
-      const totalTypes = await typeModel.countDocuments({ deleted: false });
+      const totalTypes = await typeModel.countDocuments({
+        deleted: false,
+        $or: [
+          { name: { $regex: filter } },
+          { notation: { $regex: filter } },
+          { description: { $regex: filter } },
+        ],
+      });
       let startIndex = (pageNumber - 1) * limit;
       let endIndex = pageNumber * limit;
       result.total = totalTypes;
@@ -99,6 +108,75 @@ var typeService = {
             status: Constants.ApiCode.NOT_ACCEPTABLE,
             message: Constants.String.Message.ERR_406,
             data: { error: error.message },
+          };
+        default:
+          return {
+            status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
+            message: Constants.String.Message.ERR_500,
+            data: { error: error.message },
+          };
+      }
+    }
+  },
+  postTypes: async (str) => {
+    const list = [];
+    try {
+      const records = parse(str, { delimiter: "," });
+      for (var i = records.length - 1; i >= 0; i--) {
+        if (records[i][0] === "" || records[i][1] === "")
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.ERR_406,
+            data: list,
+          };
+        var type = { name: records[i][0], notation: records[i][1] };
+        if (records[i][2] !== "") type.description = records[i][2];
+        if (records[i][3] !== "") type.color = records[i][3];
+        const typeName = await typeModel.findOne({
+          name: type.name,
+          deleted: false,
+        });
+        if (typeName)
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.UNIQUE(
+              Constants.String.Type.NAME
+            ),
+            data: list,
+          };
+        const typeNotation = await typeModel.findOne({
+          notation: type.notation,
+          deleted: false,
+        });
+        if (typeNotation)
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.UNIQUE(
+              Constants.String.Type.NOTATION
+            ),
+            data: list,
+          };
+        const newType = await typeModel.create(type);
+        list.push(newType);
+      }
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.POST_200(Constants.String.Type._),
+        data: list,
+      };
+    } catch (error) {
+      switch (error.name) {
+        case "ValidationError":
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.ERR_406,
+            data: { list, error: error.errors },
+          };
+        case "MongoServerError":
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.ERR_406,
+            data: { list, error: error.message },
           };
         default:
           return {

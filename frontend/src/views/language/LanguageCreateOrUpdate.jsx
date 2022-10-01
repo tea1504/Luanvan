@@ -1,3 +1,5 @@
+import { CKEditor } from '@ckeditor/ckeditor5-react'
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
 import {
   CButton,
   CCard,
@@ -12,68 +14,70 @@ import {
   CFormLabel,
   CRow,
 } from '@coreui/react'
-import React from 'react'
-import { useEffect } from 'react'
-import { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import Helpers from 'src/commons/helpers'
+import ckEditorConfig from 'src/configs/ckEditor.config'
 import Constants from 'src/constants'
 import Screens from 'src/constants/screens'
 import Strings from 'src/constants/strings'
-import TypeService from 'src/services/type.service'
+import LanguageService from 'src/services/language.service'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
-import { CKEditor } from '@ckeditor/ckeditor5-react'
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
-import ckEditorConfig from 'src/configs/ckEditor.config'
 
-const typeService = new TypeService()
+const languageService = new LanguageService()
 const MySwal = withReactContent(Swal)
 
-export default function TypeCreateOrUpdate() {
+export default function LanguageCreateOrUpdate() {
   const { id } = useParams()
   const navigate = useNavigate()
   const language = useSelector((state) => state.config.language)
   Strings.setLanguage(language)
 
-  const types = useSelector((state) => state.type.data)
+  const languages = useSelector((state) => state.language.data)
 
-  const [type, setType] = useState({ name: '', notation: '', description: '', color: '#12B7BC' })
-  const updateType = (newState) => {
-    setType((prevState) => ({
+  const [lang, setLang] = useState({
+    name: '',
+    notation: '',
+    description: '',
+    color: '#12B7BC',
+  })
+  const updateLanguage = (newState) => {
+    setLang((prevState) => ({
       ...prevState,
       ...newState,
     }))
   }
-  const [typeError, setTypeError] = useState({
+
+  const [langError, setLangError] = useState({
     name: null,
     notation: null,
     description: null,
     color: null,
   })
-  const updateTypeError = (newState) => {
-    setTypeError((prevState) => ({
+  const updateLangError = (newState) => {
+    setLangError((prevState) => ({
       ...prevState,
       ...newState,
     }))
   }
 
-  const getType = async (id = '') => {
-    if (types.length > 0) {
-      const type = types.find((el) => el._id === id)
-      if (!type) {
-        await getTypeFromServer(id)
-      } else updateType(type)
+  const getLanguage = async (id = '') => {
+    if (languages.length > 0) {
+      const l = languages.find((el) => el._id === id)
+      if (!l) {
+        await getLanguageFromServer(id)
+      } else updateLanguage(l)
     } else {
-      await getTypeFromServer(id)
+      await getLanguageFromServer(id)
     }
   }
 
-  const getTypeFromServer = async (id = '') => {
+  const getLanguageFromServer = async (id = '') => {
     try {
-      const result = await typeService.getType(id)
-      updateType(result.data.data)
+      const result = await languageService.getLanguage(id)
+      updateLanguage(result.data.data)
     } catch (error) {
       switch (error.status) {
         case 401:
@@ -87,36 +91,34 @@ export default function TypeCreateOrUpdate() {
             navigate(Screens.LOGIN)
           })
           break
-
         default:
-          console.log(error)
+          MySwal.fire({
+            title: Strings.Message.COMMON_ERROR,
+            icon: 'error',
+            text: error.message,
+          })
           break
       }
     }
   }
 
-  useEffect(() => {
-    if (id) {
-      const list = id.split('.')
-      getType(list[list.length - 1])
-    }
-  }, [])
-
   const validate = () => {
     var flag = true
-    if (Helpers.isNullOrEmpty(type.name)) {
-      updateTypeError({ name: Helpers.propName(Strings, Strings.Type.form.NAME_REQUIRED) })
+    if (Helpers.isNullOrEmpty(lang.name)) {
+      updateLangError({ name: Helpers.propName(Strings, Strings.Language.form.NAME_REQUIRED) })
       flag = false
-    } else if (type.name.length > 100) {
-      updateTypeError({ name: Helpers.propName(Strings, Strings.Type.form.NAME_MAX_LENGTH) })
+    } else if (lang.name.length > 100) {
+      updateLangError({ name: Helpers.propName(Strings, Strings.Language.form.NAME_MAX_LENGTH) })
       flag = false
     }
-    if (Helpers.isNullOrEmpty(type.notation)) {
-      updateTypeError({ notation: Helpers.propName(Strings, Strings.Type.form.NOTATION_REQUIRED) })
+    if (Helpers.isNullOrEmpty(lang.notation)) {
+      updateLangError({
+        notation: Helpers.propName(Strings, Strings.Language.form.NOTATION_REQUIRED),
+      })
       flag = false
-    } else if (type.notation.length > 10) {
-      updateTypeError({
-        notation: Helpers.propName(Strings, Strings.Type.form.NOTATION_MAX_LENGTH),
+    } else if (lang.notation.length > 10) {
+      updateLangError({
+        notation: Helpers.propName(Strings, Strings.Language.form.NOTATION_MAX_LENGTH),
       })
       flag = false
     }
@@ -125,7 +127,7 @@ export default function TypeCreateOrUpdate() {
 
   const handleSubmitForm = async (e) => {
     e.preventDefault()
-    updateTypeError({
+    updateLangError({
       name: null,
       notation: null,
       description: null,
@@ -134,15 +136,15 @@ export default function TypeCreateOrUpdate() {
     if (validate()) {
       try {
         if (!id) {
-          const result = await typeService.createType(type)
+          const result = await languageService.createLanguage(lang)
           MySwal.fire({
             title: Strings.Common.SUCCESS,
             icon: 'success',
             text: Strings.Message.Create.SUCCESS,
           })
-          updateType({ name: '', notation: '', description: '', color: '#12B7BC' })
+          updateLanguage({ name: '', notation: '', description: '', color: '#12B7BC' })
         } else {
-          const result = await typeService.updateType(id, type)
+          const result = await languageService.updateLanguage(id, lang)
           MySwal.fire({
             title: Strings.Common.SUCCESS,
             icon: 'success',
@@ -174,6 +176,13 @@ export default function TypeCreateOrUpdate() {
     }
   }
 
+  useEffect(() => {
+    if (id) {
+      const list = id.split('.')
+      getLanguage(list[list.length - 1])
+    }
+  }, [])
+
   return (
     <CContainer>
       <CRow>
@@ -185,61 +194,65 @@ export default function TypeCreateOrUpdate() {
             <CCardBody>
               <CForm noValidate className="row g-3">
                 <CCol xs={12}>
-                  <CFormLabel htmlFor={Strings.Type.Id.NAME}>
+                  <CFormLabel htmlFor={Strings.Language.Id.NAME}>
                     {Strings.Type.table.NAME} <strong className="text-danger">*</strong>
                   </CFormLabel>
                   <CFormInput
-                    invalid={!Helpers.isNullOrEmpty(typeError.name)}
+                    invalid={!Helpers.isNullOrEmpty(langError.name)}
                     type="text"
-                    id={Strings.Type.Id.NAME}
-                    placeholder={Strings.Type.table.NAME}
-                    value={type.name}
-                    onChange={(e) => updateType({ name: e.target.value })}
+                    id={Strings.Language.Id.NAME}
+                    placeholder={Strings.Language.table.NAME}
+                    value={lang.name}
+                    onChange={(e) => updateLanguage({ name: e.target.value })}
                   />
-                  <CFormFeedback invalid>{Strings.Type.form[typeError.name]}</CFormFeedback>
+                  <CFormFeedback invalid>{Strings.Language.form[langError.name]}</CFormFeedback>
                 </CCol>
                 <CCol xs={12} md={6}>
-                  <CFormLabel htmlFor={Strings.Type.Id.NOTATION}>
-                    {Strings.Type.table.NOTATION} <strong className="text-danger">*</strong>
+                  <CFormLabel htmlFor={Strings.Language.Id.NOTATION}>
+                    {Strings.Language.table.NOTATION} <strong className="text-danger">*</strong>
                   </CFormLabel>
                   <CFormInput
-                    invalid={!Helpers.isNullOrEmpty(typeError.notation)}
+                    invalid={!Helpers.isNullOrEmpty(langError.notation)}
                     type="text"
-                    id={Strings.Type.Id.NOTATION}
-                    placeholder={Strings.Type.table.NOTATION}
-                    value={type.notation}
-                    onChange={(e) => updateType({ notation: e.target.value })}
+                    id={Strings.Language.Id.NOTATION}
+                    placeholder={Strings.Language.table.NOTATION}
+                    value={lang.notation}
+                    onChange={(e) => updateLanguage({ notation: e.target.value })}
                   />
-                  <CFormFeedback invalid>{Strings.Type.form[typeError.notation]}</CFormFeedback>
+                  <CFormFeedback invalid>{Strings.Language.form[langError.notation]}</CFormFeedback>
                 </CCol>
                 <CCol xs={12} md={6}>
-                  <CFormLabel htmlFor={Strings.Type.Id.COLOR}>{Strings.Type.table.COLOR}</CFormLabel>
+                  <CFormLabel htmlFor={Strings.Language.Id.COLOR}>
+                    {Strings.Language.table.COLOR}
+                  </CFormLabel>
                   <CFormInput
-                    invalid={!Helpers.isNullOrEmpty(typeError.color)}
+                    invalid={!Helpers.isNullOrEmpty(langError.color)}
                     type="color"
                     className="w-100"
-                    id={Strings.Type.Id.COLOR}
-                    placeholder={Strings.Type.table.COLOR}
-                    value={type.color}
-                    onChange={(e) => updateType({ color: e.target.value })}
+                    id={Strings.Language.Id.COLOR}
+                    placeholder={Strings.Language.table.COLOR}
+                    value={lang.color}
+                    onChange={(e) => updateLanguage({ color: e.target.value })}
                   />
-                  <CFormFeedback invalid>{Strings.Type.form[typeError.color]}</CFormFeedback>
+                  <CFormFeedback invalid>{Strings.Language.form[langError.color]}</CFormFeedback>
                 </CCol>
                 <CCol xs={12}>
-                  <CFormLabel htmlFor={Strings.Type.Id.DESCRIPTION}>
-                    {Strings.Type.table.DESCRIPTION}
+                  <CFormLabel htmlFor={Strings.Language.Id.DESCRIPTION}>
+                    {Strings.Language.table.DESCRIPTION}
                   </CFormLabel>
                   <CKEditor
-                    id={Strings.Type.Id.DESCRIPTION}
+                    id={Strings.Language.Id.DESCRIPTION}
                     editor={ClassicEditor}
                     config={ckEditorConfig}
-                    data={type.description}
+                    data={lang.description}
                     onChange={(event, editor) => {
                       const data = editor.getData()
-                      updateType({ description: data })
+                      updateLanguage({ description: data })
                     }}
                   />
-                  <CFormFeedback invalid>{Strings.Type.form[typeError.description]}</CFormFeedback>
+                  <CFormFeedback invalid>
+                    {Strings.Language.form[langError.description]}
+                  </CFormFeedback>
                 </CCol>
               </CForm>
             </CCardBody>
@@ -254,7 +267,7 @@ export default function TypeCreateOrUpdate() {
                   <CButton
                     className="w-100"
                     variant="outline"
-                    onClick={() => navigate(Screens.TYPE)}
+                    onClick={() => navigate(Screens.LANGUAGE)}
                   >
                     {Strings.Common.BACK}
                   </CButton>

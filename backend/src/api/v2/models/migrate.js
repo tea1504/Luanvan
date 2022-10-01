@@ -126,8 +126,8 @@ async function start() {
         ],
         organ: "organ0000001",
         file: {
-          name: "123",
-          path: "123",
+          name: "1.jpg",
+          path: "avatars/1.jpg",
         },
         status: "officerSta01",
         right: "right0000000",
@@ -146,8 +146,8 @@ async function start() {
         ],
         organ: "organ0000001",
         file: {
-          name: "123",
-          path: "123",
+          name: "2.jpg",
+          path: "avatars/2.jpg",
         },
         status: "officerSta01",
         right: "right0000001",

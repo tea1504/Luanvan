@@ -1,17 +1,4 @@
-import {
-  CButton,
-  CCard,
-  CCardBody,
-  CCardFooter,
-  CCardHeader,
-  CCol,
-  CContainer,
-  CRow,
-  CTable,
-  CTableDataCell,
-  CTableHeaderCell,
-  CTableRow,
-} from '@coreui/react'
+import { CButton, CCard, CCardBody, CCardFooter, CCardHeader, CCol, CContainer, CRow, CTable, CTableDataCell, CTableHeaderCell, CTableRow } from '@coreui/react'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -19,21 +6,21 @@ import Helpers from 'src/commons/helpers'
 import Constants from 'src/constants'
 import Screens from 'src/constants/screens'
 import Strings from 'src/constants/strings'
-import TypeService from 'src/services/type.service'
+import LanguageService from 'src/services/language.service'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 
-const typeService = new TypeService()
+const languageService = new LanguageService()
 const MySwal = withReactContent(Swal)
 
-export default function TypeDetail() {
+export default function LanguageDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const types = useSelector((state) => state.type.data)
   const language = useSelector((state) => state.config.language)
   Strings.setLanguage(language)
 
-  const [type, setType] = useState({
+  const languages = useSelector((state) => state.language.data)
+  const [lang, setLang] = useState({
     _id: '',
     name: '',
     notation: '',
@@ -44,28 +31,28 @@ export default function TypeDetail() {
     updatedAt: '',
     __v: 0,
   })
-  const updateType = (newState) => {
-    setType((prevState) => ({
+  const updateLanguage = (newState) => {
+    setLang((prevState) => ({
       ...prevState,
       ...newState,
     }))
   }
 
-  const getType = async (id = '') => {
-    if (types.length > 0) {
-      const type = types.find((el) => el._id === id)
-      if (!type) {
-        await getTypeFromServer(id)
-      } else updateType(type)
+  const getLanguage = async (id = '') => {
+    if (languages.length > 0) {
+      const l = languages.find((el) => el._id === id)
+      if (!l) {
+        await getLanguageFromServer(id)
+      } else updateLanguage(l)
     } else {
-      await getTypeFromServer(id)
+      await getLanguageFromServer(id)
     }
   }
 
-  const getTypeFromServer = async (id = '') => {
+  const getLanguageFromServer = async (id = '') => {
     try {
-      const result = await typeService.getType(id)
-      updateType(result.data.data)
+      const result = await languageService.getLanguage(id)
+      updateLanguage(result.data.data)
     } catch (error) {
       switch (error.status) {
         case 401:
@@ -92,7 +79,7 @@ export default function TypeDetail() {
 
   useEffect(() => {
     const list = id.split('.')
-    getType(list[list.length - 1])
+    getLanguage(list[list.length - 1])
   }, [])
 
   return (
@@ -101,56 +88,56 @@ export default function TypeDetail() {
         <CCol>
           <CCard className="mb-3 border-secondary border-top-5">
             <CCardHeader className="text-center py-3" component="h3">
-              {Strings.Type.NAME} {id.split('.')[0]}
+              {Strings.Language.NAME} {id.split('.')[0]}
             </CCardHeader>
             <CCardBody>
               <CTable bordered>
                 <CTableRow>
                   <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Type.table._ID}
+                    {Strings.Language.table._ID}
                   </CTableHeaderCell>
-                  <CTableDataCell>{type._id}</CTableDataCell>
+                  <CTableDataCell>{lang._id}</CTableDataCell>
                   <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Type.table.__V}
+                    {Strings.Language.table.__V}
                   </CTableHeaderCell>
-                  <CTableDataCell>{type.__v}</CTableDataCell>
+                  <CTableDataCell>{lang.__v}</CTableDataCell>
                 </CTableRow>
                 <CTableRow>
-                  <CTableHeaderCell className="py-2">{Strings.Type.table.NAME}</CTableHeaderCell>
-                  <CTableDataCell colSpan={3}>{type.name}</CTableDataCell>
+                  <CTableHeaderCell className="py-2">{Strings.Language.table.NAME}</CTableHeaderCell>
+                  <CTableDataCell colSpan={3}>{lang.name}</CTableDataCell>
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2">
-                    {Strings.Type.table.DESCRIPTION}
+                    {Strings.Language.table.DESCRIPTION}
                   </CTableHeaderCell>
                   <CTableDataCell colSpan={3} className="text-break">
-                    {Helpers.htmlDecode(type.description)}
+                    {lang.description}
                   </CTableDataCell>
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2">
-                    {Strings.Type.table.NOTATION}
+                    {Strings.Language.table.NOTATION}
                   </CTableHeaderCell>
-                  <CTableDataCell>{type.notation}</CTableDataCell>
-                  <CTableHeaderCell className="py-2">{Strings.Type.table.COLOR}</CTableHeaderCell>
-                  <CTableDataCell className="text-center" style={{ backgroundColor: type.color }}>
-                    {type.color}
+                  <CTableDataCell>{lang.notation}</CTableDataCell>
+                  <CTableHeaderCell className="py-2">{Strings.Language.table.COLOR}</CTableHeaderCell>
+                  <CTableDataCell className="text-center" style={{ backgroundColor: lang.color }}>
+                    {lang.color}
                   </CTableDataCell>
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2">
                     {Strings.Type.table.CREATED_AT}
                   </CTableHeaderCell>
-                  <CTableDataCell>{Helpers.formatDateFromString(type.createdAt)}</CTableDataCell>
+                  <CTableDataCell>{Helpers.formatDateFromString(lang.createdAt)}</CTableDataCell>
                   <CTableHeaderCell className="py-2">
                     {Strings.Type.table.UPDATED_AT}
                   </CTableHeaderCell>
-                  <CTableDataCell>{Helpers.formatDateFromString(type.updatedAt)}</CTableDataCell>
+                  <CTableDataCell>{Helpers.formatDateFromString(lang.updatedAt)}</CTableDataCell>
                 </CTableRow>
               </CTable>
             </CCardBody>
             <CCardFooter>
-              <CButton className="w-100" onClick={() => navigate(Screens.TYPE)}>
+              <CButton className="w-100" onClick={() => navigate(Screens.LANGUAGE)}>
                 {Strings.Common.BACK}
               </CButton>
             </CCardFooter>

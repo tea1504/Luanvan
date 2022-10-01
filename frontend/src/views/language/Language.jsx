@@ -1,3 +1,5 @@
+import { cibAddthis, cilDelete } from '@coreui/icons'
+import CIcon from '@coreui/icons-react'
 import {
   CButton,
   CButtonGroup,
@@ -6,72 +8,46 @@ import {
   CCardHeader,
   CCol,
   CContainer,
-  CFormCheck,
   CFormInput,
-  CFormLabel,
-  CFormText,
-  CFormTextarea,
   CInputGroup,
   CInputGroupText,
-  CModal,
-  CModalBody,
-  CModalFooter,
-  CModalHeader,
-  CModalTitle,
   CRow,
-  CSpinner,
 } from '@coreui/react'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import Helpers from 'src/commons/helpers'
 import configs from 'src/configs'
+import Constants from 'src/constants'
+import Screens from 'src/constants/screens'
 import Strings from 'src/constants/strings'
-import typeColumns from './typeColumns'
-import TypeService from 'src/services/type.service'
-import { useEffect } from 'react'
+import LanguageService from 'src/services/language.service'
+import { setData, setPage, setRowPerPage, setTotal } from 'src/store/slice/language.slide'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
-import Screens from 'src/constants/screens'
-import Constants from 'src/constants'
-import { setData, setPage, setRowPerPage, setTotal } from 'src/store/slice/type.slide'
-import { cibAddthis, cilDelete, cilFile, cilFilter } from '@coreui/icons'
-import CIcon from '@coreui/icons-react'
-import Helpers from 'src/commons/helpers'
-import { useState } from 'react'
-import { setLoading } from 'src/store/slice/config.slice'
-import { Loading } from 'src/components'
+import languageColumns from './languageColumns'
 
-const typeService = new TypeService()
+const languageService = new LanguageService()
 const MySwal = withReactContent(Swal)
 
-export default function Type() {
+export default function Language() {
   const dispatch = useDispatch()
   let loggedUser = useSelector((state) => state.user.user)
-  let loading = useSelector((state) => state.config.loading)
   if (Helpers.isObjectEmpty(loggedUser))
     loggedUser = JSON.parse(localStorage.getItem(Constants.StorageKeys.USER_INFO))
   const language = useSelector((state) => state.config.language)
   Strings.setLanguage(language)
   const navigate = useNavigate()
 
-  const types = useSelector((state) => state.type)
+  const languages = useSelector((state) => state.language)
 
   const [filter, setFilter] = useState('')
-  const [toggleCleared, setToggleCleared] = useState(false)
   const [selectionRows, setSelectionRows] = useState([])
-  const [visible, setVisible] = useState(false)
-  const [add, setAdd] = useState({ text: '', file: null, title: false })
-  const updateAdd = (newState) => {
-    setAdd((prevState) => ({
-      ...prevState,
-      ...newState,
-    }))
-  }
 
-  const getTypes = async (limit = 10, pageNumber = 1, filter = '') => {
+  const getLanguages = async (limit = 10, pageNumber = 1, filter = '') => {
     try {
-      const result = await typeService.getTypes(limit, pageNumber, filter)
+      const result = await languageService.getLanguages(limit, pageNumber, filter)
       dispatch(setData(result.data.data.data))
       dispatch(setTotal(result.data.data.total))
     } catch (error) {
@@ -98,33 +74,24 @@ export default function Type() {
     }
   }
 
-  const handlePerRowsChange = async (newPerPage, page) => {
-    dispatch(setLoading(true))
-    await getTypes(newPerPage, page, filter)
+  const handlePerRowsChange = (newPerPage, page) => {
+    getLanguages(newPerPage, page)
     dispatch(setRowPerPage(newPerPage))
     dispatch(setPage(page))
-    dispatch(setLoading(false))
   }
 
-  const handlePageChange = async (page) => {
-    dispatch(setLoading(true))
+  const handlePageChange = (page) => {
     dispatch(setPage(page))
-    await getTypes(types.rowsPerPage, page, filter)
-    dispatch(setLoading(false))
+    getLanguages(languages.rowsPerPage, page)
   }
 
-  const handleOnChangeFilter = async (str) => {
-    dispatch(setLoading(true))
+  const handleOnChangeFilter = (str) => {
     setFilter(str)
-    dispatch(setPage(1))
-    await getTypes(types.rowsPerPage, 1, str)
-    dispatch(setLoading(false))
+    getLanguages(languages.rowsPerPage, languages.page, str)
   }
 
   const handleRowSelected = (state) => {
-    dispatch(setLoading(true))
     setSelectionRows(state.selectedRows)
-    dispatch(setLoading(false))
   }
 
   const handleOnClickButtonDelete = () => {
@@ -139,12 +106,9 @@ export default function Type() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          dispatch(setLoading(true))
-          await typeService.deleteTypes(listId)
-          await getTypes()
+          await languageService.deleteLanguages(listId)
+          await getLanguages()
           setSelectionRows([])
-          setToggleCleared(!toggleCleared)
-          dispatch(setLoading(false))
           return MySwal.fire({
             title: Strings.Delete.TITLE,
             icon: 'success',
@@ -183,42 +147,8 @@ export default function Type() {
     })
   }
 
-  const handleSubmitCSV = async () => {
-    dispatch(setLoading(true))
-    try {
-      await typeService.createTypes(add)
-      setVisible(false)
-      updateAdd({ text: '', file: null })
-    } catch (error) {
-      switch (error.status) {
-        case 401:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          }).then(() => {
-            localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
-            localStorage.clear(Constants.StorageKeys.USER_INFO)
-            navigate(Screens.LOGIN)
-          })
-          break
-        default:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          })
-          break
-      }
-    }
-    await getTypes(types.rowsPerPage, types.page, filter)
-    dispatch(setLoading(false))
-  }
-
   useEffect(() => {
-    dispatch(setLoading(true))
-    getTypes(types.rowsPerPage, types.page, filter)
-    dispatch(setLoading(false))
+    getLanguages(languages.rowsPerPage, languages.page, filter)
   }, [])
 
   return (
@@ -227,7 +157,7 @@ export default function Type() {
         <CCol>
           <CCard className="mb-3 border-secondary border-top-5">
             <CCardHeader className="text-center py-3" component="h3">
-              {Strings.Type.NAME}
+              {Strings.Language.NAME}
             </CCardHeader>
             <CCardBody>
               <CRow className="py-1">
@@ -263,13 +193,13 @@ export default function Type() {
                       <CButton
                         color="primary"
                         variant="outline"
-                        onClick={() => navigate(Screens.TYPE_CREATE)}
+                        onClick={() => navigate(Screens.LANGUAGE_CREATE)}
                       >
                         <CIcon icon={cibAddthis} /> {Strings.Common.ADD_NEW}
                       </CButton>
-                      <CButton color="primary" variant="outline" onClick={() => setVisible(true)}>
-                        <CIcon icon={cilFile} /> {Strings.Common.ADD_MULTI_NEW}
-                      </CButton>
+                      {/* <CButton color="primary" variant="outline">
+                      <CIcon icon={cilFile} /> {Strings.Common.ADD_MULTI_NEW}
+                    </CButton> */}
                     </CButtonGroup>
                   )}
                 </CCol>
@@ -278,16 +208,14 @@ export default function Type() {
                 <CCol>
                   <DataTable
                     {...configs.dataTable.props}
-                    columns={typeColumns}
-                    data={types.data}
+                    columns={languageColumns}
+                    data={languages.data}
                     onChangeRowsPerPage={handlePerRowsChange}
                     onChangePage={handlePageChange}
-                    paginationTotalRows={types.total}
-                    paginationPerPage={types.rowsPerPage}
-                    paginationDefaultPage={types.page}
+                    paginationTotalRows={languages.total}
+                    paginationPerPage={languages.rowsPerPage}
+                    paginationDefaultPage={languages.page}
                     onSelectedRowsChange={handleRowSelected}
-                    clearSelectedRows={toggleCleared}
-                    progressPending={loading}
                   />
                 </CCol>
               </CRow>
@@ -295,53 +223,6 @@ export default function Type() {
           </CCard>
         </CCol>
       </CRow>
-      <CModal
-        alignment="center"
-        size="xl"
-        visible={visible}
-        onClose={() => {
-          setVisible(false)
-          updateAdd({ text: '' })
-        }}
-        backdrop="static"
-      >
-        <CModalHeader>
-          <CModalTitle>{Strings.Type.NAME}</CModalTitle>
-        </CModalHeader>
-        <CModalBody>
-          <CFormLabel>{Strings.Type.table.AREA}</CFormLabel>
-          <CFormTextarea
-            rows="3"
-            value={add.text}
-            onChange={(e) => updateAdd({ text: e.target.value })}
-          ></CFormTextarea>
-          <CFormText component="span">
-            <div dangerouslySetInnerHTML={{ __html: Strings.Type.table.AREA_DES }}></div>
-          </CFormText>
-          <CFormLabel>{Strings.Type.table.FILE}</CFormLabel>
-          <CFormInput type="file" onChange={(e) => updateAdd({ file: e.target.files[0] })} />
-          <CFormCheck
-            id="id"
-            label={Strings.Type.table.CHECK_BOX}
-            checked={add.title}
-            onChange={() => updateAdd({ title: !add.title })}
-          />
-        </CModalBody>
-        <CModalFooter>
-          <CButton
-            color="secondary"
-            onClick={() => {
-              setVisible(false)
-              updateAdd({ text: '' })
-            }}
-          >
-            {Strings.Common.CANCEL}
-          </CButton>
-          <CButton color="primary" onClick={handleSubmitCSV}>
-            {loading && <CSpinner size="sm" />} {Strings.Common.SUBMIT}
-          </CButton>
-        </CModalFooter>
-      </CModal>
     </CContainer>
   )
 }

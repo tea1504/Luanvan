@@ -1,5 +1,9 @@
 const Constants = require("../constants");
 const typeService = require("./../services/type.service");
+var fs = require("fs");
+const { promisify } = require("util");
+const path = require("path");
+const unlinkAsync = promisify(fs.unlink);
 
 var typeController = {
   /**
@@ -47,6 +51,31 @@ var typeController = {
         color,
       });
       return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
+  postTypes: async (req, res, next) => {
+    try {
+      const file = req.file;
+      const { text, title } = req.body;
+      if (file) {
+        const data = fs.readFileSync(file.path);
+        const index = data.toString().indexOf("\n");
+        var t = data.toString();
+        if (title === "true") t = t.slice(index + 1);
+        const result = await typeService.postTypes(t);
+        fs.unlinkSync(file.path);
+        return res.status(result.status).json(result);
+      } else {
+        const result = await typeService.postTypes(text);
+        return res.status(result.status).json(result);
+      }
     } catch (error) {
       return next(error);
     }

@@ -41,9 +41,19 @@ const Constants = {
       `/types?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
     GET_TYPE: (id) => `/types/` + id,
     CREATE_TYPE: '/types',
+    CREATE_TYPES: '/types/csv',
     UPDATE_TYPE: (id) => '/types/' + id,
     DELETE_TYPE: (id) => '/types/' + id,
     DELETE_TYPES: '/types',
+
+    // Language
+    GET_LANGUAGES: (limit = 10, pageNumber = 1, filter = '') =>
+      `/languages?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+    GET_LANGUAGE: (id) => `/languages/` + id,
+    CREATE_LANGUAGE: '/languages',
+    UPDATE_LANGUAGE: (id) => '/languages/' + id,
+    DELETE_LANGUAGE: (id) => '/languages/' + id,
+    DELETE_LANGUAGES: '/languages',
   },
 
   /**

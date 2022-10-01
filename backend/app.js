@@ -12,6 +12,7 @@ var v2Router = require("./src/api/v2/routers");
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");
 const swaggerJsDoc = YAML.load("./src/api/v2/v2.yml");
+const authMiddleware = require("./src/api/v2/middlewares/auth.middleware");
 
 var app = express();
 
@@ -24,13 +25,14 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerJsDoc));
 app.use("/users", usersRouter);
 app.use("/v1", v1Router);
 app.use("/v2", v2Router);
+
+app.use(authMiddleware, express.static(path.join(__dirname, "public")));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -14,11 +14,11 @@ const authController = {
         return res.status(400).json({
           status: 400,
           message: Constants.String.Message.ERR_400(
-            Constants.String.Officer.status
+            Constants.String.Officer.CODE
           ),
         });
       if (!password)
-        res
+        return res
           .status(400)
           .json({
             status: 400,

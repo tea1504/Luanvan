@@ -1,6 +1,6 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
-import { cilBell, cilBook, cilCalculator, cilFile, cilHome } from '@coreui/icons'
+import { cilBell, cilBook, cilCalculator, cilFile, cilHome, cilLanguage } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 import Screens from './constants/screens'
 import vn from './commons/locales/vn'
@@ -33,6 +33,16 @@ const _nav = [
     role: [0],
     to: Screens.TYPE,
     icon: <CIcon icon={cilFile} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: {
+      vi: 'Ngôn ngữ',
+      en: 'Language',
+    },
+    role: [0],
+    to: Screens.LANGUAGE,
+    icon: <CIcon icon={cilLanguage} customClassName="nav-icon" />,
   },
   {
     component: CNavGroup,

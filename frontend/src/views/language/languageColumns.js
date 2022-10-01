@@ -11,19 +11,19 @@ export default [
     right: true,
   },
   {
-    name: Strings.Type.table.NAME,
+    name: Strings.Language.table.NAME,
     selector: (row) => row.name,
     sortable: true,
     maxWidth: '300px',
   },
   {
-    name: Strings.Type.table.NOTATION,
+    name: Strings.Language.table.NOTATION,
     selector: (row) => row.notation,
     sortable: true,
     width: '150px',
   },
   {
-    name: Strings.Type.table.DESCRIPTION,
+    name: Strings.Language.table.DESCRIPTION,
     selector: (row) => row.description,
     sortable: true,
     cell: (row) => (
@@ -40,16 +40,6 @@ export default [
     cell: (row) => <div style={{ backgroundColor: row.color }} className="h-100 w-100"></div>,
     width: '150px',
   },
-  // {
-  //   name: Strings.Type.table.CREATED_AT,
-  //   selector: (row) => Helpers.formatDateFromString(row.createdAt),
-  //   sortable: true,
-  // },
-  // {
-  //   name: Strings.Type.table.UPDATED_AT,
-  //   selector: (row) => Helpers.formatDateFromString(row.updatedAt),
-  //   sortable: true,
-  // },
   {
     name: Strings.Common.ACTION,
     cell: (row) => <ActionButton data={row} />,

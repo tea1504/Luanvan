@@ -31,6 +31,7 @@ const Constants = {
       ROOT: "/types",
       SLASH: "/",
       ID: "/:id",
+      CREATE_MULTI: "/csv",
     },
     Status: {
       ROOT: "/statuses",

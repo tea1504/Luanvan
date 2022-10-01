@@ -11,13 +11,15 @@ var authService = {
    * @return {import('./../interfaces').ResponseResult}
    */
   login: async (code, password) => {
+    console.log(code, password);
     try {
       const officer = await officerModel.findOne({
         code: code,
         deleted: false,
       });
 
-      if (!officer) return { status: 404, message: "không tìm thấy người dùng" };
+      if (!officer)
+        return { status: 404, message: "không tìm thấy người dùng" };
       passwordOfficer = officer.password.sort((a, b) => {
         var d1 = new Date(a.time),
           d2 = new Date(b.time);
@@ -29,9 +31,13 @@ var authService = {
       );
       if (checkPassword) {
         var token = jwt.sign({ id: officer._id }, process.env.PRIVATEKEY, {
-          expiresIn: "2h",
+          expiresIn: "8h",
         });
-        return { status: 200, message: "đăng nhập thành công", data: { token } };
+        return {
+          status: 200,
+          message: "đăng nhập thành công",
+          data: { token },
+        };
       }
       return { status: 403, message: "mật khẩu sai" };
     } catch (error) {

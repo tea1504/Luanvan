@@ -79,6 +79,7 @@ const Login = () => {
         }
       }
     } catch (error) {
+      console.log(error)
       updateErr({ form: true, code: false, password: true, message: error.message })
     }
   }
@@ -121,7 +122,7 @@ const Login = () => {
             <CCardGroup className="shadow-lg">
               <CCard className="py-5 px-3">
                 <CCardBody>
-                  <CForm noValidation validated={!err.form}>
+                  <CForm validated={!err.form}>
                     <h1>Hệ thống E-Office</h1>
                     <p className="text-medium-emphasis mb-5">
                       Chào mừng bạn đến với hệ thống E-Office.
@@ -138,7 +139,6 @@ const Login = () => {
                         placeholder="mã cán bộ"
                         autoComplete="username"
                         value={loginInfo.code}
-                        tooltipFeedback
                         onChange={(e) => {
                           updateLoginInfo({ code: e.target.value })
                         }}
@@ -175,7 +175,7 @@ const Login = () => {
                 </CCardBody>
               </CCard>
               <CCard
-                className="text-white py-5"
+                className="text-white py-5 d-none d-md-inline"
                 style={{
                   width: '44%',
                   backgroundImage: `url(${login2})`,

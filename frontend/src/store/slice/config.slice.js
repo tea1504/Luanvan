@@ -4,6 +4,7 @@ const initialState = {
   sidebarShow: true,
   sidebarFoldable: true,
   language: 'vi',
+  loading: false,
 }
 
 export const configSlice = createSlice({
@@ -19,9 +20,12 @@ export const configSlice = createSlice({
     setLanguage: (state, action) => {
       state.language = action.payload
     },
+    setLoading: (state, action) => {
+      state.loading = action.payload
+    },
   },
 })
 
-export const { setSidebarShow, setFoldable, setLanguage } = configSlice.actions
+export const { setSidebarShow, setFoldable, setLanguage, setLoading } = configSlice.actions
 
 export default configSlice.reducer

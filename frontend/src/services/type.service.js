@@ -21,6 +21,13 @@ class TypeService extends BaseService {
     })
     return result
   }
+  async createTypes(data) {
+    const result = await this.api.postFormData({
+      path: Constants.ApiPath.CREATE_TYPES,
+      data: data,
+    })
+    return result
+  }
   async updateType(id, type) {
     const result = await this.api.put({
       path: Constants.ApiPath.UPDATE_TYPE(id),

@@ -7,6 +7,7 @@ import AppSidebar from './AppSidebar'
 import DocsCallout from './DocsCallout'
 import DocsLink from './DocsLink'
 import DocsExample from './DocsExample'
+import Loading from './Loading'
 
 export {
   AppBreadcrumb,
@@ -18,4 +19,5 @@ export {
   DocsCallout,
   DocsLink,
   DocsExample,
+  Loading,
 }
