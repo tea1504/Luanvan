@@ -19,6 +19,13 @@ class UserService extends BaseService {
     })
     return result
   }
+  async putInfo(data) {
+    const result = await this.api.postFormData({
+      path: Constants.ApiPath.PUT_USER,
+      data: data,
+    })
+    return result
+  }
 }
 
 export default UserService
