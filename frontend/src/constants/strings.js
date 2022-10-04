@@ -4,8 +4,8 @@ import en from 'src/commons/locales/en'
 import vi from 'src/commons/locales/vn'
 
 const Strings = new LocalizedStrings({
-  en,
   vi,
+  en,
 })
 
 const language = localStorage.getItem(Constants.StorageKeys.LANGUAGE)

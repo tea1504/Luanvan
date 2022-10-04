@@ -20,6 +20,7 @@ import { logo } from 'src/assets/brand/logo'
 import { setSidebarShow, setLanguage } from '../store/slice/config.slice'
 import Constants from 'src/constants'
 import Strings from 'src/constants/strings'
+import Resources from 'src/commons/resources'
 
 const AppHeader = () => {
   const dispatch = useDispatch()
@@ -39,19 +40,19 @@ const AppHeader = () => {
           <CIcon icon={cilMenu} size="lg" />
         </CHeaderToggler>
         <CHeaderBrand className="mx-auto d-md-none" to="/">
-          <CIcon icon={logo} height={48} alt="Logo" />
+          <CIcon icon={Resources.Images.APP_LOGO} height={48} alt="Logo" />
         </CHeaderBrand>
         <CHeaderNav className="d-none d-md-flex me-auto">
           <CNavItem>
             <CNavLink to="/dashboard" component={NavLink}>
-              Dashboard
+              {Strings.Common.DASHBOARD}
             </CNavLink>
           </CNavItem>
           <CNavItem>
-            <CNavLink href="#">Users</CNavLink>
+            <CNavLink href="#">{Strings.Common.PROFILE}</CNavLink>
           </CNavItem>
           <CNavItem>
-            <CNavLink href="#">Settings</CNavLink>
+            <CNavLink href="#">{Strings.Common.SETTING}</CNavLink>
           </CNavItem>
         </CHeaderNav>
         <CHeaderNav>

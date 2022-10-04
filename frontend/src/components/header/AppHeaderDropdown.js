@@ -51,7 +51,7 @@ const AppHeaderDropdown = () => {
         </CDropdownItem>
         <CDropdownItem href="#">
           <CIcon icon={cilSettings} className="me-2" />
-          {Strings.Officer.CHANGE_PASSWORD}
+          {Strings.Common.CHANGE_PASSWORD}
         </CDropdownItem>
         <CDropdownDivider />
         <CDropdownItem onClick={handleLogout} style={{ cursor: 'pointer' }}>

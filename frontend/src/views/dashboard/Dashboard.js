@@ -32,13 +32,13 @@ const Dashboard = () => {
   return (
     <CContainer fluid>
       <CRow>
-        <CCol sm={9}>
+        <CCol sm={9} className="mt-1">
           <CCard className="shadow-lg">
             <CCardBody>
               <CRow>
                 {func.map((el, ind) => {
                   return (
-                    <CCol xs={6} sm={4} md={3} lg={2} key={ind}>
+                    <CCol xs={12} sm={6} md={3} lg={2} key={ind}>
                       <CWidgetStatsD
                         onMouseEnter={handleMouseEnter}
                         onMouseLeave={handleMouseLeave}
@@ -55,8 +55,8 @@ const Dashboard = () => {
             </CCardBody>
           </CCard>
         </CCol>
-        <CCol sm={3}>
-          <Calendar value={new Date()} locale={language} className="shadow border-0 p-3 w-100" />
+        <CCol sm={3} className="mt-5 mt-sm-1">
+          <Calendar value={new Date()} locale={language} className="shadow-lg border-0 p-3 w-100" />
         </CCol>
       </CRow>
     </CContainer>

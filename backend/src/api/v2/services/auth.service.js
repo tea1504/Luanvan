@@ -70,6 +70,50 @@ var authService = {
       };
     }
   },
+  /**
+   * @return {import('./../interfaces').ResponseResult}
+   */
+  putInfo: async (id, data) => {
+    try {
+      const officerPhoneNumber = await officerModel.findOne({
+        _id: { $ne: id },
+        phoneNumber: data.phoneNumber,
+        deleted: false,
+      });
+      if (officerPhoneNumber)
+        return {
+          status: Constants.ApiCode.NOT_ACCEPTABLE,
+          message: Constants.String.Message.UNIQUE(
+            Constants.String.Officer.PHONE_NUMBER
+          ),
+        };
+      const officerEmailAddress = await officerModel.findOne({
+        _id: { $ne: id },
+        emailAddress: data.emailAddress,
+        deleted: false,
+      });
+      if (officerEmailAddress)
+        return {
+          status: Constants.ApiCode.NOT_ACCEPTABLE,
+          message: Constants.String.Message.UNIQUE(
+            Constants.String.Officer.EMAIL_ADDRESS
+          ),
+        };
+      const officer = await officerModel.findOneAndUpdate(
+        { _id: id, deleted: false },
+        data
+      );
+      if (!officer) return { status: 404, message: "không tìm thấy thông tin" };
+      const UpdatedOfficer = await officerModel.findById(id);
+      return { status: 200, message: "thành công", data: UpdatedOfficer };
+    } catch (error) {
+      return {
+        status: 500,
+        message: Constants.String.Message.ERR_500,
+        data: { error: error.message },
+      };
+    }
+  },
 };
 
 module.exports = authService;

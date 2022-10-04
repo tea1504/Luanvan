@@ -19,7 +19,7 @@ const User = React.lazy(() => import('./views/user/User'))
 const routes = [
   { path: '/', exact: true, name: { vi: 'Trang chủ', en: 'Home' } },
   { path: '/dashboard', name: { vi: 'Trang chủ', en: 'Dashboard' }, element: Dashboard },
-  { path: Screens.OFFICER_INFO, name: { vi: vn.Type.NAME, en: en.Type.NAME }, element: User },
+  { path: Screens.OFFICER_INFO, name: { vi: vn.Officer.NAME, en: en.Officer.NAME }, element: User },
   { path: Screens.TYPE, name: { vi: vn.Type.NAME, en: en.Type.NAME }, element: Type, role: [0] },
   {
     path: Screens.TYPE_DETAIL(),

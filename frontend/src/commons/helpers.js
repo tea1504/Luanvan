@@ -515,6 +515,9 @@ const Helpers = {
     if (str.length <= len) return str
     return str.slice(0, (len - 3) / 2) + '...' + str.slice(str.length - len + (len - 3) / 2)
   },
+  makeID: (str1 = '', str2 = '') => {
+    return str1.toUpperCase() + '_' + str2.toUpperCase()
+  },
 }
 
 export default Helpers

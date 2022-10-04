@@ -34,6 +34,7 @@ const Constants = {
 
     // User
     GET_USER: '/officer',
+    PUT_USER: '/officer',
     LOGIN: '/login',
 
     // Type

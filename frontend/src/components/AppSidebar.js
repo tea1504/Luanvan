@@ -17,6 +17,7 @@ import { setSidebarShow, setFoldable } from '../store/slice/config.slice'
 // sidebar nav config
 import navigation from '../_nav'
 import Constants from 'src/constants'
+import Resources from 'src/commons/resources'
 
 const AppSidebar = () => {
   const dispatch = useDispatch()
@@ -38,7 +39,7 @@ const AppSidebar = () => {
       }}
     >
       <CSidebarBrand className="d-none d-md-flex" to="/">
-        <CIcon className="sidebar-brand-full" icon={logoNegative} height={64} />
+        <CIcon className="sidebar-brand-full" icon={Resources.Images.APP_LOGO} height={64} />
         <CIcon className="sidebar-brand-narrow" icon={sygnet} height={35} />
       </CSidebarBrand>
       <CSidebarNav>

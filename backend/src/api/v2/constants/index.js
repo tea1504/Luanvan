@@ -21,6 +21,7 @@ const Constants = {
       ROOT: "/",
       LOGIN: "/login",
       GET_INFO: "/officer",
+      PUT_INFO: "/officer",
     },
     Officer: {
       ROOT: "/officers",
