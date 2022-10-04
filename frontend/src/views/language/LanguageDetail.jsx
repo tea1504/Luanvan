@@ -88,27 +88,27 @@ export default function LanguageDetail() {
         <CCol>
           <CCard className="mb-3 border-secondary border-top-5">
             <CCardHeader className="text-center py-3" component="h3">
-              {Strings.Language.NAME} {id.split('.')[0]}
+              {Strings.Language.Common.NAME} {id.split('.')[0]}
             </CCardHeader>
             <CCardBody>
               <CTable bordered>
                 <CTableRow>
                   <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Language.table._ID}
+                    {Strings.Language.Table._ID}
                   </CTableHeaderCell>
                   <CTableDataCell>{lang._id}</CTableDataCell>
                   <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Language.table.__V}
+                    {Strings.Language.Table.__V}
                   </CTableHeaderCell>
                   <CTableDataCell>{lang.__v}</CTableDataCell>
                 </CTableRow>
                 <CTableRow>
-                  <CTableHeaderCell className="py-2">{Strings.Language.table.NAME}</CTableHeaderCell>
+                  <CTableHeaderCell className="py-2">{Strings.Language.Table.NAME}</CTableHeaderCell>
                   <CTableDataCell colSpan={3}>{lang.name}</CTableDataCell>
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2">
-                    {Strings.Language.table.DESCRIPTION}
+                    {Strings.Language.Table.DESCRIPTION}
                   </CTableHeaderCell>
                   <CTableDataCell colSpan={3} className="text-break">
                     {lang.description}
@@ -116,10 +116,10 @@ export default function LanguageDetail() {
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2">
-                    {Strings.Language.table.NOTATION}
+                    {Strings.Language.Table.NOTATION}
                   </CTableHeaderCell>
                   <CTableDataCell>{lang.notation}</CTableDataCell>
-                  <CTableHeaderCell className="py-2">{Strings.Language.table.COLOR}</CTableHeaderCell>
+                  <CTableHeaderCell className="py-2">{Strings.Language.Table.COLOR}</CTableHeaderCell>
                   <CTableDataCell className="text-center" style={{ backgroundColor: lang.color }}>
                     {lang.color}
                   </CTableDataCell>

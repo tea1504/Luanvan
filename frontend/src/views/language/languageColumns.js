@@ -11,19 +11,19 @@ export default [
     right: true,
   },
   {
-    name: Strings.Language.table.NAME,
+    name: Strings.Language.Table.NAME,
     selector: (row) => row.name,
     sortable: true,
     maxWidth: '300px',
   },
   {
-    name: Strings.Language.table.NOTATION,
+    name: Strings.Language.Table.NOTATION,
     selector: (row) => row.notation,
     sortable: true,
     width: '150px',
   },
   {
-    name: Strings.Language.table.DESCRIPTION,
+    name: Strings.Language.Table.DESCRIPTION,
     selector: (row) => row.description,
     sortable: true,
     cell: (row) => (

@@ -31,7 +31,7 @@ var authService = {
       );
       if (checkPassword) {
         var token = jwt.sign({ id: officer._id }, process.env.PRIVATEKEY, {
-          expiresIn: "8h",
+          expiresIn: "1d",
         });
         return {
           status: 200,

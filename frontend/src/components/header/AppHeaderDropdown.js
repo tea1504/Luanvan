@@ -21,10 +21,13 @@ const AppHeaderDropdown = () => {
   const navigate = useNavigate()
   let loggedUser = useSelector((state) => state.user.user)
   let token = useSelector((state) => state.user.token)
-  if (Helpers.isObjectEmpty(loggedUser)) {
-    loggedUser = JSON.parse(localStorage.getItem(Constants.StorageKeys.USER_INFO))
-    token = localStorage.getItem(Constants.StorageKeys.ACCESS_TOKEN)
-  }
+
+  useEffect(() => {
+    if (Helpers.isObjectEmpty(loggedUser)) {
+      loggedUser = JSON.parse(localStorage.getItem(Constants.StorageKeys.USER_INFO))
+      token = localStorage.getItem(Constants.StorageKeys.ACCESS_TOKEN)
+    }
+  }, [])
 
   const handleLogout = (e) => {
     e.preventDefault()
@@ -37,14 +40,14 @@ const AppHeaderDropdown = () => {
     <CDropdown variant="nav-item">
       <CDropdownToggle placement="bottom-end" className="py-0" caret={false}>
         <CAvatar
-          src={`${process.env.REACT_APP_BASE_URL}/${loggedUser.file.path}?token=${token}`}
+          src={`${process.env.REACT_APP_BASE_URL}/${loggedUser?.file?.path}?token=${token}`}
           size="md"
         />
       </CDropdownToggle>
       <CDropdownMenu className="pt-0" placement="bottom-end">
         <CDropdownItem onClick={() => navigate(Screen.OFFICER_INFO)} style={{ cursor: 'pointer' }}>
           <CIcon icon={cilUser} className="me-2" />
-          {Strings.Officer.PROFILE}
+          {Strings.Common.PROFILE}
         </CDropdownItem>
         <CDropdownItem href="#">
           <CIcon icon={cilSettings} className="me-2" />

@@ -35,9 +35,9 @@ const ActionButton = ({ data }) => {
 
   const handleDeleteButton = () => {
     MySwal.fire({
-      title: Strings.Delete.TITLE,
+      title: Strings.Message.Delete.TITLE,
       icon: 'info',
-      text: Strings.Delete.MESSAGE,
+      text: Strings.Message.Delete.MESSAGE,
       showCancelButton: true,
       cancelButtonText: Strings.Common.CANCEL,
       confirmButtonText: Strings.Common.OK,
@@ -46,15 +46,15 @@ const ActionButton = ({ data }) => {
         await bookService.deleteBook(data._id)
         await getBooks()
         return MySwal.fire({
-          title: Strings.Delete.TITLE,
+          title: Strings.Message.Delete.TITLE,
           icon: 'success',
-          text: Strings.Delete.SUCCESS,
+          text: Strings.Message.Delete.SUCCESS,
         })
       } else
         return MySwal.fire({
-          title: Strings.Delete.TITLE,
+          title: Strings.Message.Delete.TITLE,
           icon: 'warning',
-          text: Strings.Delete.CANCEL,
+          text: Strings.Message.Delete.CANCEL,
         })
     })
   }

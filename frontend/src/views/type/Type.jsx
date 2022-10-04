@@ -130,9 +130,9 @@ export default function Type() {
   const handleOnClickButtonDelete = () => {
     const listId = selectionRows.map((el) => el._id)
     MySwal.fire({
-      title: Strings.Delete.TITLE,
+      title: Strings.Message.Delete.TITLE,
       icon: 'info',
-      text: Strings.Delete.MESSAGE,
+      text: Strings.Message.Delete.MESSAGE,
       showCancelButton: true,
       cancelButtonText: Strings.Common.CANCEL,
       confirmButtonText: Strings.Common.OK,
@@ -146,9 +146,9 @@ export default function Type() {
           setToggleCleared(!toggleCleared)
           dispatch(setLoading(false))
           return MySwal.fire({
-            title: Strings.Delete.TITLE,
+            title: Strings.Message.Delete.TITLE,
             icon: 'success',
-            text: Strings.Delete.SUCCESS,
+            text: Strings.Message.Delete.SUCCESS,
             confirmButtonText: Strings.Common.OK,
           })
         } catch (error) {
@@ -175,9 +175,9 @@ export default function Type() {
         }
       } else
         return MySwal.fire({
-          title: Strings.Delete.TITLE,
+          title: Strings.Message.Delete.TITLE,
           icon: 'warning',
-          text: Strings.Delete.CANCEL,
+          text: Strings.Message.Delete.CANCEL,
           confirmButtonText: Strings.Common.OK,
         })
     })
@@ -227,7 +227,7 @@ export default function Type() {
         <CCol>
           <CCard className="mb-3 border-secondary border-top-5">
             <CCardHeader className="text-center py-3" component="h3">
-              {Strings.Type.NAME}
+              {Strings.Type.Common.NAME}
             </CCardHeader>
             <CCardBody>
               <CRow className="py-1">
@@ -306,23 +306,23 @@ export default function Type() {
         backdrop="static"
       >
         <CModalHeader>
-          <CModalTitle>{Strings.Type.NAME}</CModalTitle>
+          <CModalTitle>{Strings.Type.Common.NAME}</CModalTitle>
         </CModalHeader>
         <CModalBody>
-          <CFormLabel>{Strings.Type.table.AREA}</CFormLabel>
+          <CFormLabel>{Strings.Type.Table.DESCRIPTION}</CFormLabel>
           <CFormTextarea
             rows="3"
             value={add.text}
             onChange={(e) => updateAdd({ text: e.target.value })}
           ></CFormTextarea>
           <CFormText component="span">
-            <div dangerouslySetInnerHTML={{ __html: Strings.Type.table.AREA_DES }}></div>
+            <div dangerouslySetInnerHTML={{ __html: Strings.Type.Common.DESCRIPTION }}></div>
           </CFormText>
-          <CFormLabel>{Strings.Type.table.FILE}</CFormLabel>
+          <CFormLabel>{Strings.Type.Common.FILE}</CFormLabel>
           <CFormInput type="file" onChange={(e) => updateAdd({ file: e.target.files[0] })} />
           <CFormCheck
             id="id"
-            label={Strings.Type.table.CHECK_BOX}
+            label={Strings.Type.Common.CHECK_BOX}
             checked={add.title}
             onChange={() => updateAdd({ title: !add.title })}
           />

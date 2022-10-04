@@ -97,9 +97,9 @@ export default function Language() {
   const handleOnClickButtonDelete = () => {
     const listId = selectionRows.map((el) => el._id)
     MySwal.fire({
-      title: Strings.Delete.TITLE,
+      title: Strings.Message.Delete.TITLE,
       icon: 'info',
-      text: Strings.Delete.MESSAGE,
+      text: Strings.Message.Delete.MESSAGE,
       showCancelButton: true,
       cancelButtonText: Strings.Common.CANCEL,
       confirmButtonText: Strings.Common.OK,
@@ -110,9 +110,9 @@ export default function Language() {
           await getLanguages()
           setSelectionRows([])
           return MySwal.fire({
-            title: Strings.Delete.TITLE,
+            title: Strings.Message.Delete.TITLE,
             icon: 'success',
-            text: Strings.Delete.SUCCESS,
+            text: Strings.Message.Delete.SUCCESS,
             confirmButtonText: Strings.Common.OK,
           })
         } catch (error) {
@@ -139,9 +139,9 @@ export default function Language() {
         }
       } else
         return MySwal.fire({
-          title: Strings.Delete.TITLE,
+          title: Strings.Message.Delete.TITLE,
           icon: 'warning',
-          text: Strings.Delete.CANCEL,
+          text: Strings.Message.Delete.CANCEL,
           confirmButtonText: Strings.Common.OK,
         })
     })
@@ -157,7 +157,7 @@ export default function Language() {
         <CCol>
           <CCard className="mb-3 border-secondary border-top-5">
             <CCardHeader className="text-center py-3" component="h3">
-              {Strings.Language.NAME}
+              {Strings.Language.Common.NAME}
             </CCardHeader>
             <CCardBody>
               <CRow className="py-1">

@@ -105,20 +105,20 @@ export default function LanguageCreateOrUpdate() {
   const validate = () => {
     var flag = true
     if (Helpers.isNullOrEmpty(lang.name)) {
-      updateLangError({ name: Helpers.propName(Strings, Strings.Language.form.NAME_REQUIRED) })
+      updateLangError({ name: Helpers.propName(Strings, Strings.Language.Form.Validation.NAME_REQUIRED) })
       flag = false
     } else if (lang.name.length > 100) {
-      updateLangError({ name: Helpers.propName(Strings, Strings.Language.form.NAME_MAX_LENGTH) })
+      updateLangError({ name: Helpers.propName(Strings, Strings.Language.Form.Validation.NAME_MAX_LENGTH) })
       flag = false
     }
     if (Helpers.isNullOrEmpty(lang.notation)) {
       updateLangError({
-        notation: Helpers.propName(Strings, Strings.Language.form.NOTATION_REQUIRED),
+        notation: Helpers.propName(Strings, Strings.Language.Form.Validation.NOTATION_REQUIRED),
       })
       flag = false
     } else if (lang.notation.length > 10) {
       updateLangError({
-        notation: Helpers.propName(Strings, Strings.Language.form.NOTATION_MAX_LENGTH),
+        notation: Helpers.propName(Strings, Strings.Language.Form.Validation.NOTATION_MAX_LENGTH),
       })
       flag = false
     }
@@ -189,59 +189,59 @@ export default function LanguageCreateOrUpdate() {
         <CCol>
           <CCard className="mb-3 border-secondary border-top-5">
             <CCardHeader className="text-center py-3" component="h3">
-              {Strings.Type.form.TITLE}
+              {Strings.Language.Common.NAME}
             </CCardHeader>
             <CCardBody>
               <CForm noValidate className="row g-3">
                 <CCol xs={12}>
-                  <CFormLabel htmlFor={Strings.Language.Id.NAME}>
+                  <CFormLabel htmlFor={Strings.Language.Form.ID.NAME}>
                     {Strings.Type.table.NAME} <strong className="text-danger">*</strong>
                   </CFormLabel>
                   <CFormInput
                     invalid={!Helpers.isNullOrEmpty(langError.name)}
                     type="text"
-                    id={Strings.Language.Id.NAME}
-                    placeholder={Strings.Language.table.NAME}
+                    id={Strings.Language.Form.ID.NAME}
+                    placeholder={Strings.Language.Table.NAME}
                     value={lang.name}
                     onChange={(e) => updateLanguage({ name: e.target.value })}
                   />
-                  <CFormFeedback invalid>{Strings.Language.form[langError.name]}</CFormFeedback>
+                  <CFormFeedback invalid>{Strings.Language.Form.Validation[langError.name]}</CFormFeedback>
                 </CCol>
                 <CCol xs={12} md={6}>
-                  <CFormLabel htmlFor={Strings.Language.Id.NOTATION}>
-                    {Strings.Language.table.NOTATION} <strong className="text-danger">*</strong>
+                  <CFormLabel htmlFor={Strings.Language.Form.ID.NOTATION}>
+                    {Strings.Language.Table.NOTATION} <strong className="text-danger">*</strong>
                   </CFormLabel>
                   <CFormInput
                     invalid={!Helpers.isNullOrEmpty(langError.notation)}
                     type="text"
-                    id={Strings.Language.Id.NOTATION}
-                    placeholder={Strings.Language.table.NOTATION}
+                    id={Strings.Language.Form.ID.NOTATION}
+                    placeholder={Strings.Language.Table.NOTATION}
                     value={lang.notation}
                     onChange={(e) => updateLanguage({ notation: e.target.value })}
                   />
-                  <CFormFeedback invalid>{Strings.Language.form[langError.notation]}</CFormFeedback>
+                  <CFormFeedback invalid>{Strings.Language.Form.Validation[langError.notation]}</CFormFeedback>
                 </CCol>
                 <CCol xs={12} md={6}>
-                  <CFormLabel htmlFor={Strings.Language.Id.COLOR}>
-                    {Strings.Language.table.COLOR}
+                  <CFormLabel htmlFor={Strings.Language.Form.ID.COLOR}>
+                    {Strings.Language.Table.COLOR}
                   </CFormLabel>
                   <CFormInput
                     invalid={!Helpers.isNullOrEmpty(langError.color)}
                     type="color"
                     className="w-100"
-                    id={Strings.Language.Id.COLOR}
-                    placeholder={Strings.Language.table.COLOR}
+                    id={Strings.Language.Form.ID.COLOR}
+                    placeholder={Strings.Language.Table.COLOR}
                     value={lang.color}
                     onChange={(e) => updateLanguage({ color: e.target.value })}
                   />
-                  <CFormFeedback invalid>{Strings.Language.form[langError.color]}</CFormFeedback>
+                  <CFormFeedback invalid>{Strings.Language.Form.Validation[langError.color]}</CFormFeedback>
                 </CCol>
                 <CCol xs={12}>
-                  <CFormLabel htmlFor={Strings.Language.Id.DESCRIPTION}>
-                    {Strings.Language.table.DESCRIPTION}
+                  <CFormLabel htmlFor={Strings.Language.Form.ID.DESCRIPTION}>
+                    {Strings.Language.Table.DESCRIPTION}
                   </CFormLabel>
                   <CKEditor
-                    id={Strings.Language.Id.DESCRIPTION}
+                    id={Strings.Language.Form.ID.DESCRIPTION}
                     editor={ClassicEditor}
                     config={ckEditorConfig}
                     data={lang.description}
@@ -251,7 +251,7 @@ export default function LanguageCreateOrUpdate() {
                     }}
                   />
                   <CFormFeedback invalid>
-                    {Strings.Language.form[langError.description]}
+                    {Strings.Language.Form.Validation[langError.description]}
                   </CFormFeedback>
                 </CCol>
               </CForm>

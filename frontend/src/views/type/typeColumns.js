@@ -11,19 +11,19 @@ export default [
     right: true,
   },
   {
-    name: Strings.Type.table.NAME,
+    name: Strings.Type.Table.NAME,
     selector: (row) => row.name,
     sortable: true,
     maxWidth: '300px',
   },
   {
-    name: Strings.Type.table.NOTATION,
+    name: Strings.Type.Table.NOTATION,
     selector: (row) => row.notation,
     sortable: true,
     width: '150px',
   },
   {
-    name: Strings.Type.table.DESCRIPTION,
+    name: Strings.Type.Table.DESCRIPTION,
     selector: (row) => row.description,
     sortable: true,
     cell: (row) => (
@@ -33,7 +33,7 @@ export default [
     ),
   },
   {
-    name: Strings.Type.table.COLOR,
+    name: Strings.Type.Table.COLOR,
     selector: (row) => row.color,
     sortable: true,
     center: true,

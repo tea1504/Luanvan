@@ -58,9 +58,9 @@ const ActionButton = ({ data }) => {
 
   const handleDeleteButton = () => {
     MySwal.fire({
-      title: Strings.Delete.TITLE,
+      title: Strings.Message.Delete.TITLE,
       icon: 'info',
-      text: Strings.Delete.MESSAGE,
+      text: Strings.Message.Delete.MESSAGE,
       showCancelButton: true,
       cancelButtonText: Strings.Common.CANCEL,
       confirmButtonText: Strings.Common.OK,
@@ -70,9 +70,9 @@ const ActionButton = ({ data }) => {
           await languageService.deleteLanguage(data._id)
           await getLanguages()
           return MySwal.fire({
-            title: Strings.Delete.TITLE,
+            title: Strings.Message.Delete.TITLE,
             icon: 'success',
-            text: Strings.Delete.SUCCESS,
+            text: Strings.Message.Delete.SUCCESS,
             confirmButtonText: Strings.Common.OK,
           })
         } catch (error) {
@@ -100,9 +100,9 @@ const ActionButton = ({ data }) => {
         }
       } else
         return MySwal.fire({
-          title: Strings.Delete.TITLE,
+          title: Strings.Message.Delete.TITLE,
           icon: 'warning',
-          text: Strings.Delete.CANCEL,
+          text: Strings.Message.Delete.CANCEL,
           confirmButtonText: Strings.Common.OK,
         })
     })
