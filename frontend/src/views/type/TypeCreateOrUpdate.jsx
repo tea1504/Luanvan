@@ -105,18 +105,18 @@ export default function TypeCreateOrUpdate() {
   const validate = () => {
     var flag = true
     if (Helpers.isNullOrEmpty(type.name)) {
-      updateTypeError({ name: Helpers.propName(Strings, Strings.Type.Form.Validation.NAME_REQUIRED) })
+      updateTypeError({ name: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
       flag = false
     } else if (type.name.length > 100) {
-      updateTypeError({ name: Helpers.propName(Strings, Strings.Type.Form.Validation.NAME_MAX_LENGTH) })
+      updateTypeError({ name: Helpers.propName(Strings, Strings.Form.Validation.MAX_LENGTH) })
       flag = false
     }
     if (Helpers.isNullOrEmpty(type.notation)) {
-      updateTypeError({ notation: Helpers.propName(Strings, Strings.Type.Form.Validation.NOTATION_REQUIRED) })
+      updateTypeError({ notation: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
       flag = false
     } else if (type.notation.length > 10) {
       updateTypeError({
-        notation: Helpers.propName(Strings, Strings.Type.Form.Validation.NOTATION_MAX_LENGTH),
+        notation: Helpers.propName(Strings, Strings.Form.Validation.MAX_LENGTH),
       })
       flag = false
     }
@@ -186,48 +186,62 @@ export default function TypeCreateOrUpdate() {
               <CForm noValidate className="row g-3">
                 <CCol xs={12}>
                   <CFormLabel htmlFor={Strings.Type.Form.ID.NAME}>
-                    {Strings.Type.Table.NAME} <strong className="text-danger">*</strong>
+                    {Strings.Form.FieldName.NAME(Strings.Type.NAME)}{' '}
+                    <strong className="text-danger">*</strong>
                   </CFormLabel>
                   <CFormInput
                     invalid={!Helpers.isNullOrEmpty(typeError.name)}
                     type="text"
                     id={Strings.Type.Form.ID.NAME}
-                    placeholder={Strings.Type.Table.NAME}
+                    placeholder={Strings.Form.FieldName.NAME(Strings.Type.NAME)}
                     value={type.name}
                     onChange={(e) => updateType({ name: e.target.value })}
                   />
-                  <CFormFeedback invalid>{Strings.Type.Form.Validation[typeError.name]}</CFormFeedback>
+                  <CFormFeedback invalid>
+                    {typeError.name &&
+                      Strings.Form.Validation[typeError.name](
+                        Strings.Form.FieldName.NAME(Strings.Type.NAME),
+                      )}
+                  </CFormFeedback>
                 </CCol>
                 <CCol xs={12} md={6}>
                   <CFormLabel htmlFor={Strings.Type.Form.ID.NOTATION}>
-                    {Strings.Type.Table.NOTATION} <strong className="text-danger">*</strong>
+                    {Strings.Form.FieldName.NOTATION(Strings.Type.NAME)}{' '}
+                    <strong className="text-danger">*</strong>
                   </CFormLabel>
                   <CFormInput
                     invalid={!Helpers.isNullOrEmpty(typeError.notation)}
                     type="text"
                     id={Strings.Type.Form.ID.NOTATION}
-                    placeholder={Strings.Type.Table.NOTATION}
+                    placeholder={Strings.Form.FieldName.NOTATION(Strings.Type.NAME)}
                     value={type.notation}
                     onChange={(e) => updateType({ notation: e.target.value })}
                   />
-                  <CFormFeedback invalid>{Strings.Type.Form.Validation[typeError.notation]}</CFormFeedback>
+                  <CFormFeedback invalid>
+                    {typeError.notation &&
+                      Strings.Form.Validation[typeError.notation](
+                        Strings.Form.FieldName.NOTATION(Strings.Type.NAME),
+                      )}
+                  </CFormFeedback>
                 </CCol>
                 <CCol xs={12} md={6}>
-                  <CFormLabel htmlFor={Strings.Type.Form.ID.COLOR}>{Strings.Type.Table.COLOR}</CFormLabel>
+                  <CFormLabel htmlFor={Strings.Type.Form.ID.COLOR}>
+                    {Strings.Form.FieldName.COLOR(Strings.Type.NAME)}
+                  </CFormLabel>
                   <CFormInput
                     invalid={!Helpers.isNullOrEmpty(typeError.color)}
                     type="color"
                     className="w-100"
                     id={Strings.Type.Form.ID.COLOR}
-                    placeholder={Strings.Type.Table.COLOR}
+                    placeholder={Strings.Form.FieldName.COLOR(Strings.Type.NAME)}
                     value={type.color}
                     onChange={(e) => updateType({ color: e.target.value })}
                   />
-                  <CFormFeedback invalid>{Strings.Type.Form.Validation[typeError.color]}</CFormFeedback>
+                  <CFormFeedback invalid>{Strings.Form.Validation[typeError.color]}</CFormFeedback>
                 </CCol>
                 <CCol xs={12}>
                   <CFormLabel htmlFor={Strings.Type.Form.ID.DESCRIPTION}>
-                    {Strings.Type.Table.DESCRIPTION}
+                    {Strings.Form.FieldName.DESCRIPTION(Strings.Type.NAME)}
                   </CFormLabel>
                   <CKEditor
                     id={Strings.Type.Form.ID.DESCRIPTION}
@@ -239,7 +253,12 @@ export default function TypeCreateOrUpdate() {
                       updateType({ description: data })
                     }}
                   />
-                  <CFormFeedback invalid>{Strings.Type.Form.Validation[typeError.description]}</CFormFeedback>
+                  <CFormFeedback invalid>
+                    {typeError.description &&
+                      Strings.Form.Validation[typeError.description](
+                        Strings.Form.FieldName.DESCRIPTION(Strings.Type.NAME),
+                      )}
+                  </CFormFeedback>
                 </CCol>
               </CForm>
             </CCardBody>

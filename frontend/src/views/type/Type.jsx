@@ -306,10 +306,10 @@ export default function Type() {
         backdrop="static"
       >
         <CModalHeader>
-          <CModalTitle>{Strings.Type.Common.NAME}</CModalTitle>
+          <CModalTitle>{Strings.Type.NAME}</CModalTitle>
         </CModalHeader>
         <CModalBody>
-          <CFormLabel>{Strings.Type.Table.DESCRIPTION}</CFormLabel>
+          <CFormLabel>{Strings.Form.FieldName.DESCRIPTION(Strings.Type.NAME)}</CFormLabel>
           <CFormTextarea
             rows="3"
             value={add.text}
