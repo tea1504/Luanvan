@@ -16,10 +16,6 @@ const officerSchema = new mongoose.Schema(
         true,
         Constants.String.Message.REQUIRED(Constants.String.Officer.CODE),
       ],
-      unique: [
-        true,
-        Constants.String.Message.UNIQUE(Constants.String.Officer.CODE),
-      ],
       maxLength: [
         10,
         Constants.String.Message.MAX_LENGTH(Constants.String.Officer.CODE),
@@ -66,10 +62,6 @@ const officerSchema = new mongoose.Schema(
           Constants.String.Officer.EMAIL_ADDRESS
         ),
       ],
-      unique: [
-        true,
-        Constants.String.Message.UNIQUE(Constants.String.Officer.EMAIL_ADDRESS),
-      ],
       maxLength: [
         200,
         Constants.String.Message.MAX_LENGTH(
@@ -88,10 +80,6 @@ const officerSchema = new mongoose.Schema(
         Constants.String.Message.REQUIRED(
           Constants.String.Officer.PHONE_NUMBER
         ),
-      ],
-      unique: [
-        true,
-        Constants.String.Message.UNIQUE(Constants.String.Officer.PHONE_NUMBER),
       ],
       maxLength: [
         10,
