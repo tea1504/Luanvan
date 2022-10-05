@@ -1,7 +1,7 @@
 import React from 'react'
 import { CButton, CTooltip } from '@coreui/react'
 import { useNavigate } from 'react-router-dom'
-import background from './../../../assets/images/403.gif'
+import Resources from 'src/commons/resources'
 
 const Page403 = () => {
   const navigate = useNavigate()
@@ -10,7 +10,7 @@ const Page403 = () => {
     <div
       className="vh-100 d-flex flex-row align-items-center justify-content-center"
       style={{
-        backgroundImage: `url(${background})`,
+        backgroundImage: `url(${Resources.Images.ERR_403})`,
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'contain',
         backgroundPosition: 'center',

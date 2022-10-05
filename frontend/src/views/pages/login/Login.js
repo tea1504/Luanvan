@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {
   CAlert,
   CButton,
@@ -16,13 +16,12 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
-import login1 from './../../../assets/images/login_bg.gif'
-import login2 from './../../../assets/images/login.gif'
 import AuthService from 'src/services/auth.service'
 import { useDispatch } from 'react-redux'
 import { setToken, setUser } from './../../../store/slice/user.slice'
 import Constants from 'src/constants'
 import Screens from 'src/constants/screens'
+import Resources from 'src/commons/resources'
 
 const authService = new AuthService()
 
@@ -110,7 +109,7 @@ const Login = () => {
     <div
       className="bg-light min-vh-100 d-flex flex-row align-items-center"
       style={{
-        backgroundImage: `url(${login1})`,
+        backgroundImage: `url(${Resources.Images.LOGIN_BACKGROUND})`,
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -178,7 +177,7 @@ const Login = () => {
                 className="text-white py-5 d-none d-md-inline"
                 style={{
                   width: '44%',
-                  backgroundImage: `url(${login2})`,
+                  backgroundImage: `url(${Resources.Images.LOGIN_IMAGE})`,
                   backgroundRepeat: 'no-repeat',
                   backgroundSize: 'contain',
                   backgroundPosition: 'center',

@@ -1,7 +1,7 @@
 import React from 'react'
 import { CButton } from '@coreui/react'
-import background from './../../../assets/images/404.gif'
 import { useNavigate } from 'react-router-dom'
+import Resources from 'src/commons/resources'
 
 const Page404 = () => {
   const navigate = useNavigate()
@@ -10,7 +10,7 @@ const Page404 = () => {
     <div
       className="vh-100 d-flex flex-row align-items-center justify-content-center"
       style={{
-        backgroundImage: `url(${background})`,
+        backgroundImage: `url(${Resources.Images.ERR_404})`,
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'contain',
         backgroundPosition: 'center',
