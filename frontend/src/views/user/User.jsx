@@ -6,10 +6,12 @@ import {
   CCardHeader,
   CCol,
   CContainer,
+  CFormFeedback,
   CFormInput,
   CFormLabel,
   CImage,
   CRow,
+  CSpinner,
 } from '@coreui/react'
 import React, { useEffect } from 'react'
 import { useState } from 'react'
@@ -21,8 +23,10 @@ import Constants from 'src/constants'
 import Screens from 'src/constants/screens'
 import Strings from 'src/constants/strings'
 import UserService from 'src/services/user.service'
+import { setLoading } from 'src/store/slice/config.slice'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
+import { setUser as su } from '../../store/slice/user.slice'
 
 const service = new UserService()
 const MySwal = withReactContent(Swal)
@@ -30,6 +34,7 @@ const MySwal = withReactContent(Swal)
 export default function User() {
   let loggedUser = useSelector((state) => state.user.user)
   let token = useSelector((state) => state.user.token)
+  const loading = useSelector((state) => state.config.loading)
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
@@ -43,9 +48,22 @@ export default function User() {
     position: '',
     right: { code: 0, name: '' },
     avatar: null,
+    avatarTemp: null,
   })
   const updateUser = (newState) => {
     setUser((prevState) => ({
+      ...prevState,
+      ...newState,
+    }))
+  }
+  const [error, setError] = useState({
+    emailAddress: null,
+    firstName: null,
+    lastName: null,
+    phoneNumber: null,
+  })
+  const updateError = (newState) => {
+    setError((prevState) => ({
       ...prevState,
       ...newState,
     }))
@@ -56,7 +74,7 @@ export default function User() {
       const result = await service.getInfo()
       const user = result.data.data
       localStorage.setItem(Constants.StorageKeys.USER_INFO, JSON.stringify(user))
-      dispatch(setUser(user))
+      dispatch(su(user))
     } catch (error) {
       switch (error.status) {
         case 401:
@@ -81,24 +99,69 @@ export default function User() {
     }
   }
 
+  const validation = () => {
+    let flag = true
+    if (Helpers.isNullOrEmpty(user.lastName)) {
+      flag = false
+      updateError({ lastName: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
+    } else if (user.lastName.length > 40) {
+      flag = false
+      updateError({ lastName: Helpers.propName(Strings, Strings.Form.Validation.MAX_LENGTH) })
+    }
+    if (Helpers.isNullOrEmpty(user.firstName)) {
+      flag = false
+      updateError({ firstName: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
+    } else if (user.firstName.length > 10) {
+      flag = false
+      updateError({ firstName: Helpers.propName(Strings, Strings.Form.Validation.MAX_LENGTH) })
+    }
+    if (Helpers.isNullOrEmpty(user.emailAddress)) {
+      flag = false
+      updateError({ emailAddress: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
+    } else if (user.emailAddress.length > 200) {
+      flag = false
+      updateError({ emailAddress: Helpers.propName(Strings, Strings.Form.Validation.MAX_LENGTH) })
+    } else if (!user.emailAddress.match(Constants.RegExp.EMAIL_ADDRESS)) {
+      flag = false
+      updateError({ emailAddress: Helpers.propName(Strings, Strings.Form.Validation.MATCH) })
+    }
+    if (Helpers.isNullOrEmpty(user.phoneNumber)) {
+      flag = false
+      updateError({ phoneNumber: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
+    } else if (user.phoneNumber.length > 10) {
+      flag = false
+      updateError({ phoneNumber: Helpers.propName(Strings, Strings.Form.Validation.MAX_LENGTH) })
+    } else if (user.phoneNumber.length < 10) {
+      flag = false
+      updateError({ phoneNumber: Helpers.propName(Strings, Strings.Form.Validation.MIN_LENGTH) })
+    } else if (!user.phoneNumber.match(Constants.RegExp.PHONE_NUMBER)) {
+      flag = false
+      updateError({ phoneNumber: Helpers.propName(Strings, Strings.Form.Validation.MATCH) })
+    }
+    return flag
+  }
+
   const handleOnCLickUpdateButton = async (e) => {
     e.preventDefault()
-    // updateTypeError({
-    //   name: null,
-    //   notation: null,
-    //   description: null,
-    //   color: null,
-    // })
-    if (true) {
+    updateError({
+      emailAddress: null,
+      firstName: null,
+      lastName: null,
+      phoneNumber: null,
+    })
+    if (validation()) {
       try {
+        dispatch(setLoading(true))
         const result = await service.putInfo(user)
         await getUser()
+        dispatch(setLoading(false))
         MySwal.fire({
           title: Strings.Common.SUCCESS,
           icon: 'success',
           text: Strings.Message.Create.SUCCESS,
         })
       } catch (error) {
+        dispatch(setLoading(false))
         switch (error.status) {
           case 401:
             MySwal.fire({
@@ -123,8 +186,16 @@ export default function User() {
     }
   }
 
+  const handleInputFileOnChange = (e) => {
+    const file = Array.from(e.target.files)[0]
+    updateUser({ avatar: file, avatarTemp: URL.createObjectURL(file) })
+  }
+
   useEffect(() => {
     updateUser(loggedUser)
+    return () => {
+      URL.revokeObjectURL(user.avatarTemp)
+    }
   }, [])
 
   return (
@@ -136,9 +207,13 @@ export default function User() {
             thumbnail
             align="center"
             className="shadow w-100"
-            src={`${process.env.REACT_APP_BASE_URL}/${loggedUser?.file?.path}?token=${token}`}
+            src={
+              user.avatarTemp
+                ? user.avatarTemp
+                : `${process.env.REACT_APP_BASE_URL}/${loggedUser?.file?.path}?token=${token}`
+            }
           />
-          <CFormInput type="file" className="mt-1" />
+          <CFormInput type="file" onChange={handleInputFileOnChange} className="mt-1" />
         </CCol>
         <CCol sm={9} className="py-1">
           <CCard className="shadow">
@@ -184,10 +259,15 @@ export default function User() {
                       Strings.Officer.CODE,
                       Helpers.propName(Strings, Strings.Form.FieldName.LAST_NAME),
                     )}
+                    invalid={!Helpers.isNullOrEmpty(error.lastName)}
                     type="text"
                     value={user.lastName}
                     onChange={(e) => updateUser({ lastName: e.target.value })}
                   />
+                  <CFormFeedback invalid>
+                    {error.lastName &&
+                      Strings.Form.Validation[error.lastName](Strings.Form.FieldName.LAST_NAME())}
+                  </CFormFeedback>
                 </CCol>
                 <CCol xs={12} sm={2} className="mt-1">
                   <CFormLabel
@@ -205,10 +285,15 @@ export default function User() {
                       Strings.Officer.CODE,
                       Helpers.propName(Strings, Strings.Form.FieldName.FIRST_NAME),
                     )}
+                    invalid={!Helpers.isNullOrEmpty(error.firstName)}
                     type="text"
                     value={user.firstName}
                     onChange={(e) => updateUser({ firstName: e.target.value })}
                   />
+                  <CFormFeedback invalid>
+                    {error.firstName &&
+                      Strings.Form.Validation[error.firstName](Strings.Form.FieldName.FIRST_NAME())}
+                  </CFormFeedback>
                 </CCol>
               </CRow>
               <CRow>
@@ -228,10 +313,17 @@ export default function User() {
                       Strings.Officer.CODE,
                       Helpers.propName(Strings, Strings.Form.FieldName.EMAIL_ADDRESS),
                     )}
+                    invalid={!Helpers.isNullOrEmpty(error.emailAddress)}
                     type="text"
                     value={user.emailAddress}
                     onChange={(e) => updateUser({ emailAddress: e.target.value })}
                   />
+                  <CFormFeedback invalid>
+                    {error.emailAddress &&
+                      Strings.Form.Validation[error.emailAddress](
+                        Strings.Form.FieldName.EMAIL_ADDRESS(),
+                      )}
+                  </CFormFeedback>
                 </CCol>
               </CRow>
               <CRow>
@@ -251,10 +343,17 @@ export default function User() {
                       Strings.Officer.CODE,
                       Helpers.propName(Strings, Strings.Form.FieldName.PHONE_NUMBER),
                     )}
+                    invalid={!Helpers.isNullOrEmpty(error.phoneNumber)}
                     type="text"
                     value={user.phoneNumber}
                     onChange={(e) => updateUser({ phoneNumber: e.target.value })}
                   />
+                  <CFormFeedback invalid>
+                    {error.phoneNumber &&
+                      Strings.Form.Validation[error.phoneNumber](
+                        Strings.Form.FieldName.PHONE_NUMBER(),
+                      )}
+                  </CFormFeedback>
                 </CCol>
               </CRow>
               <CRow>
@@ -305,10 +404,23 @@ export default function User() {
               </CRow>
             </CCardBody>
             <CCardFooter>
-              <CButton onClick={handleOnCLickUpdateButton}>{Strings.Common.UPDATE}</CButton>
-              <CButton onClick={() => updateUser(loggedUser)} variant="outline">
-                {Strings.Common.RESET}
-              </CButton>
+              <CRow>
+                <CCol>
+                  <CButton className="w-100" onClick={handleOnCLickUpdateButton}>
+                  {loading && <CSpinner size="sm" />} {Strings.Common.UPDATE}
+                  </CButton>
+                </CCol>
+                <CCol>
+                  <CButton
+                    className="w-100"
+                    color="secondary"
+                    onClick={() => updateUser(loggedUser)}
+                    variant="outline"
+                  >
+                    {Strings.Common.RESET}
+                  </CButton>
+                </CCol>
+              </CRow>
             </CCardFooter>
           </CCard>
         </CCol>

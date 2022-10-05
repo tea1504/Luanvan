@@ -60,3 +60,14 @@ export interface PriorityModel {
   updatedAt?: String;
   __v: Number;
 }
+
+export interface File {
+  fieldname: String;
+  originalname: String;
+  encoding: String;
+  mimetype: String;
+  destination: String;
+  filename: String;
+  path: String;
+  size: String;
+}

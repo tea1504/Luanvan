@@ -15,7 +15,7 @@ export default {
     FILTER: 'Lọc',
     OK: 'Chấp nhận',
     PROFILE: 'Thông tin',
-    RESET:"Đặt lại",
+    RESET: 'Đặt lại',
     SETTING: 'Cài đặt',
     SUBMIT: 'Lưu thông tin',
     SUCCESS: 'Thành công',
@@ -46,12 +46,13 @@ export default {
 
   Form: {
     Validation: {
-      REQUIRED: (m = '') => `Bạn phải nhập ${m}`,
-      MAX_LENGTH: (m = '') => m,
-      MIN_LENGTH: (m = '') => m,
-      MAX: (m = '') => m,
-      MIN: (m = '') => m,
-      UNIQUE: (m = '') => m,
+      REQUIRED: (m = '') => `Bạn phải nhập ${m}.`,
+      MAX_LENGTH: (m = '') => `${m} quá dài.`,
+      MIN_LENGTH: (m = '') => `${m} quá ngắn.`,
+      MAX: (m = '') => `${m} quá lớn.`,
+      MIN: (m = '') => `${m} quá nhỏ.`,
+      UNIQUE: (m = '') => `${m} bị trùng lặp.`,
+      MATCH: (m = '') => `${m} không hợp lệ.`,
     },
     FieldName: {
       __V: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),

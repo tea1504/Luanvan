@@ -13,22 +13,29 @@ import {
   CInputGroup,
   CInputGroupText,
   CRow,
+  CSpinner,
 } from '@coreui/react'
-import CIcon from '@coreui/icons-react'
-import { cilLockLocked, cilUser } from '@coreui/icons'
 import AuthService from 'src/services/auth.service'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { setToken, setUser } from './../../../store/slice/user.slice'
 import Constants from 'src/constants'
 import Screens from 'src/constants/screens'
 import Resources from 'src/commons/resources'
+import { FaEye, FaEyeSlash, FaLock, FaUser } from 'react-icons/fa'
+import { setLoading } from 'src/store/slice/config.slice'
 
 const authService = new AuthService()
 
 const Login = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const [loginInfo, setLoginInfo] = useState({ code: '000001', password: '12345' })
+  let loading = useSelector((state) => state.config.loading)
+
+  const [loginInfo, setLoginInfo] = useState({
+    code: '000001',
+    password: '12345',
+    showPassword: false,
+  })
   const updateLoginInfo = (newState) => {
     setLoginInfo((prevState) => ({
       ...prevState,
@@ -69,11 +76,15 @@ const Login = () => {
     try {
       e.preventDefault()
       if (validation()) {
+        dispatch(setLoading(true))
         await getToken()
         const token = localStorage.getItem(Constants.StorageKeys.ACCESS_TOKEN)
+        dispatch(setLoading(false))
         if (token) {
+          dispatch(setLoading(true))
           await getUser()
           const user = localStorage.getItem(Constants.StorageKeys.USER_INFO)
+          dispatch(setLoading(false))
           if (user) navigate(Screens.HOME, { replace: true })
         }
       }
@@ -81,6 +92,7 @@ const Login = () => {
       console.log(error)
       updateErr({ form: true, code: false, password: true, message: error.message })
     }
+    dispatch(setLoading(false))
   }
 
   const getToken = async () => {
@@ -131,7 +143,7 @@ const Login = () => {
                     {err.message !== '' && <CAlert color="danger">{err.message}</CAlert>}
                     <CInputGroup className="mb-4">
                       <CInputGroupText id="inputGroupPrepend1">
-                        <CIcon icon={cilUser} />
+                        <FaUser />
                       </CInputGroupText>
                       <CFormInput
                         invalid={err.code}
@@ -145,11 +157,11 @@ const Login = () => {
                     </CInputGroup>
                     <CInputGroup className="mb-5">
                       <CInputGroupText>
-                        <CIcon icon={cilLockLocked} />
+                        <FaLock />
                       </CInputGroupText>
                       <CFormInput
                         invalid={err.password}
-                        type="password"
+                        type={loginInfo.showPassword ? 'text' : 'password'}
                         placeholder="Mật khẩu"
                         autoComplete="current-password"
                         value={loginInfo.password}
@@ -157,11 +169,17 @@ const Login = () => {
                           updateLoginInfo({ password: e.target.value })
                         }}
                       />
+                      <CInputGroupText
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => updateLoginInfo({ showPassword: !loginInfo.showPassword })}
+                      >
+                        {loginInfo.showPassword ? <FaEyeSlash /> : <FaEye />}
+                      </CInputGroupText>
                     </CInputGroup>
                     <CRow>
                       <CCol xs={6}>
                         <CButton onClick={handleClickLoginButton} color="primary" className="px-4">
-                          Đăng nhập
+                          {loading && <CSpinner size="sm" />} Đăng nhập
                         </CButton>
                       </CCol>
                       <CCol xs={6} className="text-right">

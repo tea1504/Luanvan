@@ -48,6 +48,7 @@
     "react-calendar": "^3.8.0",
     "react-data-table-component": "^7.5.3",
     "react-dom": "^18.0.2",
+    "react-icons": "^4.4.0",
     "react-localization": "^1.0.19",
     "react-redux": "^7.2.6",
     "react-router-dom": "^6.2.2",

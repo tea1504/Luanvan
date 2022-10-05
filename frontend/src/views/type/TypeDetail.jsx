@@ -101,27 +101,27 @@ export default function TypeDetail() {
         <CCol>
           <CCard className="mb-3 border-secondary border-top-5">
             <CCardHeader className="text-center py-3" component="h3">
-              {Strings.Type.Common.NAME} {id.split('.')[0]}
+              {Strings.Type.NAME} {type.name}
             </CCardHeader>
             <CCardBody>
-              <CTable bordered>
+              <CTable bordered responsive>
                 <CTableRow>
                   <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Type.Table._ID}
+                    {Strings.Form.FieldName._ID(Strings.Type.NAME)}
                   </CTableHeaderCell>
                   <CTableDataCell>{type._id}</CTableDataCell>
                   <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Type.Table.__V}
+                    {Strings.Form.FieldName.__V}
                   </CTableHeaderCell>
                   <CTableDataCell>{type.__v}</CTableDataCell>
                 </CTableRow>
                 <CTableRow>
-                  <CTableHeaderCell className="py-2">{Strings.Type.Table.NAME}</CTableHeaderCell>
+                  <CTableHeaderCell className="py-2">{Strings.Form.FieldName.NAME(Strings.Type.NAME)}</CTableHeaderCell>
                   <CTableDataCell colSpan={3}>{type.name}</CTableDataCell>
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2">
-                    {Strings.Type.Table.DESCRIPTION}
+                    {Strings.Form.FieldName.DESCRIPTION(Strings.Type.NAME)}
                   </CTableHeaderCell>
                   <CTableDataCell colSpan={3} className="text-break">
                     {Helpers.htmlDecode(type.description)}
@@ -129,21 +129,21 @@ export default function TypeDetail() {
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2">
-                    {Strings.Type.Table.NOTATION}
+                    {Strings.Form.FieldName.NOTATION(Strings.Type.NAME)}
                   </CTableHeaderCell>
                   <CTableDataCell>{type.notation}</CTableDataCell>
-                  <CTableHeaderCell className="py-2">{Strings.Type.Table.COLOR}</CTableHeaderCell>
+                  <CTableHeaderCell className="py-2">{Strings.Form.FieldName.COLOR(Strings.Type.NAME)}</CTableHeaderCell>
                   <CTableDataCell className="text-center" style={{ backgroundColor: type.color }}>
                     {type.color}
                   </CTableDataCell>
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2">
-                    {Strings.Type.Table.CREATED_AT}
+                    {Strings.Form.FieldName.CREATED_AT}
                   </CTableHeaderCell>
                   <CTableDataCell>{Helpers.formatDateFromString(type.createdAt)}</CTableDataCell>
                   <CTableHeaderCell className="py-2">
-                    {Strings.Type.Table.UPDATED_AT}
+                    {Strings.Form.FieldName.UPDATED_AT}
                   </CTableHeaderCell>
                   <CTableDataCell>{Helpers.formatDateFromString(type.updatedAt)}</CTableDataCell>
                 </CTableRow>

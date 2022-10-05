@@ -11,8 +11,10 @@ var storage = multer.diskStorage({
     cb(null, path.join("public/avatars/"));
   },
   filename: function (req, file, cb) {
-    console.log(file);
-    cb(null, file.fieldname + "_" + Date.now() + "_" + file.originalname);
+    cb(
+      null,
+      file.fieldname + "_" + Date.now() + "." + file.originalname.split(".")[1]
+    );
   },
 });
 

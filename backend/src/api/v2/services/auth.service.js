@@ -3,6 +3,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Constants = require("../constants");
 const officerModel = require("./../models/officer.model");
+const path = require("path");
+var fs = require("fs");
 
 var authService = {
   /**
@@ -71,9 +73,13 @@ var authService = {
     }
   },
   /**
-   * @return {import('./../interfaces').ResponseResult}
+   *
+   * @param {string} id
+   * @param {object} data
+   * @param {import("./../interfaces").File} file
+   * @returns
    */
-  putInfo: async (id, data) => {
+  putInfo: async (id, data, file = null) => {
     try {
       const officerPhoneNumber = await officerModel.findOne({
         _id: { $ne: id },
@@ -99,10 +105,23 @@ var authService = {
             Constants.String.Officer.EMAIL_ADDRESS
           ),
         };
+      if (file)
+        data.file = {
+          name: file.originalname,
+          path: "avatars/" + file.filename,
+          typeFile: file.mimetype,
+          size: file.size,
+        };
       const officer = await officerModel.findOneAndUpdate(
         { _id: id, deleted: false },
         data
       );
+      const pathFile = path.join(
+        __dirname,
+        "./../../../../public/",
+        officer.file.path
+      );
+      if (file && fs.existsSync(pathFile)) fs.unlinkSync(pathFile);
       if (!officer) return { status: 404, message: "không tìm thấy thông tin" };
       const UpdatedOfficer = await officerModel.findById(id);
       return { status: 200, message: "thành công", data: UpdatedOfficer };
