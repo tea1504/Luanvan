@@ -50,12 +50,50 @@ const authController = {
    * @param {import("express").RequestHandler} next
    */
   putInfo: async (req, res, next) => {
-    // console.log(req.body, req.file, req.userID);
+    console.log(req.file);
     const { emailAddress, firstName, lastName, phoneNumber } = req.body;
+    if (!emailAddress)
+      return res.status(Constants.ApiCode.BAD_REQUEST).json({
+        code: Constants.ApiCode.BAD_REQUEST,
+        message: Constants.String.Message.ERR_400(
+          Constants.String.Officer.EMAIL_ADDRESS
+        ),
+      });
+    if (!firstName)
+      return res.status(Constants.ApiCode.BAD_REQUEST).json({
+        code: Constants.ApiCode.BAD_REQUEST,
+        message: Constants.String.Message.ERR_400(
+          Constants.String.Officer.FIRST_NAME
+        ),
+      });
+    if (!lastName)
+      return res.status(Constants.ApiCode.BAD_REQUEST).json({
+        code: Constants.ApiCode.BAD_REQUEST,
+        message: Constants.String.Message.ERR_400(
+          Constants.String.Officer.LAST_NAME
+        ),
+      });
+    if (!phoneNumber)
+      return res.status(Constants.ApiCode.BAD_REQUEST).json({
+        code: Constants.ApiCode.BAD_REQUEST,
+        message: Constants.String.Message.ERR_400(
+          Constants.String.Officer.PHONE_NUMBER
+        ),
+      });
     try {
-      const result = await authService.putInfo(req.userID, { emailAddress, firstName, lastName, phoneNumber });
+      const result = await authService.putInfo(
+        req.userID,
+        {
+          emailAddress,
+          firstName,
+          lastName,
+          phoneNumber,
+        },
+        req.file
+      );
       return res.status(result.status).json(result);
     } catch (error) {
+      console.log(error);
       return next(error);
     }
   },
