@@ -1,5 +1,6 @@
 const Constants = require("../constants");
 const languageService = require("./../services/language.service");
+var fs = require("fs");
 
 var languageController = {
   /**
@@ -31,7 +32,9 @@ var languageController = {
       if (!name)
         return res.status(Constants.ApiCode.BAD_REQUEST).json({
           status: Constants.ApiCode.BAD_REQUEST,
-          message: Constants.String.Message.ERR_400(Constants.String.Language.NAME),
+          message: Constants.String.Message.ERR_400(
+            Constants.String.Language.NAME
+          ),
         });
       if (!notation)
         return res.status(Constants.ApiCode.BAD_REQUEST).json({
@@ -47,6 +50,31 @@ var languageController = {
         color,
       });
       return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
+  postLanguages: async (req, res, next) => {
+    try {
+      const file = req.file;
+      const { text, title } = req.body;
+      if (file) {
+        const data = fs.readFileSync(file.path);
+        const index = data.toString().indexOf("\n");
+        var t = data.toString();
+        if (title === "true") t = t.slice(index + 1);
+        const result = await languageService.postLanguages(t);
+        fs.unlinkSync(file.path);
+        return res.status(result.status).json(result);
+      } else {
+        const result = await languageService.postLanguages(text);
+        return res.status(result.status).json(result);
+      }
     } catch (error) {
       return next(error);
     }
@@ -79,7 +107,9 @@ var languageController = {
       if (!name)
         return res.status(Constants.ApiCode.BAD_REQUEST).json({
           status: Constants.ApiCode.BAD_REQUEST,
-          message: Constants.String.Message.ERR_400(Constants.String.Language.NAME),
+          message: Constants.String.Message.ERR_400(
+            Constants.String.Language.NAME
+          ),
         });
       if (!notation)
         return res.status(Constants.ApiCode.BAD_REQUEST).json({
@@ -108,7 +138,9 @@ var languageController = {
     try {
       const { id } = req.params;
       list = id.split(".");
-      const result = await languageService.deleteLanguage(list[list.length - 1]);
+      const result = await languageService.deleteLanguage(
+        list[list.length - 1]
+      );
       return res.status(result.status).json(result);
     } catch (error) {
       return next(error);
