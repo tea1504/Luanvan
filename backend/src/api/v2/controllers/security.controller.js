@@ -1,5 +1,6 @@
 const Constants = require("../constants");
 const securityService = require("./../services/security.service");
+var fs = require("fs");
 
 var securityController = {
   /**
@@ -64,6 +65,31 @@ var securityController = {
    * @param {import("express").Request} req
    * @param {import("express").Response} res
    * @param {import("express").RequestHandler} next
+   */ 
+  postSecurities: async (req, res, next) => {
+    try {
+      const file = req.file;
+      const { text, title } = req.body;
+      if (file) {
+        const data = fs.readFileSync(file.path);
+        const index = data.toString().indexOf("\n");
+        var t = data.toString();
+        if (title === "true") t = t.slice(index + 1);
+        const result = await securityService.postSecurities(t);
+        fs.unlinkSync(file.path);
+        return res.status(result.status).json(result);
+      } else {
+        const result = await securityService.postSecurities(text);
+        return res.status(result.status).json(result);
+      }
+    } catch (error) {
+      return next(error);
+    }
+  },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
    */
   putSecurity: async (req, res, next) => {
     try {
@@ -96,7 +122,9 @@ var securityController = {
     try {
       const { id } = req.params;
       list = id.split(".");
-      const result = await securityService.deleteSecurity(list[list.length - 1]);
+      const result = await securityService.deleteSecurity(
+        list[list.length - 1]
+      );
       return res.status(result.status).json(result);
     } catch (error) {
       return next(error);

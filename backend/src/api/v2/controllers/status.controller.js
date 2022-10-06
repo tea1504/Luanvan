@@ -1,6 +1,7 @@
 const Constants = require("../constants");
 const statusModel = require("../models/status.model");
 const statusService = require("./../services/status.service");
+var fs = require("fs");
 
 var statusController = {
   /**
@@ -84,6 +85,31 @@ var statusController = {
         color,
       });
       return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
+  postStatuses: async (req, res, next) => {
+    try {
+      const file = req.file;
+      const { text, title } = req.body;
+      if (file) {
+        const data = fs.readFileSync(file.path);
+        const index = data.toString().indexOf("\n");
+        var t = data.toString();
+        if (title === "true") t = t.slice(index + 1);
+        const result = await statusService.postStatuses(t);
+        fs.unlinkSync(file.path);
+        return res.status(result.status).json(result);
+      } else {
+        const result = await statusService.postStatuses(text);
+        return res.status(result.status).json(result);
+      }
     } catch (error) {
       return next(error);
     }

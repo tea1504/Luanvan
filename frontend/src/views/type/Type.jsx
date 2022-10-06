@@ -40,9 +40,8 @@ import CIcon from '@coreui/icons-react'
 import Helpers from 'src/commons/helpers'
 import { useState } from 'react'
 import { setLoading } from 'src/store/slice/config.slice'
-import { Loading } from 'src/components'
 
-const typeService = new TypeService()
+const service = new TypeService()
 const MySwal = withReactContent(Swal)
 
 export default function Type() {
@@ -55,7 +54,7 @@ export default function Type() {
   Strings.setLanguage(language)
   const navigate = useNavigate()
 
-  const types = useSelector((state) => state.type)
+  const store = useSelector((state) => state.type)
 
   const [filter, setFilter] = useState('')
   const [toggleCleared, setToggleCleared] = useState(false)
@@ -69,9 +68,9 @@ export default function Type() {
     }))
   }
 
-  const getTypes = async (limit = 10, pageNumber = 1, filter = '') => {
+  const getState = async (limit = 10, pageNumber = 1, filter = '') => {
     try {
-      const result = await typeService.getTypes(limit, pageNumber, filter)
+      const result = await service.getMany(limit, pageNumber, filter)
       dispatch(setData(result.data.data.data))
       dispatch(setTotal(result.data.data.total))
     } catch (error) {
@@ -100,7 +99,7 @@ export default function Type() {
 
   const handlePerRowsChange = async (newPerPage, page) => {
     dispatch(setLoading(true))
-    await getTypes(newPerPage, page, filter)
+    await getState(newPerPage, page, filter)
     dispatch(setRowPerPage(newPerPage))
     dispatch(setPage(page))
     dispatch(setLoading(false))
@@ -109,7 +108,7 @@ export default function Type() {
   const handlePageChange = async (page) => {
     dispatch(setLoading(true))
     dispatch(setPage(page))
-    await getTypes(types.rowsPerPage, page, filter)
+    await getState(store.rowsPerPage, page, filter)
     dispatch(setLoading(false))
   }
 
@@ -117,7 +116,7 @@ export default function Type() {
     dispatch(setLoading(true))
     setFilter(str)
     dispatch(setPage(1))
-    await getTypes(types.rowsPerPage, 1, str)
+    await getState(store.rowsPerPage, 1, str)
     dispatch(setLoading(false))
   }
 
@@ -140,8 +139,8 @@ export default function Type() {
       if (result.isConfirmed) {
         try {
           dispatch(setLoading(true))
-          await typeService.deleteTypes(listId)
-          await getTypes()
+          await service.deleteMany(listId)
+          await getState()
           setSelectionRows([])
           setToggleCleared(!toggleCleared)
           dispatch(setLoading(false))
@@ -186,7 +185,7 @@ export default function Type() {
   const handleSubmitCSV = async () => {
     dispatch(setLoading(true))
     try {
-      await typeService.createTypes(add)
+      await service.createMany(add)
       setVisible(false)
       updateAdd({ text: '', file: null })
     } catch (error) {
@@ -211,13 +210,13 @@ export default function Type() {
           break
       }
     }
-    await getTypes(types.rowsPerPage, types.page, filter)
+    await getState(store.rowsPerPage, store.page, filter)
     dispatch(setLoading(false))
   }
 
   useEffect(() => {
     dispatch(setLoading(true))
-    getTypes(types.rowsPerPage, types.page, filter)
+    getState(store.rowsPerPage, store.page, filter)
     dispatch(setLoading(false))
   }, [])
 
@@ -279,12 +278,12 @@ export default function Type() {
                   <DataTable
                     {...configs.dataTable.props}
                     columns={typeColumns}
-                    data={types.data}
+                    data={store.data}
                     onChangeRowsPerPage={handlePerRowsChange}
                     onChangePage={handlePageChange}
-                    paginationTotalRows={types.total}
-                    paginationPerPage={types.rowsPerPage}
-                    paginationDefaultPage={types.page}
+                    paginationTotalRows={store.total}
+                    paginationPerPage={store.rowsPerPage}
+                    paginationDefaultPage={store.page}
                     onSelectedRowsChange={handleRowSelected}
                     clearSelectedRows={toggleCleared}
                     progressPending={loading}
@@ -330,15 +329,21 @@ export default function Type() {
         <CModalFooter>
           <CButton
             color="secondary"
+            disabled={loading}
             onClick={() => {
               setVisible(false)
-              updateAdd({ text: '' })
+              updateAdd({ text: '', title: false })
             }}
           >
             {Strings.Common.CANCEL}
           </CButton>
-          <CButton color="primary" onClick={handleSubmitCSV}>
-            {loading && <CSpinner size="sm" />} {Strings.Common.SUBMIT}
+          <CButton disabled={loading} color="primary" onClick={handleSubmitCSV}>
+            {loading && (
+              <>
+                <CSpinner size="sm" /> {Strings.Common.PROCESSING}
+              </>
+            )}
+            {!loading && Strings.Common.SUBMIT}
           </CButton>
         </CModalFooter>
       </CModal>

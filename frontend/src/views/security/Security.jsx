@@ -1,4 +1,4 @@
-import { cibAddthis, cilDelete, cilFile } from '@coreui/icons'
+import { cibAddthis } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import {
   CButton,
@@ -34,17 +34,17 @@ import configs from 'src/configs'
 import Constants from 'src/constants'
 import Screens from 'src/constants/screens'
 import Strings from 'src/constants/strings'
-import LanguageService from 'src/services/language.service'
+import SecurityService from 'src/services/security.service'
 import { setLoading } from 'src/store/slice/config.slice'
-import { setData, setPage, setRowPerPage, setTotal } from 'src/store/slice/language.slide'
+import { setData, setPage, setRowPerPage, setTotal } from 'src/store/slice/security.slide'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
-import languageColumns from './languageColumns'
+import securityColumns from './securityColumns'
 
-const service = new LanguageService()
+const service = new SecurityService()
 const MySwal = withReactContent(Swal)
 
-export default function Language() {
+export default function Security() {
   const dispatch = useDispatch()
   let loading = useSelector((state) => state.config.loading)
   let loggedUser = useSelector((state) => state.user.user)
@@ -54,7 +54,7 @@ export default function Language() {
   Strings.setLanguage(language)
   const navigate = useNavigate()
 
-  const store = useSelector((state) => state.language)
+  const store = useSelector((state) => state.security)
 
   const [filter, setFilter] = useState('')
   const [selectionRows, setSelectionRows] = useState([])
@@ -132,10 +132,12 @@ export default function Language() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
+          dispatch(setLoading(true))
           await service.deleteMany(listId)
           await getState()
           setSelectionRows([])
           setToggleCleared(!toggleCleared)
+          dispatch(setLoading(false))
           return MySwal.fire({
             title: Strings.Message.Delete.TITLE,
             icon: 'success',
@@ -143,6 +145,7 @@ export default function Language() {
             confirmButtonText: Strings.Common.OK,
           })
         } catch (error) {
+          dispatch(setLoading(false))
           switch (error.status) {
             case 401:
               MySwal.fire({
@@ -164,13 +167,15 @@ export default function Language() {
               break
           }
         }
-      } else
+      } else {
+        dispatch(setLoading(false))
         return MySwal.fire({
           title: Strings.Message.Delete.TITLE,
           icon: 'warning',
           text: Strings.Message.Delete.CANCEL,
           confirmButtonText: Strings.Common.OK,
         })
+      }
     })
   }
 
@@ -216,7 +221,7 @@ export default function Language() {
         <CCol>
           <CCard className="mb-3 border-secondary border-top-5">
             <CCardHeader className="text-center py-3" component="h3">
-              {Strings.Language.NAME}
+              {Strings.Security.NAME}
             </CCardHeader>
             <CCardBody>
               <CRow className="py-1">
@@ -252,7 +257,7 @@ export default function Language() {
                       <CButton
                         color="primary"
                         variant="outline"
-                        onClick={() => navigate(Screens.LANGUAGE_CREATE)}
+                        onClick={() => navigate(Screens.SECURITY_CREATE)}
                       >
                         <CIcon icon={cibAddthis} /> {Strings.Common.ADD_NEW}
                       </CButton>
@@ -267,7 +272,7 @@ export default function Language() {
                 <CCol>
                   <DataTable
                     {...configs.dataTable.props}
-                    columns={languageColumns}
+                    columns={securityColumns}
                     data={store.data}
                     onChangeRowsPerPage={handlePerRowsChange}
                     onChangePage={handlePageChange}
@@ -295,21 +300,21 @@ export default function Language() {
         backdrop="static"
       >
         <CModalHeader>
-          <CModalTitle>{Strings.Language.NAME}</CModalTitle>
+          <CModalTitle>{Strings.Security.NAME}</CModalTitle>
         </CModalHeader>
         <CModalBody>
-          <CFormLabel>{Strings.Form.FieldName.CSV(Strings.Language.NAME)}</CFormLabel>
+          <CFormLabel>{Strings.Form.FieldName.CSV(Strings.Security.NAME)}</CFormLabel>
           <CFormTextarea
             rows="3"
             value={add.text}
             onChange={(e) => updateAdd({ text: e.target.value })}
           ></CFormTextarea>
           <CFormText component="span">
-            <div dangerouslySetInnerHTML={{ __html: Strings.Language.Common.DESCRIPTION }}></div>
+            <div dangerouslySetInnerHTML={{ __html: Strings.Security.Common.DESCRIPTION }}></div>
           </CFormText>
-          <CFormLabel>{Strings.Form.FieldName.FILE_CSV(Strings.Language.NAME)}</CFormLabel>
+          <CFormLabel>{Strings.Form.FieldName.FILE_CSV(Strings.Security.NAME)}</CFormLabel>
           <CFormInput type="file" onChange={(e) => updateAdd({ file: e.target.files[0] })} />
-          <CTooltip content={Strings.Language.Common.TITLE}>
+          <CTooltip content={Strings.Common.TITLE_CSV}>
             <CFormCheck
               id="id"
               label={Strings.Form.FieldName.CHECK_BOX_CSV}
@@ -318,21 +323,27 @@ export default function Language() {
             />
           </CTooltip>
           <CFormText className="d-inline d-sm-none" component="span">
-            <div dangerouslySetInnerHTML={{ __html: Strings.Language.Common.TITLE }}></div>
+            <div dangerouslySetInnerHTML={{ __html: Strings.Common.TITLE_CSV }}></div>
           </CFormText>
         </CModalBody>
         <CModalFooter>
           <CButton
             color="secondary"
+            disabled={loading}
             onClick={() => {
               setVisible(false)
-              updateAdd({ text: '' })
+              updateAdd({ text: '', title: false })
             }}
           >
             {Strings.Common.CANCEL}
           </CButton>
-          <CButton color="primary" onClick={handleSubmitCSV}>
-            {loading && <CSpinner size="sm" />} {Strings.Common.SUBMIT}
+          <CButton disabled={loading} color="primary" onClick={handleSubmitCSV}>
+            {loading && (
+              <>
+                <CSpinner size="sm" /> {Strings.Common.PROCESSING}
+              </>
+            )}
+            {!loading && Strings.Common.SUBMIT}
           </CButton>
         </CModalFooter>
       </CModal>

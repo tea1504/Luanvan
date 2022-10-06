@@ -27,22 +27,42 @@ const _nav = [
   {
     component: CNavItem,
     name: {
-      vi: 'Loại văn bản',
-      en: 'Type',
-    },
-    role: [0],
-    to: Screens.TYPE,
-    icon: <CIcon icon={cilFile} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: {
-      vi: 'Ngôn ngữ',
-      en: 'Language',
+      vi: vn.Language.NAME,
+      en: en.Language.NAME,
     },
     role: [0],
     to: Screens.LANGUAGE,
     icon: <CIcon icon={cilLanguage} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: {
+      vi: vn.Security.NAME,
+      en: en.Security.NAME,
+    },
+    role: [0],
+    to: Screens.SECURITY,
+    icon: <CIcon icon={cilLanguage} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: {
+      vi: vn.Priority.NAME,
+      en: en.Priority.NAME,
+    },
+    role: [0],
+    to: Screens.PRIORITY,
+    icon: <CIcon icon={cilLanguage} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: {
+      vi: vn.Type.NAME,
+      en: en.Type.NAME,
+    },
+    role: [0],
+    to: Screens.TYPE,
+    icon: <CIcon icon={cilFile} customClassName="nav-icon" />,
   },
   {
     component: CNavGroup,

@@ -19,24 +19,23 @@ import Helpers from 'src/commons/helpers'
 import Constants from 'src/constants'
 import Screens from 'src/constants/screens'
 import Strings from 'src/constants/strings'
-import LanguageService from 'src/services/language.service'
+import PriorityService from 'src/services/priority.service'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 
-const service = new LanguageService()
+const service = new PriorityService()
 const MySwal = withReactContent(Swal)
 
-export default function LanguageDetail() {
+export default function PriorityDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const language = useSelector((state) => state.config.language)
   Strings.setLanguage(language)
 
   const store = useSelector((state) => state.language.data)
-  const [lang, setLang] = useState({
+  const [state, setState] = useState({
     _id: '',
     name: '',
-    notation: '',
     description: '',
     color: '',
     deleted: false,
@@ -44,28 +43,28 @@ export default function LanguageDetail() {
     updatedAt: '',
     __v: 0,
   })
-  const updateLanguage = (newState) => {
-    setLang((prevState) => ({
+  const updateState = (newState) => {
+    setState((prevState) => ({
       ...prevState,
       ...newState,
     }))
   }
 
-  const getLanguage = async (id = '') => {
+  const getState = async (id = '') => {
     if (store.length > 0) {
       const s = store.find((el) => el._id === id)
       if (!s) {
-        await getLanguageFromServer(id)
-      } else updateLanguage(s)
+        await getStateFromServer(id)
+      } else updateState(s)
     } else {
-      await getLanguageFromServer(id)
+      await getStateFromServer(id)
     }
   }
 
-  const getLanguageFromServer = async (id = '') => {
+  const getStateFromServer = async (id = '') => {
     try {
       const result = await service.getOne(id)
-      updateLanguage(result.data.data)
+      updateState(result.data.data)
     } catch (error) {
       switch (error.status) {
         case 401:
@@ -92,7 +91,7 @@ export default function LanguageDetail() {
 
   useEffect(() => {
     const list = id.split('.')
-    getLanguage(list[list.length - 1])
+    getState(list[list.length - 1])
   }, [])
 
   return (
@@ -101,7 +100,7 @@ export default function LanguageDetail() {
         <CCol>
           <CCard className="mb-3 border-secondary border-top-5">
             <CCardHeader className="text-center py-3" component="h3">
-              {Strings.Language.NAME} {lang.name}
+              {Strings.Priority.NAME} {state.name}
             </CCardHeader>
             <CCardBody>
               <CTable bordered responsive>
@@ -109,52 +108,52 @@ export default function LanguageDetail() {
                   <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
                     {Strings.Form.FieldName._ID}
                   </CTableHeaderCell>
-                  <CTableDataCell>{lang._id}</CTableDataCell>
+                  <CTableDataCell>{state._id}</CTableDataCell>
                   <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
                     {Strings.Form.FieldName.__V}
                   </CTableHeaderCell>
-                  <CTableDataCell>{lang.__v}</CTableDataCell>
+                  <CTableDataCell>{state.__v}</CTableDataCell>
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2">
-                    {Strings.Form.FieldName.NAME(Strings.Language.NAME)}
+                    {Strings.Form.FieldName.NAME(Strings.Priority.NAME)}
                   </CTableHeaderCell>
-                  <CTableDataCell colSpan={3}>{lang.name}</CTableDataCell>
+                  <CTableDataCell colSpan={3}>{state.name}</CTableDataCell>
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2">
-                    {Strings.Form.FieldName.DESCRIPTION(Strings.Language.NAME)}
+                    {Strings.Form.FieldName.DESCRIPTION(Strings.Priority.NAME)}
                   </CTableHeaderCell>
                   <CTableDataCell colSpan={3} className="text-break">
-                    {lang.description}
+                    {state.description}
                   </CTableDataCell>
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2">
-                    {Strings.Form.FieldName.NOTATION(Strings.Language.NAME)}
+                    {Strings.Form.FieldName.COLOR(Strings.Priority.NAME)}
                   </CTableHeaderCell>
-                  <CTableDataCell>{lang.notation}</CTableDataCell>
-                  <CTableHeaderCell className="py-2">
-                    {Strings.Form.FieldName.COLOR(Strings.Language.NAME)}
-                  </CTableHeaderCell>
-                  <CTableDataCell className="text-center" style={{ backgroundColor: lang.color }}>
-                    {lang.color}
+                  <CTableDataCell
+                    colSpan={3}
+                    className="text-center"
+                    style={{ backgroundColor: state.color }}
+                  >
+                    {state.color}
                   </CTableDataCell>
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2">
                     {Strings.Form.FieldName.CREATED_AT}
                   </CTableHeaderCell>
-                  <CTableDataCell>{Helpers.formatDateFromString(lang.createdAt)}</CTableDataCell>
+                  <CTableDataCell>{Helpers.formatDateFromString(state.createdAt)}</CTableDataCell>
                   <CTableHeaderCell className="py-2">
                     {Strings.Form.FieldName.UPDATED_AT}
                   </CTableHeaderCell>
-                  <CTableDataCell>{Helpers.formatDateFromString(lang.updatedAt)}</CTableDataCell>
+                  <CTableDataCell>{Helpers.formatDateFromString(state.updatedAt)}</CTableDataCell>
                 </CTableRow>
               </CTable>
             </CCardBody>
             <CCardFooter>
-              <CButton className="w-100" onClick={() => navigate(Screens.LANGUAGE)}>
+              <CButton className="w-100" onClick={() => navigate(Screens.PRIORITY)}>
                 {Strings.Common.BACK}
               </CButton>
             </CCardFooter>

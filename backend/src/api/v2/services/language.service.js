@@ -1,6 +1,7 @@
 require("dotenv").config();
 const Constants = require("../constants");
 const languageModel = require("./../models/language.model");
+const { parse } = require("csv-parse/sync");
 
 var languageService = {
   /**
@@ -103,6 +104,81 @@ var languageService = {
             status: Constants.ApiCode.NOT_ACCEPTABLE,
             message: Constants.String.Message.ERR_406,
             data: { error: error.message },
+          };
+        default:
+          return {
+            status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
+            message: Constants.String.Message.ERR_500,
+            data: { error: error.message },
+          };
+      }
+    }
+  },
+  postLanguages: async (str) => {
+    const list = [];
+    try {
+      const records = parse(str, { delimiter: "," });
+      for (var i = records.length - 1; i >= 0; i--) {
+        if (
+          (records[i][0] + "").trim() === "" ||
+          (records[i][1] + "").trim() === ""
+        )
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.ERR_406,
+            data: list,
+          };
+        var type = {
+          name: (records[i][0] + "").trim(),
+          notation: (records[i][1] + "").trim(),
+        };
+        if (records[i][2]) type.description = (records[i][2] + "").trim();
+        if (records[i][3]) type.color = (records[i][3] + "").trim();
+        const languageName = await languageModel.findOne({
+          name: type.name,
+          deleted: false,
+        });
+        if (languageName)
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.UNIQUE(
+              Constants.String.Type.NAME
+            ),
+            data: list,
+          };
+        const languageNotation = await languageModel.findOne({
+          notation: type.notation,
+          deleted: false,
+        });
+        if (languageNotation)
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.UNIQUE(
+              Constants.String.Type.NOTATION
+            ),
+            data: list,
+          };
+        const newLanguage = await languageModel.create(type);
+        list.push(newLanguage);
+      }
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.POST_200(Constants.String.Type._),
+        data: list,
+      };
+    } catch (error) {
+      switch (error.name) {
+        case "ValidationError":
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.ERR_406,
+            data: { list, error: error.errors },
+          };
+        case "MongoServerError":
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.ERR_406,
+            data: { list, error: error.message },
           };
         default:
           return {

@@ -11,19 +11,13 @@ export default [
     right: true,
   },
   {
-    name: Strings.Form.FieldName.NAME(Strings.Language.NAME),
+    name: Strings.Form.FieldName.NAME(Strings.Security.NAME),
     selector: (row) => row.name,
     sortable: true,
     maxWidth: '300px',
   },
   {
-    name: Strings.Form.FieldName.NOTATION(),
-    selector: (row) => row.notation,
-    sortable: true,
-    width: '150px',
-  },
-  {
-    name: Strings.Form.FieldName.DESCRIPTION(Strings.Language.NAME),
+    name: Strings.Form.FieldName.DESCRIPTION(Strings.Security.NAME),
     selector: (row) => row.description,
     sortable: true,
     cell: (row) => (

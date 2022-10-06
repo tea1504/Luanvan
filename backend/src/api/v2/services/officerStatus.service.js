@@ -1,6 +1,7 @@
 require("dotenv").config();
 const Constants = require("../constants");
 const officerStatusModel = require("../models/officerStatus.model");
+const { parse } = require("csv-parse/sync");
 
 var officerStatusService = {
   /**
@@ -44,7 +45,9 @@ var officerStatusService = {
         .sort({ createdAt: -1 });
       return {
         status: Constants.ApiCode.SUCCESS,
-        message: Constants.String.Message.GET_200(Constants.String.OfficerStatus._),
+        message: Constants.String.Message.GET_200(
+          Constants.String.OfficerStatus._
+        ),
         data: result,
       };
     } catch (error) {
@@ -61,7 +64,10 @@ var officerStatusService = {
    */
   getOfficerStatus: async (id) => {
     try {
-      const type = await officerStatusModel.findOne({ _id: id, deleted: false });
+      const type = await officerStatusModel.findOne({
+        _id: id,
+        deleted: false,
+      });
       if (!type)
         return {
           status: Constants.ApiCode.NOT_FOUND,
@@ -71,7 +77,9 @@ var officerStatusService = {
         };
       return {
         status: Constants.ApiCode.SUCCESS,
-        message: Constants.String.Message.GET_200(Constants.String.OfficerStatus._),
+        message: Constants.String.Message.GET_200(
+          Constants.String.OfficerStatus._
+        ),
         data: type,
       };
     } catch (error) {
@@ -111,7 +119,9 @@ var officerStatusService = {
       const newOfficerStatus = await officerStatusModel.create(officerStatus);
       return {
         status: Constants.ApiCode.SUCCESS,
-        message: Constants.String.Message.POST_200(Constants.String.OfficerStatus._),
+        message: Constants.String.Message.POST_200(
+          Constants.String.OfficerStatus._
+        ),
         data: newOfficerStatus,
       };
     } catch (error) {
@@ -127,6 +137,63 @@ var officerStatusService = {
             status: Constants.ApiCode.NOT_ACCEPTABLE,
             message: Constants.String.Message.ERR_406,
             data: { error: error.message },
+          };
+        default:
+          return {
+            status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
+            message: Constants.String.Message.ERR_500,
+            data: { error: error.message },
+          };
+      }
+    }
+  },
+  postOfficerStatuses: async (str) => {
+    const list = [];
+    try {
+      const records = parse(str, { delimiter: "," });
+      for (var i = records.length - 1; i >= 0; i--) {
+        if ((records[i][0] + "").trim() === "")
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.ERR_406,
+            data: list,
+          };
+        var item = { name: (records[i][0] + "").trim() };
+        if (records[i][1]) item.description = (records[i][1] + "").trim();
+        if (records[i][2]) item.color = (records[i][2] + "").trim();
+        const itemName = await officerStatusModel.findOne({
+          name: item.name,
+          deleted: false,
+        });
+        if (itemName)
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.UNIQUE(
+              Constants.String.Type.NAME
+            ),
+            data: list,
+          };
+        const newItem = await officerStatusModel.create(item);
+        list.push(newItem);
+      }
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.POST_200(Constants.String.Type._),
+        data: list,
+      };
+    } catch (error) {
+      switch (error.name) {
+        case "ValidationError":
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.ERR_406,
+            data: { list, error: error.errors },
+          };
+        case "MongoServerError":
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.ERR_406,
+            data: { list, error: error.message },
           };
         default:
           return {
@@ -174,7 +241,9 @@ var officerStatusService = {
       const result = await officerStatusModel.findOne({ _id: id });
       return {
         status: Constants.ApiCode.SUCCESS,
-        message: Constants.String.Message.PUT_200(Constants.String.OfficerStatus._),
+        message: Constants.String.Message.PUT_200(
+          Constants.String.OfficerStatus._
+        ),
         data: result,
       };
     } catch (error) {

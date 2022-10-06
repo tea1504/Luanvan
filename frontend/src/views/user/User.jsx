@@ -158,7 +158,7 @@ export default function User() {
         MySwal.fire({
           title: Strings.Common.SUCCESS,
           icon: 'success',
-          text: Strings.Message.Create.SUCCESS,
+          text: Strings.Message.Update.SUCCESS,
         })
       } catch (error) {
         dispatch(setLoading(false))

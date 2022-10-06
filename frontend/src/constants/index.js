@@ -52,9 +52,30 @@ const Constants = {
       `/languages?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
     GET_LANGUAGE: (id) => `/languages/` + id,
     CREATE_LANGUAGE: '/languages',
+    CREATE_LANGUAGES: '/languages/csv',
     UPDATE_LANGUAGE: (id) => '/languages/' + id,
     DELETE_LANGUAGE: (id) => '/languages/' + id,
     DELETE_LANGUAGES: '/languages',
+
+    // Security
+    GET_SECURITIES: (limit = 10, pageNumber = 1, filter = '') =>
+      `/securities?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+    GET_SECURITY: (id) => `/securities/` + id,
+    CREATE_SECURITY: '/securities',
+    CREATE_SECURITIES: '/securities/csv',
+    UPDATE_SECURITY: (id) => '/securities/' + id,
+    DELETE_SECURITY: (id) => '/securities/' + id,
+    DELETE_SECURITIES: '/securities',
+
+    // Priority
+    GET_PRIORITIES: (limit = 10, pageNumber = 1, filter = '') =>
+      `/priorities?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+    GET_PRIORITY: (id) => `/priorities/` + id,
+    CREATE_PRIORITY: '/priorities',
+    CREATE_PRIORITIES: '/priorities/csv',
+    UPDATE_PRIORITY: (id) => '/priorities/' + id,
+    DELETE_PRIORITY: (id) => '/priorities/' + id,
+    DELETE_PRIORITIES: '/priorities',
   },
 
   /**

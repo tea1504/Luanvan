@@ -23,17 +23,18 @@ import TypeService from 'src/services/type.service'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 
-const typeService = new TypeService()
+const service = new TypeService()
 const MySwal = withReactContent(Swal)
 
 export default function TypeDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const types = useSelector((state) => state.type.data)
   const language = useSelector((state) => state.config.language)
   Strings.setLanguage(language)
 
-  const [type, setType] = useState({
+  const store = useSelector((state) => state.type.data)
+
+  const [state, setState] = useState({
     _id: '',
     name: '',
     notation: '',
@@ -44,19 +45,19 @@ export default function TypeDetail() {
     updatedAt: '',
     __v: 0,
   })
-  const updateType = (newState) => {
-    setType((prevState) => ({
+  const updateState = (newState) => {
+    setState((prevState) => ({
       ...prevState,
       ...newState,
     }))
   }
 
   const getType = async (id = '') => {
-    if (types.length > 0) {
-      const type = types.find((el) => el._id === id)
-      if (!type) {
+    if (store.length > 0) {
+      const s = store.find((el) => el._id === id)
+      if (!s) {
         await getTypeFromServer(id)
-      } else updateType(type)
+      } else updateState(s)
     } else {
       await getTypeFromServer(id)
     }
@@ -64,8 +65,8 @@ export default function TypeDetail() {
 
   const getTypeFromServer = async (id = '') => {
     try {
-      const result = await typeService.getType(id)
-      updateType(result.data.data)
+      const result = await service.getOne(id)
+      updateState(result.data.data)
     } catch (error) {
       switch (error.status) {
         case 401:
@@ -101,51 +102,51 @@ export default function TypeDetail() {
         <CCol>
           <CCard className="mb-3 border-secondary border-top-5">
             <CCardHeader className="text-center py-3" component="h3">
-              {Strings.Type.NAME} {type.name}
+              {Strings.Type.NAME} {state.name}
             </CCardHeader>
             <CCardBody>
               <CTable bordered responsive>
                 <CTableRow>
                   <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Form.FieldName._ID(Strings.Type.NAME)}
+                    {Strings.Form.FieldName._ID}
                   </CTableHeaderCell>
-                  <CTableDataCell>{type._id}</CTableDataCell>
+                  <CTableDataCell>{state._id}</CTableDataCell>
                   <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
                     {Strings.Form.FieldName.__V}
                   </CTableHeaderCell>
-                  <CTableDataCell>{type.__v}</CTableDataCell>
+                  <CTableDataCell>{state.__v}</CTableDataCell>
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2">{Strings.Form.FieldName.NAME(Strings.Type.NAME)}</CTableHeaderCell>
-                  <CTableDataCell colSpan={3}>{type.name}</CTableDataCell>
+                  <CTableDataCell colSpan={3}>{state.name}</CTableDataCell>
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2">
                     {Strings.Form.FieldName.DESCRIPTION(Strings.Type.NAME)}
                   </CTableHeaderCell>
                   <CTableDataCell colSpan={3} className="text-break">
-                    {Helpers.htmlDecode(type.description)}
+                    {Helpers.htmlDecode(state.description)}
                   </CTableDataCell>
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2">
                     {Strings.Form.FieldName.NOTATION(Strings.Type.NAME)}
                   </CTableHeaderCell>
-                  <CTableDataCell>{type.notation}</CTableDataCell>
+                  <CTableDataCell>{state.notation}</CTableDataCell>
                   <CTableHeaderCell className="py-2">{Strings.Form.FieldName.COLOR(Strings.Type.NAME)}</CTableHeaderCell>
-                  <CTableDataCell className="text-center" style={{ backgroundColor: type.color }}>
-                    {type.color}
+                  <CTableDataCell className="text-center" style={{ backgroundColor: state.color }}>
+                    {state.color}
                   </CTableDataCell>
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2">
                     {Strings.Form.FieldName.CREATED_AT}
                   </CTableHeaderCell>
-                  <CTableDataCell>{Helpers.formatDateFromString(type.createdAt)}</CTableDataCell>
+                  <CTableDataCell>{Helpers.formatDateFromString(state.createdAt)}</CTableDataCell>
                   <CTableHeaderCell className="py-2">
                     {Strings.Form.FieldName.UPDATED_AT}
                   </CTableHeaderCell>
-                  <CTableDataCell>{Helpers.formatDateFromString(type.updatedAt)}</CTableDataCell>
+                  <CTableDataCell>{Helpers.formatDateFromString(state.updatedAt)}</CTableDataCell>
                 </CTableRow>
               </CTable>
             </CCardBody>

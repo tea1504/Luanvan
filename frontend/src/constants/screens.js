@@ -24,6 +24,18 @@ const Screens = {
   LANGUAGE_CREATE: '/languages/create',
   LANGUAGE_UPDATE: (id = ':id') => '/languages/update/' + id,
 
+  // Security
+  SECURITY: '/securities',
+  SECURITY_DETAIL: (id = ':id') => '/securities/detail/' + id,
+  SECURITY_CREATE: '/securities/create',
+  SECURITY_UPDATE: (id = ':id') => '/securities/update/' + id,
+
+  // Priority
+  PRIORITY: '/priorities',
+  PRIORITY_DETAIL: (id = ':id') => '/priorities/detail/' + id,
+  PRIORITY_CREATE: '/priorities/create',
+  PRIORITY_UPDATE: (id = ':id') => '/priorities/update/' + id,
+
   // Officer
   OFFICER_INFO: '/officer',
   // =========================================================================

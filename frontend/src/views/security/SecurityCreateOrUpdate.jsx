@@ -1,3 +1,5 @@
+import { CKEditor } from '@ckeditor/ckeditor5-react'
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
 import {
   CButton,
   CCard,
@@ -13,47 +15,49 @@ import {
   CRow,
   CSpinner,
 } from '@coreui/react'
-import React from 'react'
-import { useEffect } from 'react'
-import { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import Helpers from 'src/commons/helpers'
+import ckEditorConfig from 'src/configs/ckEditor.config'
 import Constants from 'src/constants'
 import Screens from 'src/constants/screens'
 import Strings from 'src/constants/strings'
-import TypeService from 'src/services/type.service'
+import LanguageService from 'src/services/language.service'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
-import { CKEditor } from '@ckeditor/ckeditor5-react'
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
-import ckEditorConfig from 'src/configs/ckEditor.config'
 import { useDispatch } from 'react-redux'
 import { setLoading } from 'src/store/slice/config.slice'
+import Required from 'src/components/Required'
+import SecurityService from 'src/services/security.service'
 
-const services = new TypeService()
+const service = new SecurityService()
 const MySwal = withReactContent(Swal)
 
-export default function TypeCreateOrUpdate() {
+export default function SecurityCreateOrUpdate() {
   const { id } = useParams()
-  const navigate = useNavigate()
   const dispatch = useDispatch()
   let loading = useSelector((state) => state.config.loading)
+  const navigate = useNavigate()
   const language = useSelector((state) => state.config.language)
   Strings.setLanguage(language)
 
-  const store = useSelector((state) => state.type.data)
+  const store = useSelector((state) => state.security.data)
 
-  const [state, setState] = useState({ name: '', notation: '', description: '', color: '#12B7BC' })
+  const [state, setState] = useState({
+    name: '',
+    description: '',
+    color: '#12B7BC',
+  })
   const updateState = (newState) => {
     setState((prevState) => ({
       ...prevState,
       ...newState,
     }))
   }
+
   const [error, setError] = useState({
     name: null,
-    notation: null,
     description: null,
     color: null,
   })
@@ -66,10 +70,10 @@ export default function TypeCreateOrUpdate() {
 
   const getState = async (id = '') => {
     if (store.length > 0) {
-      const s = store.find((el) => el._id === id)
-      if (!s) {
+      const l = store.find((el) => el._id === id)
+      if (!l) {
         await getStateFromServer(id)
-      } else updateState(s)
+      } else updateState(l)
     } else {
       await getStateFromServer(id)
     }
@@ -78,7 +82,7 @@ export default function TypeCreateOrUpdate() {
   const getStateFromServer = async (id = '') => {
     try {
       dispatch(setLoading(true))
-      const result = await services.getOne(id)
+      const result = await service.getOne(id)
       updateState(result.data.data)
       dispatch(setLoading(false))
     } catch (error) {
@@ -95,9 +99,12 @@ export default function TypeCreateOrUpdate() {
             navigate(Screens.LOGIN)
           })
           break
-
         default:
-          console.log(error)
+          MySwal.fire({
+            title: Strings.Message.COMMON_ERROR,
+            icon: 'error',
+            text: error.message,
+          })
           break
       }
     }
@@ -106,18 +113,19 @@ export default function TypeCreateOrUpdate() {
   const validate = () => {
     var flag = true
     if (Helpers.isNullOrEmpty(state.name)) {
-      updateError({ name: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
+      updateError({
+        name: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED),
+      })
       flag = false
     } else if (state.name.length > 100) {
-      updateError({ name: Helpers.propName(Strings, Strings.Form.Validation.MAX_LENGTH) })
+      updateError({
+        name: Helpers.propName(Strings, Strings.Form.Validation.MAX_LENGTH),
+      })
       flag = false
     }
-    if (Helpers.isNullOrEmpty(state.notation)) {
-      updateError({ notation: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
-      flag = false
-    } else if (state.notation.length > 10) {
+    if (state.description.length > 1000) {
       updateError({
-        notation: Helpers.propName(Strings, Strings.Form.Validation.MAX_LENGTH),
+        description: Helpers.propName(Strings, Strings.Form.Validation.MAX_LENGTH),
       })
       flag = false
     }
@@ -128,7 +136,6 @@ export default function TypeCreateOrUpdate() {
     e.preventDefault()
     updateError({
       name: null,
-      notation: null,
       description: null,
       color: null,
     })
@@ -136,23 +143,22 @@ export default function TypeCreateOrUpdate() {
       try {
         dispatch(setLoading(true))
         if (!id) {
-          const result = await services.createOne(state)
-          dispatch(setLoading(false))
+          const result = await service.createOne(state)
           MySwal.fire({
             title: Strings.Common.SUCCESS,
             icon: 'success',
             text: Strings.Message.Create.SUCCESS,
           })
-          updateState({ name: '', notation: '', description: '', color: '#12B7BC' })
+          updateState({ name: '', description: '', color: '#12B7BC' })
         } else {
-          const result = await services.updateOne(id, state)
-          dispatch(setLoading(false))
+          const result = await service.updateOne(id, state)
           MySwal.fire({
             title: Strings.Common.SUCCESS,
             icon: 'success',
             text: Strings.Message.Update.SUCCESS,
           })
         }
+        dispatch(setLoading(false))
       } catch (error) {
         dispatch(setLoading(false))
         switch (error.status) {
@@ -186,7 +192,6 @@ export default function TypeCreateOrUpdate() {
     } else
       updateState({
         name: '',
-        notation: '',
         description: '',
         color: '#12B7BC',
       })
@@ -211,71 +216,76 @@ export default function TypeCreateOrUpdate() {
         <CCol>
           <CCard className="mb-3 border-secondary border-top-5">
             <CCardHeader className="text-center py-3" component="h3">
-              {Strings.Type.Common.NAME}
+              {Strings.Security.NAME}
             </CCardHeader>
             <CCardBody>
               <CForm noValidate className="row g-3">
                 <CCol xs={12}>
-                  <CFormLabel htmlFor={Strings.Type.Form.ID.NAME}>
-                    {Strings.Form.FieldName.NAME(Strings.Type.NAME)}{' '}
-                    <strong className="text-danger">*</strong>
+                  <CFormLabel
+                    htmlFor={Helpers.makeID(
+                      Strings.Security.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.NAME),
+                    )}
+                  >
+                    {Strings.Form.FieldName.NAME(Strings.Security.NAME)}{' '}
+                    <Required mes={Strings.Form.Validation.REQUIRED()} />
                   </CFormLabel>
                   <CFormInput
                     invalid={!Helpers.isNullOrEmpty(error.name)}
                     type="text"
-                    id={Strings.Type.Form.ID.NAME}
-                    placeholder={Strings.Form.FieldName.NAME(Strings.Type.NAME)}
+                    id={Helpers.makeID(
+                      Strings.Security.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.NAME),
+                    )}
+                    placeholder={Strings.Form.FieldName.NAME(Strings.Security.NAME)}
                     value={state.name}
                     onChange={(e) => updateState({ name: e.target.value })}
+                    onKeyPress={handleKeypress}
                   />
                   <CFormFeedback invalid>
-                    {error.name &&
-                      Strings.Form.Validation[error.name](
-                        Strings.Form.FieldName.NAME(Strings.Type.NAME),
-                      )}
+                    {error.name && Strings.Form.Validation[error.name](Strings.Security.NAME)}
                   </CFormFeedback>
                 </CCol>
-                <CCol xs={12} md={6}>
-                  <CFormLabel htmlFor={Strings.Type.Form.ID.NOTATION}>
-                    {Strings.Form.FieldName.NOTATION(Strings.Type.NAME)}{' '}
-                    <strong className="text-danger">*</strong>
-                  </CFormLabel>
-                  <CFormInput
-                    invalid={!Helpers.isNullOrEmpty(error.notation)}
-                    type="text"
-                    id={Strings.Type.Form.ID.NOTATION}
-                    placeholder={Strings.Form.FieldName.NOTATION(Strings.Type.NAME)}
-                    value={state.notation}
-                    onChange={(e) => updateState({ notation: e.target.value })}
-                  />
-                  <CFormFeedback invalid>
-                    {error.notation &&
-                      Strings.Form.Validation[error.notation](
-                        Strings.Form.FieldName.NOTATION(Strings.Type.NAME),
-                      )}
-                  </CFormFeedback>
-                </CCol>
-                <CCol xs={12} md={6}>
-                  <CFormLabel htmlFor={Strings.Type.Form.ID.COLOR}>
-                    {Strings.Form.FieldName.COLOR(Strings.Type.NAME)}
+                <CCol>
+                  <CFormLabel
+                    htmlFor={Helpers.makeID(
+                      Strings.Security.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.COLOR),
+                    )}
+                  >
+                    {Strings.Form.FieldName.COLOR(Strings.Security.NAME)}
                   </CFormLabel>
                   <CFormInput
                     invalid={!Helpers.isNullOrEmpty(error.color)}
                     type="color"
                     className="w-100"
-                    id={Strings.Type.Form.ID.COLOR}
-                    placeholder={Strings.Form.FieldName.COLOR(Strings.Type.NAME)}
+                    id={Helpers.makeID(
+                      Strings.Security.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.COLOR),
+                    )}
+                    placeholder={Strings.Form.FieldName.COLOR(Strings.Security.NAME)}
                     value={state.color}
                     onChange={(e) => updateState({ color: e.target.value })}
+                    onKeyPress={handleKeypress}
                   />
-                  <CFormFeedback invalid>{Strings.Form.Validation[error.color]}</CFormFeedback>
+                  <CFormFeedback invalid>
+                    {error.color && Strings.Form.Validation[error.color](Strings.Security.NAME)}
+                  </CFormFeedback>
                 </CCol>
                 <CCol xs={12}>
-                  <CFormLabel htmlFor={Strings.Type.Form.ID.DESCRIPTION}>
-                    {Strings.Form.FieldName.DESCRIPTION(Strings.Type.NAME)}
+                  <CFormLabel
+                    htmlFor={Helpers.makeID(
+                      Strings.Security.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.DESCRIPTION),
+                    )}
+                  >
+                    {Strings.Form.FieldName.DESCRIPTION(Strings.Security.NAME)}
                   </CFormLabel>
                   <CKEditor
-                    id={Strings.Type.Form.ID.DESCRIPTION}
+                    id={Helpers.makeID(
+                      Strings.Security.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.DESCRIPTION),
+                    )}
                     editor={ClassicEditor}
                     config={ckEditorConfig}
                     data={state.description}
@@ -284,11 +294,11 @@ export default function TypeCreateOrUpdate() {
                       updateState({ description: data })
                     }}
                   />
-                  <CFormFeedback invalid>
+                  <CFormFeedback
+                    style={{ color: '#e55353', fontSize: '0.875em', marginTop: '0.25rem' }}
+                  >
                     {error.description &&
-                      Strings.Form.Validation[error.description](
-                        Strings.Form.FieldName.DESCRIPTION(Strings.Type.NAME),
-                      )}
+                      Strings.Form.Validation[error.description](Strings.Security.NAME)}
                   </CFormFeedback>
                 </CCol>
               </CForm>
@@ -317,7 +327,7 @@ export default function TypeCreateOrUpdate() {
                     className="w-100"
                     variant="outline"
                     color="secondary"
-                    onClick={() => navigate(Screens.TYPE)}
+                    onClick={() => navigate(Screens.SECURITY)}
                   >
                     {Strings.Common.BACK}
                   </CButton>

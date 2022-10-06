@@ -10,15 +10,17 @@ export default {
     DASHBOARD: 'Trang chủ',
     DELETE_MULTI: 'Xóa những phần đã chọn',
     DELETE: 'Xóa',
-    DETAIL: 'Detail',
+    DETAIL: 'Chi tiết',
     EDIT: 'Chỉnh sửa',
     FILTER: 'Lọc',
     OK: 'Chấp nhận',
+    PROCESSING: 'Đang xử lý ...',
     PROFILE: 'Thông tin',
     RESET: 'Đặt lại',
     SETTING: 'Cài đặt',
     SUBMIT: 'Lưu thông tin',
     SUCCESS: 'Thành công',
+    TITLE_CSV: 'Bỏ qua dòng đầu tiên của file',
     UPDATE: 'Cập nhật',
   },
 
@@ -46,7 +48,7 @@ export default {
 
   Form: {
     Validation: {
-      REQUIRED: (m = '') => `Bạn phải nhập ${m}.`,
+      REQUIRED: (m = '') => (m ? `Bạn phải nhập ${m.toLowerCase()}.` : 'Trường bắt buộc nhập'),
       MAX_LENGTH: (m = '') => `${m} quá dài.`,
       MIN_LENGTH: (m = '') => `${m} quá ngắn.`,
       MAX: (m = '') => `${m} quá lớn.`,
@@ -55,18 +57,21 @@ export default {
       MATCH: (m = '') => `${m} không hợp lệ.`,
     },
     FieldName: {
-      __V: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
-      _ID: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
+      __V: 'Phiên bản',
+      _ID: 'ID',
       APPROVER: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
       ARRIVAL_DATE: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
       ARRIVAL_NUMBER: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
+      CHECK_BOX_CSV: 'File có tiêu đề',
       CODE: (m = '') => (m ? `Mã số ${m.toLowerCase()}` : 'Mã số'),
-      COLOR: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
-      CREATED_AT: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
+      COLOR: (m = '') => (m ? `Màu sắc ${m.toLowerCase()}` : 'Màu sắc'),
+      CREATED_AT: 'Thời điểm khởi tạo',
+      CSV: (m = '') => (m ? `Nhập dữ liệu ${m.toLowerCase()}` : 'Nhập dữ liệu'),
       DELETED: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
-      DESCRIPTION: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
+      DESCRIPTION: (m = '') => (m ? `Mô tả ${m.toLowerCase()}` : 'Mô tả'),
       DUE_DATE: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
       EMAIL_ADDRESS: (m = '') => (m ? `Địa chỉ email ${m.toLowerCase()}` : 'Địa chỉ email'),
+      FILE_CSV: (m = '') => (m ? `File csv ${m.toLowerCase()}` : 'File csv'),
       FILE: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
       FIRST_NAME: (m = '') => (m ? `Tên ${m.toLowerCase()}` : 'Tên'),
       HANDLER: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
@@ -76,7 +81,7 @@ export default {
       LANGUAGE: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
       LAST_NAME: (m = '') => (m ? `Họ lót ${m.toLowerCase()}` : 'Họ lót'),
       NAME: (m = '') => (m ? `Tên ${m.toLowerCase()}` : 'Tên'),
-      NOTATION: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
+      NOTATION: (m = '') => (m ? `Ký hiệu ${m.toLowerCase()}` : 'Ký hiệu'),
       ORGANIZATION: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
       PAGE_AMOUNT: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
       PASSWORD: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
@@ -95,8 +100,7 @@ export default {
       TRACE_HEADER_LIST: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
       TYPE_FILE: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
       TYPE: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
-      UPDATED_AT: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
-      __V: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
+      UPDATED_AT: 'Thời điểm cập nhật',
       VALUE: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
     },
   },
@@ -148,16 +152,11 @@ export default {
     },
   },
   Language: {
+    NAME: 'Ngôn ngữ',
+    CODE: 'LANGUAGE',
     Common: {
-      NAME: 'Ngôn ngữ',
-    },
-    Form: {
-      ID: {
-        COLOR: '',
-        DESCRIPTION: '',
-        NAME: '',
-        NOTATION: '',
-      },
+      DESCRIPTION: `Mỗi cột dữ liệu phải cách nhau bởi dấu <code>,</code>.<br /> Ví dụ:<br /> <code>Tiếng Việt, vn, Tiếng Kinh Việt Nam, #123456</code> <br/> <code>Tiếng Anh, en, Tiếng Anh - Anh,</code> <br/> <code>Trung Quốc, cn,,</code>`,
+      TITLE: 'Bỏ qua dòng đầu tiên của file',
     },
   },
   Officer: {
@@ -241,8 +240,10 @@ export default {
     },
   },
   Priority: {
+    NAME: 'Độ khẩn',
     Common: {
-      NAME: 'Độ khẩn',
+      DESCRIPTION:
+        'Mỗi cột dữ liệu phải cách nhau bởi dấu <code>,</code>.<br /> Ví dụ:<br /> <code>Độ khẩn 1, dk_01, Cần xử lý ngay, #123456</code> <br/> <code>Độ khẩn 2, dk_02, Xử lý trong ngày,</code> <br/> <code>Không khẩn, dk_00,,</code>',
     },
     Form: {
       ID: {
@@ -261,8 +262,10 @@ export default {
     },
   },
   Security: {
+    NAME: 'Độ mật',
+    CODE: 'SECURITY',
     Common: {
-      NAME: 'Độ mật',
+      DESCRIPTION: `Mỗi cột dữ liệu phải cách nhau bởi dấu <code>,</code>.<br /> Ví dụ:<br /> <code>Độ mật 1, dm_01, Chỉ dành cho lãnh đạo đơn vị, #123456</code> <br/> <code>Độ mật 2, dm_02, Chỉ dành cho cán bộ đơn vị,</code> <br/> <code>Không mật, dm_00,,</code>`,
     },
     Form: {
       ID: {

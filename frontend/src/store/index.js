@@ -7,6 +7,8 @@ import configSlice from './slice/config.slice'
 import bookSlide from './slice/book.slide'
 import typeSlide from './slice/type.slide'
 import languageSlide from './slice/language.slide'
+import securitySlide from './slice/security.slide'
+import prioritySlide from './slice/priority.slide'
 
 const reducers = combineReducers({
   user: userSlice,
@@ -14,6 +16,8 @@ const reducers = combineReducers({
   book: bookSlide,
   type: typeSlide,
   language: languageSlide,
+  security: securitySlide,
+  priority: prioritySlide,
 })
 
 const persistConfig = {
