@@ -1,5 +1,6 @@
 const Constants = require("../constants");
 const priorityService = require("./../services/priority.service");
+var fs = require("fs");
 
 var priorityController = {
   /**
@@ -56,6 +57,31 @@ var priorityController = {
         color,
       });
       return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
+  postPriorities: async (req, res, next) => {
+    try {
+      const file = req.file;
+      const { text, title } = req.body;
+      if (file) {
+        const data = fs.readFileSync(file.path);
+        const index = data.toString().indexOf("\n");
+        var t = data.toString();
+        if (title === "true") t = t.slice(index + 1);
+        const result = await priorityService.postPriorities(t);
+        fs.unlinkSync(file.path);
+        return res.status(result.status).json(result);
+      } else {
+        const result = await priorityService.postPriorities(text);
+        return res.status(result.status).json(result);
+      }
     } catch (error) {
       return next(error);
     }
