@@ -3,8 +3,8 @@ info:
   title: E-Office API's Document
   version: "1.0.0"
 servers:
+  - url: http://10.10.35.101:5000/v2
   - url: http://localhost:5000/v2
-  - url: http://10.10.34.217:5000/v2
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -708,6 +708,42 @@ paths:
           description: Dữ liệu không được chấp nhận
         500:
           description: Lỗi hệ thống
+  /types/csv:
+    post:
+      summary: Thêm nhiều bản ghi
+      tags:
+        - Type
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema: 
+              type: object
+              properties:
+                text:
+                  type: string
+                  default: "1,1,\n2,2,\n3,3,"
+                title:
+                  type: boolean
+                  default: false
+                file:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          description: Thêm mới thành công
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
   /types/{id}:
     get:
       summary: Lấy bản ghi 1 loại văn bản theo id
@@ -875,6 +911,42 @@ paths:
           description: Không có quyền truy cập
         404:
           description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+  /statuses/csv:
+    post:
+      summary: Thêm nhiều bản ghi
+      tags:
+        - Status
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema: 
+              type: object
+              properties:
+                text:
+                  type: string
+                  default: "1,1,\n2,2,\n3,3,"
+                title:
+                  type: boolean
+                  default: false
+                file:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          description: Thêm mới thành công
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
         406:
           description: Dữ liệu không được chấp nhận
         500:
@@ -1048,6 +1120,42 @@ paths:
           description: Dữ liệu không được chấp nhận
         500:
           description: Lỗi hệ thống
+  /securities/csv:
+    post:
+      summary: Thêm nhiều bản ghi
+      tags:
+        - Security
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema: 
+              type: object
+              properties:
+                text:
+                  type: string
+                  default: "1,1,\n2,2,\n3,3,"
+                title:
+                  type: boolean
+                  default: false
+                file:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          description: Thêm mới thành công
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
   /securities/{id}:
     get:
       summary: Lấy bản ghi theo id
@@ -1213,6 +1321,42 @@ paths:
           description: Không có quyền truy cập
         404:
           description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+  /priorities/csv:
+    post:
+      summary: Thêm nhiều bản ghi
+      tags:
+        - Priority
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema: 
+              type: object
+              properties:
+                text:
+                  type: string
+                  default: "1,1,\n2,2,\n3,3,"
+                title:
+                  type: boolean
+                  default: false
+                file:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          description: Thêm mới thành công
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
         406:
           description: Dữ liệu không được chấp nhận
         500:
@@ -1386,6 +1530,42 @@ paths:
           description: Dữ liệu không được chấp nhận
         500:
           description: Lỗi hệ thống
+  /languages/csv:
+    post:
+      summary: Thêm nhiều bản ghi
+      tags:
+        - Language
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema: 
+              type: object
+              properties:
+                text:
+                  type: string
+                  default: "1,1,\n2,2,\n3,3,"
+                title:
+                  type: boolean
+                  default: false
+                file:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          description: Thêm mới thành công
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
   /languages/{id}:
     get:
       summary: Lấy bản ghi theo id
@@ -1553,6 +1733,42 @@ paths:
           description: Không có quyền truy cập
         404:
           description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+  /officerStatuses/csv:
+    post:
+      summary: Thêm nhiều bản ghi
+      tags:
+        - Officer Status
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema: 
+              type: object
+              properties:
+                text:
+                  type: string
+                  default: "1,1,\n2,2,\n3,3,"
+                title:
+                  type: boolean
+                  default: false
+                file:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          description: Thêm mới thành công
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
         406:
           description: Dữ liệu không được chấp nhận
         500:
