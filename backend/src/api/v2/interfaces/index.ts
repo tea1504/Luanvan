@@ -71,3 +71,24 @@ export interface File {
   path: String;
   size: String;
 }
+
+export interface RightModel {
+  _id?: String;
+  code: Number;
+  name: String;
+  createOD?: Boolean;
+  updateOD?: Boolean;
+  deleteOD?: Boolean;
+  approveOD?: Boolean;
+  createOfficer?: Boolean;
+  updateOfficer?: Boolean;
+  deleteOfficer?: Boolean;
+  createCategories?: Boolean;
+  updateCategories?: Boolean;
+  deleteCategories?: Boolean;
+  scope?: Number;
+  deleted?: Boolean;
+  createdAt?: String;
+  updatedAt?: String;
+  __v?: Number;
+}

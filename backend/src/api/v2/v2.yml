@@ -3,7 +3,7 @@ info:
   title: E-Office API's Document
   version: "1.0.0"
 servers:
-  - url: http://10.10.35.101:5000/v2
+  - url: http://192.168.109.100:5000/v2
   - url: http://localhost:5000/v2
 components:
   securitySchemes:
@@ -1834,6 +1834,177 @@ paths:
       summary: Xóa bản ghi theo id
       tags:
         - Officer Status
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      responses:
+        200:
+          description: Thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+  /rights:
+    get:
+      summary: Lấy danh sách bản ghi
+      tags:
+        - Right
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          required: true
+          description: Số lượng bản ghi
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+            default: 1
+          required: true
+          description: Trang
+        - in: query
+          name: filter
+          schema:
+            type: string
+          required: false
+          description: Lọc kết quả
+      responses:
+        200:
+          description: Truy vấn thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        500:
+          description: Lỗi hệ thống
+    post:
+      summary: Thêm mới bản ghi
+      tags:
+        - Right
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Right"
+      responses:
+        200:
+          description: OK
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+    delete:
+      summary: Xóa nhiều bản ghi
+      tags:
+        - Right
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        200:
+          description: Xóa thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+  /rights/{id}:
+    get:
+      summary: Lấy bản ghi theo id
+      tags:
+        - Right
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      responses:
+        200:
+          description: Lấy bản ghi thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+    put:
+      summary: Cập nhật bản ghi theo id
+      tags:
+        - Right
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OfficerStatus"
+      responses:
+        200:
+          description: Thành công
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+    delete:
+      summary: Xóa bản ghi theo id
+      tags:
+        - Right
       parameters:
         - in: path
           name: id
