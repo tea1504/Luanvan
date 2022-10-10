@@ -36,12 +36,21 @@ const Screens = {
   PRIORITY_CREATE: '/priorities/create',
   PRIORITY_UPDATE: (id = ':id') => '/priorities/update/' + id,
 
+  // Right
+  RIGHT: '/rights',
+  RIGHT_DETAIL: (id = ':id') => '/rights/detail/' + id,
+  RIGHT_CREATE: '/rights/create',
+  RIGHT_UPDATE: (id = ':id') => '/rights/update/' + id,
+
   // Officer
   OFFICER_INFO: '/officer',
   // =========================================================================
   // Public
   // =========================================================================
   LOGIN: '/login',
+  E404: '/404',
+  E403: '/403',
+  E500: '/500',
 }
 
 export default Screens
