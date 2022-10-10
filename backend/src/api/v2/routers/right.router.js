@@ -4,6 +4,7 @@ const route = express.Router();
 const controller = require("./../controllers/right.controller");
 
 route.get(Constants.ApiPath.Right.SLASH, controller.getMany);
+route.get(Constants.ApiPath.Right.GET_MAX_CODE, controller.getMaxCode);
 route.get(Constants.ApiPath.Right.ID, controller.getOne);
 route.post(Constants.ApiPath.Right.SLASH, controller.postOne);
 route.put(Constants.ApiPath.Right.ID, controller.putOne);
