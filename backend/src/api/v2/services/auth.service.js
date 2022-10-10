@@ -61,7 +61,7 @@ var authService = {
           id,
           "-_id -password -status -organ -deleted -createdAt -updatedAt -__v"
         )
-        .populate("right", "-_id code name");
+        .populate("right");
       if (!officer) return { status: 404, message: "không tìm thấy thông tin" };
       return { status: 200, message: "thành công", data: officer };
     } catch (error) {
