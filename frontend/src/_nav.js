@@ -47,6 +47,16 @@ const _nav = [
   {
     component: CNavItem,
     name: {
+      vi: vn.Right.NAME,
+      en: en.Right.NAME,
+    },
+    role: [0],
+    to: Screens.RIGHT,
+    icon: <CIcon icon={cilLanguage} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: {
       vi: vn.Priority.NAME,
       en: en.Priority.NAME,
     },
