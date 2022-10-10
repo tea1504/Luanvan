@@ -52,6 +52,7 @@ const Constants = {
       SLASH: "/",
       ID: "/:id",
       CREATE_MULTI: "/csv",
+      GET_MAX_CODE:"/max-code"
     },
     Priority: {
       ROOT: "/priorities",
