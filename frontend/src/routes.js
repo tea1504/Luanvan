@@ -21,6 +21,9 @@ const SecurityDetail = React.lazy(() => import('./views/security/SecurityDetail'
 const Priority = React.lazy(() => import('./views/priority/Priority'))
 const PriorityCreateOrUpDate = React.lazy(() => import('./views/priority/PriorityCreateOrUpdate'))
 const PriorityDetail = React.lazy(() => import('./views/priority/PriorityDetail'))
+const Right = React.lazy(() => import('./views/right/Right'))
+const RightCreateOrUpDate = React.lazy(() => import('./views/right/RightCreateOrUpdate'))
+const RightDetail = React.lazy(() => import('./views/right/RightDetail'))
 
 const routes = [
   { path: '/', exact: true, name: { vi: 'Trang chủ', en: 'Home' } },
@@ -96,6 +99,30 @@ const routes = [
     path: Screens.PRIORITY_UPDATE(),
     name: { vi: vn.Common.UPDATE, en: en.Common.UPDATE },
     element: PriorityCreateOrUpDate,
+    role: [0],
+  },
+  {
+    path: Screens.RIGHT,
+    name: { vi: vn.Right.NAME, en: en.Right.NAME },
+    element: Right,
+    role: [0],
+  },
+  {
+    path: Screens.RIGHT_DETAIL(),
+    name: { vi: vn.Common.DETAIL, en: en.Common.DETAIL },
+    element: RightDetail,
+    role: [0],
+  },
+  {
+    path: Screens.RIGHT_CREATE,
+    name: { vi: vn.Common.CREATE, en: en.Common.CREATE },
+    element: RightCreateOrUpDate,
+    role: [0],
+  },
+  {
+    path: Screens.RIGHT_UPDATE(),
+    name: { vi: vn.Common.UPDATE, en: en.Common.UPDATE },
+    element: RightCreateOrUpDate,
     role: [0],
   },
   { path: Screens.TYPE, name: { vi: vn.Type.NAME, en: en.Type.NAME }, element: Type, role: [0] },
