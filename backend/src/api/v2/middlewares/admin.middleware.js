@@ -12,7 +12,7 @@ const checkAdmin = async (req, res, next) => {
     const right = await officerModel
       .findById(req.userID, "-_id right")
       .populate("right");
-    if (right.right.code != 0)
+    if (right.right.scope != 0)
       return res.status(403).send({
         status: 403,
         message: Constants.String.Message.ERR_403,
