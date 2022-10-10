@@ -54,6 +54,76 @@ var rightService = {
     }
   },
   /**
+   * @param {string} id
+   * @returns {import("./../interfaces").ResponseResult}
+   */
+  getOne: async (id) => {
+    try {
+      const item = await model.findOne({ _id: id, deleted: false });
+      if (!item)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Right._),
+        };
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.GET_200(Constants.String.Right._),
+        data: item,
+      };
+    } catch (error) {
+      switch (error.name) {
+        case "CastError":
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.ERR_406,
+            data: { error: error.message },
+          };
+        default:
+          return {
+            status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
+            message: Constants.String.Message.ERR_500,
+            data: { error: error.message },
+          };
+      }
+    }
+  },
+  /**
+   * @returns {import("./../interfaces").ResponseResult}
+   */
+  getMaxCode: async () => {
+    try {
+      const result = await model
+        .findOne({ deleted: false }, "-_id code")
+        .sort({ code: -1 });
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.GET_200(Constants.String.Right.CODE),
+        data: result,
+      };
+    } catch (error) {
+      switch (error.name) {
+        case "ValidationError":
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.ERR_406,
+            data: { error: error.errors },
+          };
+        case "MongoServerError":
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.ERR_406,
+            data: { error: error.message },
+          };
+        default:
+          return {
+            status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
+            message: Constants.String.Message.ERR_500,
+            data: { error: error.message },
+          };
+      }
+    }
+  },
+  /**
    * @param {import("./../interfaces").RightModel} data
    * @returns {import("./../interfaces").ResponseResult}
    */
@@ -108,40 +178,6 @@ var rightService = {
   },
   /**
    * @param {string} id
-   * @returns {import("./../interfaces").ResponseResult}
-   */
-  getOne: async (id) => {
-    try {
-      const item = await model.findOne({ _id: id, deleted: false });
-      if (!item)
-        return {
-          status: Constants.ApiCode.NOT_FOUND,
-          message: Constants.String.Message.ERR_404(Constants.String.Right._),
-        };
-      return {
-        status: Constants.ApiCode.SUCCESS,
-        message: Constants.String.Message.GET_200(Constants.String.Right._),
-        data: item,
-      };
-    } catch (error) {
-      switch (error.name) {
-        case "CastError":
-          return {
-            status: Constants.ApiCode.NOT_ACCEPTABLE,
-            message: Constants.String.Message.ERR_406,
-            data: { error: error.message },
-          };
-        default:
-          return {
-            status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
-            message: Constants.String.Message.ERR_500,
-            data: { error: error.message },
-          };
-      }
-    }
-  },
-  /**
-   * @param {string} id
    * @param {import("./../interfaces").RightModel} data
    * @returns {import("./../interfaces").ResponseResult}
    */
@@ -171,9 +207,7 @@ var rightService = {
       if (code)
         return {
           status: Constants.ApiCode.NOT_ACCEPTABLE,
-          message: Constants.String.Message.UNIQUE(
-            Constants.String.Right.CODE
-          ),
+          message: Constants.String.Message.UNIQUE(Constants.String.Right.CODE),
         };
       const updatedItem = await model.findOneAndUpdate(
         { _id: id, deleted: false },
