@@ -76,6 +76,16 @@ const Constants = {
     UPDATE_PRIORITY: (id) => '/priorities/' + id,
     DELETE_PRIORITY: (id) => '/priorities/' + id,
     DELETE_PRIORITIES: '/priorities',
+
+    // Priority
+    GET_RIGHTS: (limit = 10, pageNumber = 1, filter = '') =>
+      `/rights?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+    GET_RIGHT: (id) => `/rights/` + id,
+    GET_MAX_CODE: `/rights/max-code`,
+    CREATE_RIGHT: '/rights',
+    UPDATE_RIGHT: (id) => '/rights/' + id,
+    DELETE_RIGHT: (id) => '/rights/' + id,
+    DELETE_RIGHTS: '/rights',
   },
 
   /**
