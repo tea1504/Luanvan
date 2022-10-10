@@ -36,6 +36,9 @@ const MySwal = withReactContent(Swal)
 export default function LanguageCreateOrUpdate() {
   const { id } = useParams()
   const dispatch = useDispatch()
+  let loggedUser = useSelector((state) => state.user.user)
+  if (Helpers.isObjectEmpty(loggedUser))
+    loggedUser = JSON.parse(localStorage.getItem(Constants.StorageKeys.USER_INFO))
   let loading = useSelector((state) => state.config.loading)
   const navigate = useNavigate()
   const language = useSelector((state) => state.config.language)
@@ -199,11 +202,10 @@ export default function LanguageCreateOrUpdate() {
   }
 
   const handelOnClickResetButton = async () => {
-    if (id){
+    if (id) {
       const list = id.split('.')
       await getState(list[list.length - 1])
-    }
-    else
+    } else
       updateState({
         name: '',
         notation: '',
@@ -220,8 +222,11 @@ export default function LanguageCreateOrUpdate() {
 
   useEffect(() => {
     if (id) {
+      if (!loggedUser.right.updateCategories) navigate(Screens.E403)
       const list = id.split('.')
       getState(list[list.length - 1])
+    } else {
+      if (!loggedUser.right.createCategories) navigate(Screens.E403)
     }
   }, [])
 

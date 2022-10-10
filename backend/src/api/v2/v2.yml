@@ -3,7 +3,7 @@ info:
   title: E-Office API's Document
   version: "1.0.0"
 servers:
-  - url: http://192.168.109.100:5000/v2
+  - url: http://10.10.42.249:5000/v2
   - url: http://localhost:5000/v2
 components:
   securitySchemes:
@@ -1944,6 +1944,24 @@ paths:
           description: Dữ liệu không được chấp nhận
         500:
           description: Lỗi hệ thống
+  /rights/max-code:
+    get:
+      summary: Lấy bản ghi
+      tags:
+        - Right
+      responses:
+          200:
+            description: Lấy bản ghi thành công
+          401:
+            description: Phiên đăng nhập hết hạn
+          403:
+            description: Không có quyền truy cập
+          404:
+            description: Không tìm thấy loại văn bản hoặc liên kết
+          406:
+            description: Dữ liệu không được chấp nhận
+          500:
+            description: Lỗi hệ thống
   /rights/{id}:
     get:
       summary: Lấy bản ghi theo id

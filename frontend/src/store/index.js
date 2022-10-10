@@ -9,6 +9,7 @@ import typeSlide from './slice/type.slide'
 import languageSlide from './slice/language.slide'
 import securitySlide from './slice/security.slide'
 import prioritySlide from './slice/priority.slide'
+import rightSlide from './slice/right.slide'
 
 const reducers = combineReducers({
   user: userSlice,
@@ -18,6 +19,8 @@ const reducers = combineReducers({
   language: languageSlide,
   security: securitySlide,
   priority: prioritySlide,
+  priority: prioritySlide,
+  right: rightSlide,
 })
 
 const persistConfig = {

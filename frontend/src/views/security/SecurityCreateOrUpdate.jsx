@@ -23,7 +23,6 @@ import ckEditorConfig from 'src/configs/ckEditor.config'
 import Constants from 'src/constants'
 import Screens from 'src/constants/screens'
 import Strings from 'src/constants/strings'
-import LanguageService from 'src/services/language.service'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import { useDispatch } from 'react-redux'
@@ -37,6 +36,9 @@ const MySwal = withReactContent(Swal)
 export default function SecurityCreateOrUpdate() {
   const { id } = useParams()
   const dispatch = useDispatch()
+  let loggedUser = useSelector((state) => state.user.user)
+  if (Helpers.isObjectEmpty(loggedUser))
+    loggedUser = JSON.parse(localStorage.getItem(Constants.StorageKeys.USER_INFO))
   let loading = useSelector((state) => state.config.loading)
   const navigate = useNavigate()
   const language = useSelector((state) => state.config.language)
@@ -205,9 +207,11 @@ export default function SecurityCreateOrUpdate() {
 
   useEffect(() => {
     if (id) {
+      if (!loggedUser.right.updateCategories) navigate(Screens.E403)
       const list = id.split('.')
       getState(list[list.length - 1])
     }
+    if (!loggedUser.right.createCategories) navigate(Screens.E403)
   }, [])
 
   return (

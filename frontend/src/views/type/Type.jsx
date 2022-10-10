@@ -247,7 +247,7 @@ export default function Type() {
                   </CInputGroup>
                 </CCol>
                 <CCol className="text-end mt-1">
-                  {[0].includes(loggedUser?.right.code) && (
+                  {loggedUser.right.createCategories && (
                     <CButtonGroup role="group">
                       {selectionRows.length != 0 && (
                         <CButton

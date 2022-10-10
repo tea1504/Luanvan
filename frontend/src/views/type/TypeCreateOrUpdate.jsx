@@ -38,6 +38,9 @@ export default function TypeCreateOrUpdate() {
   const { id } = useParams()
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  let loggedUser = useSelector((state) => state.user.user)
+  if (Helpers.isObjectEmpty(loggedUser))
+    loggedUser = JSON.parse(localStorage.getItem(Constants.StorageKeys.USER_INFO))
   let loading = useSelector((state) => state.config.loading)
   const language = useSelector((state) => state.config.language)
   Strings.setLanguage(language)
@@ -200,9 +203,11 @@ export default function TypeCreateOrUpdate() {
 
   useEffect(() => {
     if (id) {
+      if (!loggedUser.right.updateCategories) navigate(Screens.E403)
       const list = id.split('.')
       getState(list[list.length - 1])
     }
+    if (!loggedUser.right.createCategories) navigate(Screens.E403)
   }, [])
 
   return (

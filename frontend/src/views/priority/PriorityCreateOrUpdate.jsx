@@ -36,6 +36,9 @@ const MySwal = withReactContent(Swal)
 export default function PriorityCreateOrUpdate() {
   const { id } = useParams()
   const dispatch = useDispatch()
+  let loggedUser = useSelector((state) => state.user.user)
+  if (Helpers.isObjectEmpty(loggedUser))
+    loggedUser = JSON.parse(localStorage.getItem(Constants.StorageKeys.USER_INFO))
   let loading = useSelector((state) => state.config.loading)
   const navigate = useNavigate()
   const language = useSelector((state) => state.config.language)
@@ -204,9 +207,11 @@ export default function PriorityCreateOrUpdate() {
 
   useEffect(() => {
     if (id) {
+      if (!loggedUser.right.updateCategories) navigate(Screens.E403)
       const list = id.split('.')
       getState(list[list.length - 1])
     }
+    if (!loggedUser.right.createCategories) navigate(Screens.E403)
   }, [])
 
   return (

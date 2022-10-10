@@ -119,7 +119,7 @@ const ActionButton = ({ data }) => {
           <CIcon icon={cibReadTheDocs} className="text-white" />
         </CButton>
       </CTooltip>
-      {[0].includes(loggedUser.right.code) && (
+      {loggedUser.right.updateCategories && (
         <CTooltip content={Strings.Common.EDIT}>
           <CButton
             color="warning"
@@ -132,7 +132,7 @@ const ActionButton = ({ data }) => {
           </CButton>
         </CTooltip>
       )}
-      {[0].includes(loggedUser.right.code) && (
+      {loggedUser.right.deleteCategories && (
         <CTooltip content={Strings.Common.DELETE}>
           <CButton color="danger" className="m-1" onClick={handleDeleteButton}>
             <CIcon icon={cilDelete} />
