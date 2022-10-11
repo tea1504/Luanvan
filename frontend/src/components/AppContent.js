@@ -27,7 +27,9 @@ const AppContent = () => {
                   name={route.name}
                   element={
                     localStorage.getItem(Constants.StorageKeys.ACCESS_TOKEN) !== null ? (
-                      !route.role || route.role.includes(user ? user.right.scope : -1) ? (
+                      !route.role ||
+                      (route.role.includes(user ? user.right.scope : -1) &&
+                        (!route.right || user.right[route.right])) ? (
                         <route.element />
                       ) : (
                         <Navigate to="/403" />
