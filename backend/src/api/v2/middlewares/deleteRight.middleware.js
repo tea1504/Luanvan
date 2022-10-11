@@ -6,9 +6,9 @@ const Constants = require("../constants");
  * @param {import("express").Response} res
  * @param {import("express").RequestHandler} next
  */
-const createCategories = async (req, res, next) => {
+const deleteRight = async (req, res, next) => {
   try {
-    if (!req.userRight.right.createCategories)
+    if (!req.userRight.right.deleteRight)
       return res.status(403).send({
         status: 403,
         message: Constants.String.Message.ERR_403,
@@ -23,4 +23,4 @@ const createCategories = async (req, res, next) => {
   return next();
 };
 
-module.exports = createCategories;
+module.exports = deleteRight;
