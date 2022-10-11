@@ -1,6 +1,7 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const Constants = require("../constants");
+const officerModel = require("../models/officer.model");
 /**
  * @param {import("express").Request} req
  * @param {import("express").Response} res
@@ -16,6 +17,10 @@ const verifyToken = async (req, res, next) => {
   }
   try {
     const decoded = jwt.verify(token, process.env.PRIVATEKEY);
+    const right = await officerModel
+      .findById(decoded.id, "-_id right")
+      .populate("right");
+    req.userRight = right;
     req.userID = decoded.id;
   } catch (error) {
     if (error.message === "jwt expired")

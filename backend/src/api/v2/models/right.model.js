@@ -9,7 +9,10 @@ const rightSchema = new mongoose.Schema(
   {
     code: {
       type: Number,
-      required: [true, Constants.String.Message.REQUIRED(Constants.String.Right.CODE),]
+      required: [
+        true,
+        Constants.String.Message.REQUIRED(Constants.String.Right.CODE),
+      ],
     },
     name: {
       type: String,
@@ -18,6 +21,16 @@ const rightSchema = new mongoose.Schema(
         Constants.String.Message.REQUIRED(Constants.String.Right.NAME),
       ],
       maxLength: 20,
+    },
+    readOD: {
+      type: Boolean,
+      required: [
+        true,
+        Constants.String.Message.REQUIRED(
+          Constants.String.Right.READ_OFFICIAL_DISPATCH
+        ),
+      ],
+      default: false,
     },
     createOD: {
       type: Boolean,
@@ -59,6 +72,14 @@ const rightSchema = new mongoose.Schema(
       ],
       default: false,
     },
+    readOfficer: {
+      type: Boolean,
+      required: [
+        true,
+        Constants.String.Message.REQUIRED(Constants.String.Right.READ_OFFICER),
+      ],
+      default: false,
+    },
     createOfficer: {
       type: Boolean,
       required: [
@@ -89,6 +110,16 @@ const rightSchema = new mongoose.Schema(
       ],
       default: false,
     },
+    readCategories: {
+      type: Boolean,
+      required: [
+        true,
+        Constants.String.Message.REQUIRED(
+          Constants.String.Right.READ_CATEGORIES
+        ),
+      ],
+      default: false,
+    },
     createCategories: {
       type: Boolean,
       required: [
@@ -115,6 +146,46 @@ const rightSchema = new mongoose.Schema(
         true,
         Constants.String.Message.REQUIRED(
           Constants.String.Right.DELETE_CATEGORIES
+        ),
+      ],
+      default: false,
+    },
+    createRight: {
+      type: Boolean,
+      required: [
+        true,
+        Constants.String.Message.REQUIRED(
+          Constants.String.Right.CREATE_RIGHT
+        ),
+      ],
+      default: false,
+    },
+    readRight: {
+      type: Boolean,
+      required: [
+        true,
+        Constants.String.Message.REQUIRED(
+          Constants.String.Right.READ_RIGHT
+        ),
+      ],
+      default: false,
+    },
+    updateRight: {
+      type: Boolean,
+      required: [
+        true,
+        Constants.String.Message.REQUIRED(
+          Constants.String.Right.UPDATE_RIGHT
+        ),
+      ],
+      default: false,
+    },
+    deleteRight: {
+      type: Boolean,
+      required: [
+        true,
+        Constants.String.Message.REQUIRED(
+          Constants.String.Right.DELETE_RIGHT
         ),
       ],
       default: false,

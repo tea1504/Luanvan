@@ -57,24 +57,32 @@ async function start() {
     await _right.deleteMany();
     await _right.create({
       _id: "right0000000",
+      approveOD: true,
       code: 0,
-      name: "Super User",
       createCategories: true,
       createOD: true,
       createOfficer: true,
-      updateCategories: true,
-      updateOD: true,
-      updateOfficer: true,
+      createRight: true,
       deleteCategories: true,
       deleteOD: true,
       deleteOfficer: true,
-      approveOD: true,
+      deleteRight: true,
+      name: "Super User",
+      readOD: true,
+      readRight: true,
+      readOfficer: true,
+      readCategories: true,
       scope: 0,
+      updateCategories: true,
+      updateOD: true,
+      updateOfficer: true,
+      updateRight: true,
     });
     await _right.create({
       _id: "right0000001",
       code: 1,
       name: "right 1",
+      scope: 1,
     });
   }
 

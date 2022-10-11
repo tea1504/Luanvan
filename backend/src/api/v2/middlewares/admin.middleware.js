@@ -1,6 +1,5 @@
 require("dotenv").config();
 const Constants = require("../constants");
-const officerModel = require("./../models/officer.model");
 
 /**
  * @param {import("express").Request} req
@@ -9,10 +8,7 @@ const officerModel = require("./../models/officer.model");
  */
 const checkAdmin = async (req, res, next) => {
   try {
-    const right = await officerModel
-      .findById(req.userID, "-_id right")
-      .populate("right");
-    if (right.right.scope != 0)
+    if (req.userRight.right.scope != 0)
       return res.status(403).send({
         status: 403,
         message: Constants.String.Message.ERR_403,

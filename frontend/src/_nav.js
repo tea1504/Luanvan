@@ -5,6 +5,7 @@ import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 import Screens from './constants/screens'
 import vn from './commons/locales/vn'
 import en from './commons/locales/en'
+import { FaFile, FaHome, FaLanguage, FaRunning, FaShareAlt, FaShieldAlt, FaUserShield } from 'react-icons/fa'
 
 const _nav = [
   {
@@ -14,7 +15,7 @@ const _nav = [
       en: 'Home',
     },
     to: '/dashboard',
-    icon: <CIcon icon={cilHome} customClassName="nav-icon" />,
+    icon: <FaHome className="nav-icon" />,
   },
   {
     component: CNavTitle,
@@ -32,7 +33,7 @@ const _nav = [
     },
     role: [0],
     to: Screens.LANGUAGE,
-    icon: <CIcon icon={cilLanguage} customClassName="nav-icon" />,
+    icon: <FaLanguage className="nav-icon" />,
   },
   {
     component: CNavItem,
@@ -42,7 +43,7 @@ const _nav = [
     },
     role: [0],
     to: Screens.SECURITY,
-    icon: <CIcon icon={cilLanguage} customClassName="nav-icon" />,
+    icon: <FaShieldAlt className="nav-icon" />,
   },
   {
     component: CNavItem,
@@ -52,7 +53,7 @@ const _nav = [
     },
     role: [0],
     to: Screens.RIGHT,
-    icon: <CIcon icon={cilLanguage} customClassName="nav-icon" />,
+    icon: <FaUserShield className="nav-icon" />,
   },
   {
     component: CNavItem,
@@ -62,7 +63,7 @@ const _nav = [
     },
     role: [0],
     to: Screens.PRIORITY,
-    icon: <CIcon icon={cilLanguage} customClassName="nav-icon" />,
+    icon: <FaRunning className="nav-icon" />,
   },
   {
     component: CNavItem,
@@ -72,7 +73,7 @@ const _nav = [
     },
     role: [0],
     to: Screens.TYPE,
-    icon: <CIcon icon={cilFile} customClassName="nav-icon" />,
+    icon: <FaFile className="nav-icon" />,
   },
   {
     component: CNavGroup,
