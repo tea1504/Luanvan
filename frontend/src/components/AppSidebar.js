@@ -39,10 +39,12 @@ const AppSidebar = () => {
       }}
     >
       <CSidebarBrand className="d-none d-md-flex" to="/">
-        <CIcon className="sidebar-brand-full" icon={Resources.Images.APP_LOGO} height={64} />
-        <CIcon className="sidebar-brand-narrow" icon={sygnet} height={35} />
+        <CIcon className="sidebar-brand-full" icon={Resources.Images.APP_LOGO_2} height={64} />
+        <CIcon className="sidebar-brand-narrow" icon={Resources.Images.APP_SYGNET} height={35} />
       </CSidebarBrand>
-      <CSidebarNav>
+      <CSidebarNav
+        style={{ background: 'url(https://www.freeiconspng.com/thumbs/clouds-png/clouds-png-9.png)' }}
+      >
         <SimpleBar>
           <AppSidebarNav items={navigation} />
         </SimpleBar>

@@ -159,6 +159,12 @@ const Login = () => {
     }
   }
 
+  const handleKeypress = (e) => {
+    if (e.charCode === 13) {
+      handleClickLoginButton(e)
+    }
+  }
+
   useEffect(() => {
     const token = localStorage.getItem(Constants.StorageKeys.ACCESS_TOKEN)
     if (token) navigate(Screens.HOME, { replace: true })
@@ -199,6 +205,7 @@ const Login = () => {
                         onChange={(e) => {
                           updateLoginInfo({ code: e.target.value })
                         }}
+                        onKeyPress={handleKeypress}
                       />
                       <CFormFeedback invalid>
                         {err.code &&
@@ -218,6 +225,7 @@ const Login = () => {
                         onChange={(e) => {
                           updateLoginInfo({ password: e.target.value })
                         }}
+                        onKeyPress={handleKeypress}
                       />
                       <CInputGroupText
                         style={{ cursor: 'pointer' }}
