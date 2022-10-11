@@ -9,6 +9,7 @@ import {
   CCol,
   CContainer,
   CForm,
+  CFormFeedback,
   CFormInput,
   CInputGroup,
   CInputGroupText,
@@ -23,8 +24,13 @@ import Screens from 'src/constants/screens'
 import Resources from 'src/commons/resources'
 import { FaEye, FaEyeSlash, FaLock, FaUser } from 'react-icons/fa'
 import { setLoading } from 'src/store/slice/config.slice'
+import Strings from 'src/constants/strings'
+import Helpers from 'src/commons/helpers'
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 const authService = new AuthService()
+const MySwal = withReactContent(Swal)
 
 const Login = () => {
   const navigate = useNavigate()
@@ -32,8 +38,8 @@ const Login = () => {
   let loading = useSelector((state) => state.config.loading)
 
   const [loginInfo, setLoginInfo] = useState({
-    code: '000001',
-    password: '12345',
+    code: '',
+    password: '',
     showPassword: false,
   })
   const updateLoginInfo = (newState) => {
@@ -43,10 +49,8 @@ const Login = () => {
     }))
   }
   const [err, setErr] = useState({
-    code: false,
-    password: false,
-    form: true,
-    message: '',
+    code: null,
+    password: null,
   })
   const updateErr = (newState) => {
     setErr((prevState) => ({
@@ -55,26 +59,26 @@ const Login = () => {
     }))
   }
 
-  useEffect(() => {
-    const token = localStorage.getItem(Constants.StorageKeys.ACCESS_TOKEN)
-    if (token) navigate(Screens.HOME, { replace: true })
-  }, [])
-
   const validation = () => {
+    var flag = true
     if (!loginInfo.code) {
-      updateErr({ code: true, form: true, password: false, message: 'nhập mã cán bộ' })
-      return false
+      updateErr({ code: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
+      flag = false
     }
     if (!loginInfo.password) {
-      updateErr({ password: true, form: true, code: false, message: 'nhập mật khẩu' })
-      return false
+      updateErr({ password: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
+      flag = false
     }
-    return true
+    return flag
   }
 
   const handleClickLoginButton = async (e) => {
     try {
       e.preventDefault()
+      updateErr({
+        code: null,
+        password: null,
+      })
       if (validation()) {
         dispatch(setLoading(true))
         await getToken()
@@ -102,7 +106,26 @@ const Login = () => {
       localStorage.setItem(Constants.StorageKeys.ACCESS_TOKEN, token)
       dispatch(setToken(token))
     } catch (error) {
-      updateErr({ form: true, code: false, password: true, message: error.message })
+      switch (error.status) {
+        case 401:
+          MySwal.fire({
+            title: Strings.Message.COMMON_ERROR,
+            icon: 'error',
+            text: error.message,
+          }).then(() => {
+            localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
+            localStorage.clear(Constants.StorageKeys.USER_INFO)
+            navigate(Screens.LOGIN)
+          })
+          break
+        default:
+          MySwal.fire({
+            title: Strings.Message.COMMON_ERROR,
+            icon: 'error',
+            text: error.message,
+          })
+          break
+      }
     }
   }
 
@@ -113,9 +136,33 @@ const Login = () => {
       localStorage.setItem(Constants.StorageKeys.USER_INFO, JSON.stringify(user))
       dispatch(setUser(user))
     } catch (error) {
-      updateErr({ form: true, code: false, password: true, message: error.message })
+      switch (error.status) {
+        case 401:
+          MySwal.fire({
+            title: Strings.Message.COMMON_ERROR,
+            icon: 'error',
+            text: error.message,
+          }).then(() => {
+            localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
+            localStorage.clear(Constants.StorageKeys.USER_INFO)
+            navigate(Screens.LOGIN)
+          })
+          break
+        default:
+          MySwal.fire({
+            title: Strings.Message.COMMON_ERROR,
+            icon: 'error',
+            text: error.message,
+          })
+          break
+      }
     }
   }
+
+  useEffect(() => {
+    const token = localStorage.getItem(Constants.StorageKeys.ACCESS_TOKEN)
+    if (token) navigate(Screens.HOME, { replace: true })
+  }, [])
 
   return (
     <div
@@ -133,14 +180,13 @@ const Login = () => {
             <CCardGroup className="shadow-lg">
               <CCard className="py-5 px-3">
                 <CCardBody>
-                  <CForm validated={!err.form}>
+                  <CForm>
                     <h1>Hệ thống E-Office</h1>
                     <p className="text-medium-emphasis mb-5">
                       Chào mừng bạn đến với hệ thống E-Office.
                       <br />
                       Hãy đăng nhập bằng tài khoản cán bộ.
                     </p>
-                    {err.message !== '' && <CAlert color="danger">{err.message}</CAlert>}
                     <CInputGroup className="mb-4">
                       <CInputGroupText id="inputGroupPrepend1">
                         <FaUser />
@@ -154,6 +200,10 @@ const Login = () => {
                           updateLoginInfo({ code: e.target.value })
                         }}
                       />
+                      <CFormFeedback invalid>
+                        {err.code &&
+                          Strings.Form.Validation[err.code](Strings.Form.FieldName.CODE())}
+                      </CFormFeedback>
                     </CInputGroup>
                     <CInputGroup className="mb-5">
                       <CInputGroupText>
@@ -175,6 +225,10 @@ const Login = () => {
                       >
                         {loginInfo.showPassword ? <FaEyeSlash /> : <FaEye />}
                       </CInputGroupText>
+                      <CFormFeedback invalid>
+                        {err.password &&
+                          Strings.Form.Validation[err.password](Strings.Form.FieldName.PASSWORD())}
+                      </CFormFeedback>
                     </CInputGroup>
                     <CRow>
                       <CCol xs={6}>

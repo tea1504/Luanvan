@@ -112,18 +112,20 @@ const ActionButton = ({ data }) => {
 
   return (
     <div>
-      <CTooltip content={Strings.Common.DETAIL}>
-        <CButton
-          color="info"
-          className="m-1"
-          onClick={() =>
-            navigate(Screens.RIGHT_DETAIL(`${Helpers.toSlug(data.name)}.${data._id}`))
-          }
-        >
-          <FaInfoCircle style={{ color: 'whitesmoke' }} />
-        </CButton>
-      </CTooltip>
-      {loggedUser.right.updateCategories && (
+      {loggedUser.right[Strings.Common.READ_RIGHT] && (
+        <CTooltip content={Strings.Common.DETAIL}>
+          <CButton
+            color="info"
+            className="m-1"
+            onClick={() =>
+              navigate(Screens.RIGHT_DETAIL(`${Helpers.toSlug(data.name)}.${data._id}`))
+            }
+          >
+            <FaInfoCircle style={{ color: 'whitesmoke' }} />
+          </CButton>
+        </CTooltip>
+      )}
+      {loggedUser.right[Strings.Common.UPDATE_RIGHT] && (
         <CTooltip content={Strings.Common.EDIT}>
           <CButton
             color="warning"
@@ -136,7 +138,7 @@ const ActionButton = ({ data }) => {
           </CButton>
         </CTooltip>
       )}
-      {loggedUser.right.deleteCategories && (
+      {loggedUser.right[Strings.Common.DELETE_RIGHT] && (
         <CTooltip content={Strings.Common.DELETE}>
           <CButton color="danger" className="m-1" onClick={handleDeleteButton}>
             <FaTrash style={{ color: 'whitesmoke' }} />

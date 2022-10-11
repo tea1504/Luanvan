@@ -237,9 +237,9 @@ export default function Language() {
                   </CInputGroup>
                 </CCol>
                 <CCol className="text-end mt-1">
-                  {loggedUser?.right.createCategories && (
-                    <CButtonGroup role="group">
-                      {selectionRows.length != 0 && (
+                  <CButtonGroup role="group">
+                    {loggedUser?.right[Strings.Common.DELETE_CATEGORIES] &&
+                      selectionRows.length != 0 && (
                         <CButton
                           color="danger"
                           variant="outline"
@@ -249,6 +249,7 @@ export default function Language() {
                           <FaPlusSquare /> {Strings.Common.DELETE_MULTI}
                         </CButton>
                       )}
+                    {loggedUser?.right[Strings.Common.CREATE_CATEGORIES] && (
                       <CButton
                         color="primary"
                         variant="outline"
@@ -256,11 +257,13 @@ export default function Language() {
                       >
                         <CIcon icon={cibAddthis} /> {Strings.Common.ADD_NEW}
                       </CButton>
+                    )}
+                    {loggedUser?.right[Strings.Common.CREATE_CATEGORIES] && (
                       <CButton color="primary" variant="outline" onClick={() => setVisible(true)}>
                         <FaFileCsv /> {Strings.Common.ADD_MULTI_NEW}
                       </CButton>
-                    </CButtonGroup>
-                  )}
+                    )}
+                  </CButtonGroup>
                 </CCol>
               </CRow>
               <CRow>

@@ -27,6 +27,15 @@ export default [
     sortable: true,
     cell: (row) => (
       <div>
+        <CTooltip content={Strings.Form.FieldName.READ_OD}>
+          <span className="mx-1">
+            {row.readOD ? (
+              <FaCheckCircle className="text-success" size="1.5rem" />
+            ) : (
+              <FaTimesCircle className="text-danger" size="1.5rem" />
+            )}
+          </span>
+        </CTooltip>
         <CTooltip content={Strings.Form.FieldName.CREATE_OD}>
           <span className="mx-1">
             {row.createOD ? (
@@ -68,10 +77,64 @@ export default [
     center: true,
   },
   {
+    name: Strings.Common.R_RIGHT,
+    sortable: true,
+    cell: (row) => (
+      <div>
+        <CTooltip content={Strings.Form.FieldName.READ_RIGHT}>
+          <span className="mx-1">
+            {row.readRight ? (
+              <FaCheckCircle className="text-success" size="1.5rem" />
+            ) : (
+              <FaTimesCircle className="text-danger" size="1.5rem" />
+            )}
+          </span>
+        </CTooltip>
+        <CTooltip content={Strings.Form.FieldName.CREATE_RIGHT}>
+          <span className="mx-1">
+            {row.createRight ? (
+              <FaCheckCircle className="text-success" size="1.5rem" />
+            ) : (
+              <FaTimesCircle className="text-danger" size="1.5rem" />
+            )}
+          </span>
+        </CTooltip>
+        <CTooltip content={Strings.Form.FieldName.UPDATE_RIGHT}>
+          <span className="mx-1">
+            {row.updateRight ? (
+              <FaCheckCircle className="text-success" size="1.5rem" />
+            ) : (
+              <FaTimesCircle className="text-danger" size="1.5rem" />
+            )}
+          </span>
+        </CTooltip>
+        <CTooltip content={Strings.Form.FieldName.DELETE_RIGHT}>
+          <span className="mx-1">
+            {row.deleteRight ? (
+              <FaCheckCircle className="text-success" size="1.5rem" />
+            ) : (
+              <FaTimesCircle className="text-danger" size="1.5rem" />
+            )}
+          </span>
+        </CTooltip>
+      </div>
+    ),
+    center: true,
+  },
+  {
     name: Strings.Common.R_OFFICER,
     sortable: true,
     cell: (row) => (
       <div>
+        <CTooltip content={Strings.Form.FieldName.READ_OFFICER}>
+          <span className="mx-1">
+            {row.readOfficer ? (
+              <FaCheckCircle className="text-success" size="1.5rem" />
+            ) : (
+              <FaTimesCircle className="text-danger" size="1.5rem" />
+            )}
+          </span>
+        </CTooltip>
         <CTooltip content={Strings.Form.FieldName.CREATE_OFFICER}>
           <span className="mx-1">
             {row.createOfficer ? (
@@ -108,6 +171,15 @@ export default [
     sortable: true,
     cell: (row) => (
       <div>
+        <CTooltip content={Strings.Form.FieldName.READ_CATEGORIES}>
+          <span className="mx-1">
+            {row.readCategories ? (
+              <FaCheckCircle className="text-success" size="1.5rem" />
+            ) : (
+              <FaTimesCircle className="text-danger" size="1.5rem" />
+            )}
+          </span>
+        </CTooltip>
         <CTooltip content={Strings.Form.FieldName.CREATE_CATEGORIES}>
           <span className="mx-1">
             {row.createCategories ? (

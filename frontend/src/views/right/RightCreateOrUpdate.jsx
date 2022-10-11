@@ -52,13 +52,20 @@ export default function RightCreateOrUpdate() {
     code: 0,
     name: '',
     scope: 0,
+    readOD: false,
     createOD: false,
     updateOD: false,
     deleteOD: false,
     approveOD: false,
+    readRight: false,
+    createRight: false,
+    updateRight: false,
+    deleteRight: false,
+    readOfficer: false,
     createOfficer: false,
     updateOfficer: false,
     deleteOfficer: false,
+    readCategories: false,
     createCategories: false,
     updateCategories: false,
     deleteCategories: false,
@@ -187,13 +194,20 @@ export default function RightCreateOrUpdate() {
             code: 0,
             name: '',
             scope: 0,
+            readOD: false,
             createOD: false,
             updateOD: false,
             deleteOD: false,
             approveOD: false,
+            readRight: false,
+            createRight: false,
+            updateRight: false,
+            deleteRight: false,
+            readOfficer: false,
             createOfficer: false,
             updateOfficer: false,
             deleteOfficer: false,
+            readCategories: false,
             createCategories: false,
             updateCategories: false,
             deleteCategories: false,
@@ -243,13 +257,20 @@ export default function RightCreateOrUpdate() {
         code: 0,
         name: '',
         scope: 0,
+        readOD: false,
         createOD: false,
         updateOD: false,
         deleteOD: false,
         approveOD: false,
+        readRight: false,
+        createRight: false,
+        updateRight: false,
+        deleteRight: false,
+        readOfficer: false,
         createOfficer: false,
         updateOfficer: false,
         deleteOfficer: false,
+        readCategories: false,
         createCategories: false,
         updateCategories: false,
         deleteCategories: false,
@@ -365,7 +386,19 @@ export default function RightCreateOrUpdate() {
                 <CCol xs={12}>
                   <h4>{Strings.Common.R_OD}</h4>
                 </CCol>
-                <CCol xs={12} sm={6} md={3}>
+                <CCol xs={12} sm={6} md={2}>
+                  <CFormCheck
+                    id={Helpers.makeID(
+                      Strings.Right.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.READ_OD),
+                    )}
+                    value={state.readOD}
+                    checked={state.readOD}
+                    label={Strings.Form.FieldName.READ_OD}
+                    onChange={() => updateState({ readOD: !state.readOD })}
+                  />
+                </CCol>
+                <CCol xs={12} sm={6} md={2}>
                   <CFormCheck
                     id={Helpers.makeID(
                       Strings.Right.CODE,
@@ -377,7 +410,7 @@ export default function RightCreateOrUpdate() {
                     onChange={() => updateState({ createOD: !state.createOD })}
                   />
                 </CCol>
-                <CCol xs={12} sm={6} md={3}>
+                <CCol xs={12} sm={6} md={2}>
                   <CFormCheck
                     id={Helpers.makeID(
                       Strings.Right.CODE,
@@ -389,7 +422,7 @@ export default function RightCreateOrUpdate() {
                     onChange={() => updateState({ updateOD: !state.updateOD })}
                   />
                 </CCol>
-                <CCol xs={12} sm={6} md={3}>
+                <CCol xs={12} sm={6} md={2}>
                   <CFormCheck
                     id={Helpers.makeID(
                       Strings.Right.CODE,
@@ -401,7 +434,7 @@ export default function RightCreateOrUpdate() {
                     onChange={() => updateState({ deleteOD: !state.deleteOD })}
                   />
                 </CCol>
-                <CCol xs={12} sm={6} md={3}>
+                <CCol xs={12} sm={6} md={4}>
                   <CFormCheck
                     id={Helpers.makeID(
                       Strings.Right.CODE,
@@ -417,9 +450,75 @@ export default function RightCreateOrUpdate() {
                   <hr />
                 </CCol>
                 <CCol xs={12}>
+                  <h4>{Strings.Common.R_RIGHT}</h4>
+                </CCol>
+                <CCol sm={12} md={3}>
+                  <CFormCheck
+                    id={Helpers.makeID(
+                      Strings.Right.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.READ_RIGHT),
+                    )}
+                    value={state.readRight}
+                    checked={state.readRight}
+                    label={Strings.Form.FieldName.READ_RIGHT}
+                    onChange={() => updateState({ readRight: !state.readRight })}
+                  />
+                </CCol>
+                <CCol sm={12} md={3}>
+                  <CFormCheck
+                    id={Helpers.makeID(
+                      Strings.Right.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.CREATE_RIGHT),
+                    )}
+                    value={state.createRight}
+                    checked={state.createRight}
+                    label={Strings.Form.FieldName.CREATE_RIGHT}
+                    onChange={() => updateState({ createRight: !state.createRight })}
+                  />
+                </CCol>
+                <CCol sm={12} md={3}>
+                  <CFormCheck
+                    id={Helpers.makeID(
+                      Strings.Right.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.UPDATE_RIGHT),
+                    )}
+                    value={state.updateRight}
+                    checked={state.updateRight}
+                    label={Strings.Form.FieldName.UPDATE_RIGHT}
+                    onChange={() => updateState({ updateRight: !state.updateRight })}
+                  />
+                </CCol>
+                <CCol sm={12} md={3}>
+                  <CFormCheck
+                    id={Helpers.makeID(
+                      Strings.Right.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.DELETE_RIGHT),
+                    )}
+                    value={state.deleteRight}
+                    checked={state.deleteRight}
+                    label={Strings.Form.FieldName.DELETE_RIGHT}
+                    onChange={() => updateState({ deleteRight: !state.deleteRight })}
+                  />
+                </CCol>
+                <CCol xs={12}>
+                  <hr />
+                </CCol>
+                <CCol xs={12}>
                   <h4>{Strings.Common.R_OFFICER}</h4>
                 </CCol>
-                <CCol sm={12} md={4}>
+                <CCol sm={12} md={3}>
+                  <CFormCheck
+                    id={Helpers.makeID(
+                      Strings.Right.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.READ_OFFICER),
+                    )}
+                    value={state.readOfficer}
+                    checked={state.readOfficer}
+                    label={Strings.Form.FieldName.READ_OFFICER}
+                    onChange={() => updateState({ readOfficer: !state.readOfficer })}
+                  />
+                </CCol>
+                <CCol sm={12} md={3}>
                   <CFormCheck
                     id={Helpers.makeID(
                       Strings.Right.CODE,
@@ -431,7 +530,7 @@ export default function RightCreateOrUpdate() {
                     onChange={() => updateState({ createOfficer: !state.createOfficer })}
                   />
                 </CCol>
-                <CCol sm={12} md={4}>
+                <CCol sm={12} md={3}>
                   <CFormCheck
                     id={Helpers.makeID(
                       Strings.Right.CODE,
@@ -443,7 +542,7 @@ export default function RightCreateOrUpdate() {
                     onChange={() => updateState({ updateOfficer: !state.updateOfficer })}
                   />
                 </CCol>
-                <CCol sm={12} md={4}>
+                <CCol sm={12} md={3}>
                   <CFormCheck
                     id={Helpers.makeID(
                       Strings.Right.CODE,
@@ -461,7 +560,19 @@ export default function RightCreateOrUpdate() {
                 <CCol xs={12}>
                   <h4>{Strings.Common.R_CATEGORY}</h4>
                 </CCol>
-                <CCol sm={12} md={4}>
+                <CCol sm={12} md={3}>
+                  <CFormCheck
+                    id={Helpers.makeID(
+                      Strings.Right.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.READ_CATEGORIES),
+                    )}
+                    value={state.readCategories}
+                    checked={state.readCategories}
+                    label={Strings.Form.FieldName.READ_CATEGORIES}
+                    onChange={() => updateState({ readCategories: !state.readCategories })}
+                  />
+                </CCol>
+                <CCol sm={12} md={3}>
                   <CFormCheck
                     id={Helpers.makeID(
                       Strings.Right.CODE,
@@ -473,7 +584,7 @@ export default function RightCreateOrUpdate() {
                     onChange={() => updateState({ createCategories: !state.createCategories })}
                   />
                 </CCol>
-                <CCol sm={12} md={4}>
+                <CCol sm={12} md={3}>
                   <CFormCheck
                     id={Helpers.makeID(
                       Strings.Right.CODE,
@@ -485,7 +596,7 @@ export default function RightCreateOrUpdate() {
                     onChange={() => updateState({ updateCategories: !state.updateCategories })}
                   />
                 </CCol>
-                <CCol sm={12} md={4}>
+                <CCol sm={12} md={3}>
                   <CFormCheck
                     id={Helpers.makeID(
                       Strings.Right.CODE,

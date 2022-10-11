@@ -191,18 +191,18 @@ export default function Right() {
                   </CInputGroup>
                 </CCol>
                 <CCol className="text-end mt-1">
-                  {loggedUser.right.createCategories && (
-                    <CButtonGroup role="group">
-                      {selectionRows.length != 0 && (
-                        <CButton
-                          color="danger"
-                          variant="outline"
-                          disabled={selectionRows.length === 0}
-                          onClick={handleOnClickButtonDelete}
-                        >
-                          <FaPlusSquare /> {Strings.Common.DELETE_MULTI}
-                        </CButton>
-                      )}
+                  <CButtonGroup role="group">
+                    {loggedUser.right[Strings.Common.DELETE_RIGHT] && selectionRows.length != 0 && (
+                      <CButton
+                        color="danger"
+                        variant="outline"
+                        disabled={selectionRows.length === 0}
+                        onClick={handleOnClickButtonDelete}
+                      >
+                        <FaPlusSquare /> {Strings.Common.DELETE_MULTI}
+                      </CButton>
+                    )}
+                    {loggedUser.right[Strings.Common.CREATE_RIGHT] && (
                       <CButton
                         color="primary"
                         variant="outline"
@@ -210,8 +210,8 @@ export default function Right() {
                       >
                         <CIcon icon={cibAddthis} /> {Strings.Common.ADD_NEW}
                       </CButton>
-                    </CButtonGroup>
-                  )}
+                    )}
+                  </CButtonGroup>
                 </CCol>
               </CRow>
               <CRow>
