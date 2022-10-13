@@ -64,7 +64,16 @@ const _nav = [
     to: Screens.SECURITY,
     icon: <FaShieldAlt className="nav-icon" />,
   },
-
+  {
+    component: CNavItem,
+    name: {
+      vi: vn.Status.NAME,
+      en: en.Status.NAME,
+    },
+    role: [0],
+    to: Screens.STATUS,
+    icon: <FaShieldAlt className="nav-icon" />,
+  },
   {
     component: CNavItem,
     name: {
@@ -74,6 +83,16 @@ const _nav = [
     role: [0],
     to: Screens.PRIORITY,
     icon: <FaRunning className="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: {
+      vi: vn.Right.NAME,
+      en: en.Right.NAME,
+    },
+    role: [0],
+    to: Screens.RIGHT,
+    icon: <FaUserShield className="nav-icon" />,
   },
   {
     component: CNavItem,

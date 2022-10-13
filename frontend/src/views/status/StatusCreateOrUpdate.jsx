@@ -28,12 +28,12 @@ import withReactContent from 'sweetalert2-react-content'
 import { useDispatch } from 'react-redux'
 import { setLoading } from 'src/store/slice/config.slice'
 import Required from 'src/components/Required'
-import SecurityService from 'src/services/security.service'
+import StatusService from 'src/services/status.service'
 
-const service = new SecurityService()
+const service = new StatusService()
 const MySwal = withReactContent(Swal)
 
-export default function SecurityCreateOrUpdate() {
+export default function StatusCreateOrUpdate() {
   const { id } = useParams()
   const dispatch = useDispatch()
   let loggedUser = useSelector((state) => state.user.user)
@@ -44,7 +44,7 @@ export default function SecurityCreateOrUpdate() {
   const language = useSelector((state) => state.config.language)
   Strings.setLanguage(language)
 
-  const store = useSelector((state) => state.security.data)
+  const store = useSelector((state) => state.status.data)
 
   const [state, setState] = useState({
     name: '',
@@ -220,74 +220,74 @@ export default function SecurityCreateOrUpdate() {
         <CCol>
           <CCard className="mb-3 border-secondary border-top-5">
             <CCardHeader className="text-center py-3" component="h3">
-              {Strings.Security.NAME}
+              {Strings.Status.NAME}
             </CCardHeader>
             <CCardBody>
               <CForm noValidate className="row g-3">
                 <CCol xs={12}>
                   <CFormLabel
                     htmlFor={Helpers.makeID(
-                      Strings.Security.CODE,
+                      Strings.Status.CODE,
                       Helpers.propName(Strings, Strings.Form.FieldName.NAME),
                     )}
                   >
-                    {Strings.Form.FieldName.NAME(Strings.Security.NAME)}{' '}
+                    {Strings.Form.FieldName.NAME(Strings.Status.NAME)}{' '}
                     <Required mes={Strings.Form.Validation.REQUIRED()} />
                   </CFormLabel>
                   <CFormInput
                     invalid={!Helpers.isNullOrEmpty(error.name)}
                     type="text"
                     id={Helpers.makeID(
-                      Strings.Security.CODE,
+                      Strings.Status.CODE,
                       Helpers.propName(Strings, Strings.Form.FieldName.NAME),
                     )}
-                    placeholder={Strings.Form.FieldName.NAME(Strings.Security.NAME)}
+                    placeholder={Strings.Form.FieldName.NAME(Strings.Status.NAME)}
                     value={state.name}
                     onChange={(e) => updateState({ name: e.target.value })}
                     onKeyPress={handleKeypress}
                   />
                   <CFormFeedback invalid>
-                    {error.name && Strings.Form.Validation[error.name](Strings.Security.NAME)}
+                    {error.name && Strings.Form.Validation[error.name](Strings.Status.NAME)}
                   </CFormFeedback>
                 </CCol>
                 <CCol>
                   <CFormLabel
                     htmlFor={Helpers.makeID(
-                      Strings.Security.CODE,
+                      Strings.Status.CODE,
                       Helpers.propName(Strings, Strings.Form.FieldName.COLOR),
                     )}
                   >
-                    {Strings.Form.FieldName.COLOR(Strings.Security.NAME)}
+                    {Strings.Form.FieldName.COLOR(Strings.Status.NAME)}
                   </CFormLabel>
                   <CFormInput
                     invalid={!Helpers.isNullOrEmpty(error.color)}
                     type="color"
                     className="w-100"
                     id={Helpers.makeID(
-                      Strings.Security.CODE,
+                      Strings.Status.CODE,
                       Helpers.propName(Strings, Strings.Form.FieldName.COLOR),
                     )}
-                    placeholder={Strings.Form.FieldName.COLOR(Strings.Security.NAME)}
+                    placeholder={Strings.Form.FieldName.COLOR(Strings.Status.NAME)}
                     value={state.color}
                     onChange={(e) => updateState({ color: e.target.value })}
                     onKeyPress={handleKeypress}
                   />
                   <CFormFeedback invalid>
-                    {error.color && Strings.Form.Validation[error.color](Strings.Security.NAME)}
+                    {error.color && Strings.Form.Validation[error.color](Strings.Status.NAME)}
                   </CFormFeedback>
                 </CCol>
                 <CCol xs={12}>
                   <CFormLabel
                     htmlFor={Helpers.makeID(
-                      Strings.Security.CODE,
+                      Strings.Status.CODE,
                       Helpers.propName(Strings, Strings.Form.FieldName.DESCRIPTION),
                     )}
                   >
-                    {Strings.Form.FieldName.DESCRIPTION(Strings.Security.NAME)}
+                    {Strings.Form.FieldName.DESCRIPTION(Strings.Status.NAME)}
                   </CFormLabel>
                   <CKEditor
                     id={Helpers.makeID(
-                      Strings.Security.CODE,
+                      Strings.Status.CODE,
                       Helpers.propName(Strings, Strings.Form.FieldName.DESCRIPTION),
                     )}
                     editor={ClassicEditor}
@@ -302,7 +302,7 @@ export default function SecurityCreateOrUpdate() {
                     style={{ color: '#e55353', fontSize: '0.875em', marginTop: '0.25rem' }}
                   >
                     {error.description &&
-                      Strings.Form.Validation[error.description](Strings.Security.NAME)}
+                      Strings.Form.Validation[error.description](Strings.Status.NAME)}
                   </CFormFeedback>
                 </CCol>
               </CForm>
@@ -337,7 +337,7 @@ export default function SecurityCreateOrUpdate() {
                     disabled={loading}
                     variant="outline"
                     color="secondary"
-                    onClick={() => navigate(Screens.SECURITY)}
+                    onClick={() => navigate(Screens.STATUS)}
                   >
                     {Strings.Common.BACK}
                   </CButton>

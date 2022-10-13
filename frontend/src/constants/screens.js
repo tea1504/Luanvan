@@ -36,6 +36,12 @@ const Screens = {
   SECURITY_CREATE: '/securities/create',
   SECURITY_UPDATE: (id = ':id') => '/securities/update/' + id,
 
+  // Status
+  STATUS: '/statuses',
+  STATUS_DETAIL: (id = ':id') => '/statuses/detail/' + id,
+  STATUS_CREATE: '/statuses/create',
+  STATUS_UPDATE: (id = ':id') => '/statuses/update/' + id,
+
   // Priority
   PRIORITY: '/priorities',
   PRIORITY_DETAIL: (id = ':id') => '/priorities/detail/' + id,

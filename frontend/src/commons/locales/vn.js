@@ -310,8 +310,10 @@ export default {
     },
   },
   Status: {
+    NAME: 'Trạng thái',
+    CODE: 'STATUS',
     Common: {
-      NAME: 'Trạng thái',
+      DESCRIPTION: '',
     },
     Form: {
       ID: {

@@ -68,6 +68,16 @@ const Constants = {
     DELETE_SECURITY: (id) => '/securities/' + id,
     DELETE_SECURITIES: '/securities',
 
+    // Status
+    GET_STATUSES: (limit = 10, pageNumber = 1, filter = '') =>
+      `/statuses?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+    GET_STATUS: (id) => `/statuses/` + id,
+    CREATE_STATUS: '/statuses',
+    CREATE_STATUSES: '/statuses/csv',
+    UPDATE_STATUS: (id) => '/statuses/' + id,
+    DELETE_STATUS: (id) => '/statuses/' + id,
+    DELETE_STATUSES: '/statuses',
+
     // Priority
     GET_PRIORITIES: (limit = 10, pageNumber = 1, filter = '') =>
       `/priorities?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,

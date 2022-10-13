@@ -22,6 +22,9 @@ const RightDetail = React.lazy(() => import('./views/right/RightDetail'))
 const Security = React.lazy(() => import('./views/security/Security'))
 const SecurityCreateOrUpDate = React.lazy(() => import('./views/security/SecurityCreateOrUpdate'))
 const SecurityDetail = React.lazy(() => import('./views/security/SecurityDetail'))
+const Status = React.lazy(() => import('./views/status/Status'))
+const StatusCreateOrUpDate = React.lazy(() => import('./views/status/StatusCreateOrUpdate'))
+const StatusDetail = React.lazy(() => import('./views/status/StatusDetail'))
 const Type = React.lazy(() => import('./views/type/Type'))
 const TypeCreateOrUpdate = React.lazy(() => import('./views/type/TypeCreateOrUpdate'))
 const TypeDetail = React.lazy(() => import('./views/type/TypeDetail'))
@@ -128,6 +131,34 @@ const routes = [
     path: Screens.SECURITY_UPDATE(),
     name: { vi: vn.Common.UPDATE, en: en.Common.UPDATE },
     element: SecurityCreateOrUpDate,
+    role: [0],
+    right: Strings.Common.UPDATE_CATEGORIES,
+  },
+  {
+    path: Screens.STATUS,
+    name: { vi: vn.Status.NAME, en: en.Status.NAME },
+    element: Status,
+    role: [0],
+    right: Strings.Common.READ_CATEGORIES,
+  },
+  {
+    path: Screens.STATUS_DETAIL(),
+    name: { vi: vn.Common.DETAIL, en: en.Common.DETAIL },
+    element: StatusDetail,
+    role: [0],
+    right: Strings.Common.READ_CATEGORIES,
+  },
+  {
+    path: Screens.STATUS_CREATE,
+    name: { vi: vn.Common.CREATE, en: en.Common.CREATE },
+    element: StatusCreateOrUpDate,
+    role: [0],
+    right: Strings.Common.CREATE_CATEGORIES,
+  },
+  {
+    path: Screens.STATUS_UPDATE(),
+    name: { vi: vn.Common.UPDATE, en: en.Common.UPDATE },
+    element: StatusCreateOrUpDate,
     role: [0],
     right: Strings.Common.UPDATE_CATEGORIES,
   },

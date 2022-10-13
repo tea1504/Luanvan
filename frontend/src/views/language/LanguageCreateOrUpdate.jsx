@@ -353,12 +353,17 @@ export default function LanguageCreateOrUpdate() {
             <CCardFooter>
               <CRow>
                 <CCol md={6} className="mt-1">
-                  <CButton className="w-100" onClick={handleSubmitForm}>
+                  <CButton className="w-100" disabled={loading} onClick={handleSubmitForm}>
                     {loading && <CSpinner size="sm" />} {Strings.Common.SUBMIT}
                   </CButton>
                 </CCol>
                 <CCol md={6} className="mt-1">
-                  <CButton className="w-100" variant="outline" onClick={handelOnClickResetButton}>
+                  <CButton
+                    className="w-100"
+                    disabled={loading}
+                    variant="outline"
+                    onClick={handelOnClickResetButton}
+                  >
                     {Strings.Common.RESET}
                   </CButton>
                 </CCol>
@@ -367,6 +372,7 @@ export default function LanguageCreateOrUpdate() {
                 <CCol className="mt-1">
                   <CButton
                     className="w-100"
+                    disabled={loading}
                     variant="outline"
                     color="secondary"
                     onClick={() => navigate(Screens.LANGUAGE)}
