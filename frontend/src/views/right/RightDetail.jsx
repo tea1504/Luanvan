@@ -36,7 +36,6 @@ export default function RightDetail() {
   const store = useSelector((state) => state.right.data)
   const [state, setState] = useState({
     _id: '',
-    code: 0,
     name: '',
     scope: 0,
     readOD: false,
@@ -131,12 +130,6 @@ export default function RightDetail() {
                     {Strings.Form.FieldName.__V}
                   </CTableHeaderCell>
                   <CTableDataCell colSpan={2}>{state.__v}</CTableDataCell>
-                </CTableRow>
-                <CTableRow>
-                  <CTableHeaderCell className="py-2">
-                    {Strings.Form.FieldName.CODE(Strings.Right.NAME)}
-                  </CTableHeaderCell>
-                  <CTableDataCell colSpan={5}>{state.code}</CTableDataCell>
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2">

@@ -13,11 +13,6 @@ export default [
     right: true,
   },
   {
-    name: Strings.Form.FieldName.CODE(Strings.Right.NAME),
-    selector: (row) => row.code,
-    sortable: true,
-  },
-  {
     name: Strings.Form.FieldName.NAME(Strings.Right.NAME),
     selector: (row) => row.name,
     sortable: true,

@@ -49,7 +49,6 @@ export default function RightCreateOrUpdate() {
   const store = useSelector((state) => state.right.data)
 
   const [state, setState] = useState({
-    code: 0,
     name: '',
     scope: 0,
     readOD: false,
@@ -79,7 +78,6 @@ export default function RightCreateOrUpdate() {
 
   const [error, setError] = useState({
     name: null,
-    code: null,
   })
   const updateError = (newState) => {
     setError((prevState) => ({
@@ -104,37 +102,6 @@ export default function RightCreateOrUpdate() {
       dispatch(setLoading(true))
       const result = await service.getOne(id)
       updateState(result.data.data)
-      dispatch(setLoading(false))
-    } catch (error) {
-      dispatch(setLoading(false))
-      switch (error.status) {
-        case 401:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          }).then(() => {
-            localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
-            localStorage.clear(Constants.StorageKeys.USER_INFO)
-            navigate(Screens.LOGIN)
-          })
-          break
-        default:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          })
-          break
-      }
-    }
-  }
-
-  const getMaxCode = async () => {
-    try {
-      dispatch(setLoading(true))
-      const result = await service.getMaxCode()
-      updateState({ code: result.data.data.code + 1 })
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
@@ -191,7 +158,6 @@ export default function RightCreateOrUpdate() {
             text: Strings.Message.Create.SUCCESS,
           })
           updateState({
-            code: 0,
             name: '',
             scope: 0,
             readOD: false,
@@ -212,7 +178,6 @@ export default function RightCreateOrUpdate() {
             updateCategories: false,
             deleteCategories: false,
           })
-          await getMaxCode()
         } else {
           await service.updateOne(id, state)
           MySwal.fire({
@@ -254,7 +219,6 @@ export default function RightCreateOrUpdate() {
       await getState(list[list.length - 1])
     } else
       updateState({
-        code: 0,
         name: '',
         scope: 0,
         readOD: false,
@@ -290,7 +254,6 @@ export default function RightCreateOrUpdate() {
       getState(list[list.length - 1])
     } else {
       if (!loggedUser.right.createCategories) navigate(Screens.E403)
-      getMaxCode()
     }
   }, [])
 
@@ -304,32 +267,6 @@ export default function RightCreateOrUpdate() {
             </CCardHeader>
             <CCardBody>
               <CForm noValidate className="row g-3">
-                <CCol xs={12}>
-                  <CFormLabel
-                    htmlFor={Helpers.makeID(
-                      Strings.Right.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.CODE),
-                    )}
-                  >
-                    {Strings.Form.FieldName.CODE(Strings.Right.NAME)}
-                  </CFormLabel>
-                  <CFormInput
-                    invalid={!Helpers.isNullOrEmpty(error.code)}
-                    type="number"
-                    id={Helpers.makeID(
-                      Strings.Right.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.CODE),
-                    )}
-                    placeholder={Strings.Form.FieldName.CODE(Strings.Right.NAME)}
-                    value={state.code}
-                    onChange={(e) => updateState({ code: e.target.value })}
-                    onKeyPress={handleKeypress}
-                    disabled={true}
-                  />
-                  <CFormFeedback invalid>
-                    {error.code && Strings.Form.Validation[error.code](Strings.Right.NAME)}
-                  </CFormFeedback>
-                </CCol>
                 <CCol xs={12}>
                   <CFormLabel
                     htmlFor={Helpers.makeID(

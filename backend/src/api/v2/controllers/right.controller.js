@@ -40,23 +40,9 @@ var rightController = {
    * @param {import("express").Response} res
    * @param {import("express").RequestHandler} next
    */
-  getMaxCode: async (req, res, next) => {
-    try {
-      const result = await service.getMaxCode();
-      return res.status(result.status).json(result);
-    } catch (error) {
-      return next(error);
-    }
-  },
-  /**
-   * @param {import("express").Request} req
-   * @param {import("express").Response} res
-   * @param {import("express").RequestHandler} next
-   */
   postOne: async (req, res, next) => {
     try {
       const {
-        code,
         name,
         readOD,
         createOD,
@@ -84,15 +70,7 @@ var rightController = {
             Constants.String.Right.NAME
           ),
         });
-      if (!code && code != 0)
-        return res.status(Constants.ApiCode.BAD_REQUEST).json({
-          status: Constants.ApiCode.BAD_REQUEST,
-          message: Constants.String.Message.ERR_400(
-            Constants.String.Right.CODE
-          ),
-        });
       const result = await service.postOne({
-        code,
         name,
         readOD,
         createOD,
@@ -128,7 +106,6 @@ var rightController = {
       const { id } = req.params;
       list = id.split(".");
       const {
-        code,
         name,
         readOD,
         createOD,
@@ -156,15 +133,7 @@ var rightController = {
             Constants.String.Right.NAME
           ),
         });
-      if (!code && code != 0)
-        return res.status(Constants.ApiCode.BAD_REQUEST).json({
-          status: Constants.ApiCode.BAD_REQUEST,
-          message: Constants.String.Message.ERR_400(
-            Constants.String.Right.CODE
-          ),
-        });
       const result = await service.putOne(list[list.length - 1], {
-        code,
         name,
         readOD,
         createOD,

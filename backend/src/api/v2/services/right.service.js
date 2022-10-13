@@ -88,42 +88,6 @@ var rightService = {
     }
   },
   /**
-   * @returns {import("./../interfaces").ResponseResult}
-   */
-  getMaxCode: async () => {
-    try {
-      const result = await model
-        .findOne({ deleted: false }, "-_id code")
-        .sort({ code: -1 });
-      return {
-        status: Constants.ApiCode.SUCCESS,
-        message: Constants.String.Message.GET_200(Constants.String.Right.CODE),
-        data: result,
-      };
-    } catch (error) {
-      switch (error.name) {
-        case "ValidationError":
-          return {
-            status: Constants.ApiCode.NOT_ACCEPTABLE,
-            message: Constants.String.Message.ERR_406,
-            data: { error: error.errors },
-          };
-        case "MongoServerError":
-          return {
-            status: Constants.ApiCode.NOT_ACCEPTABLE,
-            message: Constants.String.Message.ERR_406,
-            data: { error: error.message },
-          };
-        default:
-          return {
-            status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
-            message: Constants.String.Message.ERR_500,
-            data: { error: error.message },
-          };
-      }
-    }
-  },
-  /**
    * @param {import("./../interfaces").RightModel} data
    * @returns {import("./../interfaces").ResponseResult}
    */
@@ -137,15 +101,6 @@ var rightService = {
         return {
           status: Constants.ApiCode.NOT_ACCEPTABLE,
           message: Constants.String.Message.UNIQUE(Constants.String.Right.NAME),
-        };
-      const code = await model.findOne({
-        code: data.code,
-        deleted: false,
-      });
-      if (code)
-        return {
-          status: Constants.ApiCode.NOT_ACCEPTABLE,
-          message: Constants.String.Message.UNIQUE(Constants.String.Right.CODE),
         };
       const newItem = await model.create(data);
       return {
@@ -199,17 +154,7 @@ var rightService = {
           status: Constants.ApiCode.NOT_ACCEPTABLE,
           message: Constants.String.Message.UNIQUE(Constants.String.Right.NAME),
         };
-      const code = await model.findOne({
-        _id: { $ne: id },
-        code: data.code,
-        deleted: false,
-      });
-      if (code)
-        return {
-          status: Constants.ApiCode.NOT_ACCEPTABLE,
-          message: Constants.String.Message.UNIQUE(Constants.String.Right.CODE),
-        };
-      const updatedItem = await model.findOneAndUpdate(
+      await model.findOneAndUpdate(
         { _id: id, deleted: false },
         data
       );

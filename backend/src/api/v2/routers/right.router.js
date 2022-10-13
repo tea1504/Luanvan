@@ -8,11 +8,6 @@ const route = express.Router();
 const controller = require("./../controllers/right.controller");
 
 route.get(Constants.ApiPath.Right.SLASH, readRight, controller.getMany);
-route.get(
-  Constants.ApiPath.Right.GET_MAX_CODE,
-  readRight,
-  controller.getMaxCode
-);
 route.get(Constants.ApiPath.Right.ID, readRight, controller.getOne);
 route.post(Constants.ApiPath.Right.SLASH, createRight, controller.postOne);
 route.put(Constants.ApiPath.Right.ID, updateRight, controller.putOne);
