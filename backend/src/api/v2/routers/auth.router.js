@@ -32,5 +32,10 @@ route.post(
   upload.single("avatar"),
   authController.putInfo
 );
+route.put(
+  Constants.ApiPath.Auth.CHANGE_PASSWORD,
+  authMiddleware,
+  authController.changePassword
+);
 
 module.exports = route;

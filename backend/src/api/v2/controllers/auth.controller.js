@@ -97,6 +97,21 @@ const authController = {
       return next(error);
     }
   },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
+  changePassword: async (req, res, next) => {
+    try {
+      const id = req.userID;
+      const { password, oldPassword } = req.body;
+      const result = await authService.changePassword(id, { password, oldPassword });
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  },
 };
 
 module.exports = authController;
