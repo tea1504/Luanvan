@@ -24,6 +24,12 @@ const Screens = {
   LANGUAGE_CREATE: '/languages/create',
   LANGUAGE_UPDATE: (id = ':id') => '/languages/update/' + id,
 
+  // Language
+  OFFICER_STATUS: '/officer-statuses',
+  OFFICER_STATUS_DETAIL: (id = ':id') => '/officer-statuses/detail/' + id,
+  OFFICER_STATUS_CREATE: '/officer-statuses/create',
+  OFFICER_STATUS_UPDATE: (id = ':id') => '/officer-statuses/update/' + id,
+
   // Security
   SECURITY: '/securities',
   SECURITY_DETAIL: (id = ':id') => '/securities/detail/' + id,
@@ -42,8 +48,9 @@ const Screens = {
   RIGHT_CREATE: '/rights/create',
   RIGHT_UPDATE: (id = ':id') => '/rights/update/' + id,
 
-  // Officer
+  // user
   OFFICER_INFO: '/officer',
+  USER_CHANGE_PASSWORD: '/officer/change-password',
   // =========================================================================
   // Public
   // =========================================================================
