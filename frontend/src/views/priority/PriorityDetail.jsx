@@ -32,7 +32,7 @@ export default function PriorityDetail() {
   const language = useSelector((state) => state.config.language)
   Strings.setLanguage(language)
 
-  const store = useSelector((state) => state.language.data)
+  const store = useSelector((state) => state.priority.data)
   const [state, setState] = useState({
     _id: '',
     name: '',

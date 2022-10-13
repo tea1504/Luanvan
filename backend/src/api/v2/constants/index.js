@@ -22,6 +22,7 @@ const Constants = {
       LOGIN: "/login",
       GET_INFO: "/officer",
       PUT_INFO: "/officer",
+      CHANGE_PASSWORD: "/officer/change-password",
     },
     Officer: {
       ROOT: "/officers",
@@ -79,7 +80,7 @@ const Constants = {
       CREATE_MULTI: "/csv",
     },
     OfficerStatus: {
-      ROOT: "/officerstatuses",
+      ROOT: "/officer-statuses",
       SLASH: "/",
       ID: "/:id",
       CREATE_MULTI: "/csv",

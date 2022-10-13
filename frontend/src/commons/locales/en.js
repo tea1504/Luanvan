@@ -78,6 +78,7 @@ export default {
       MIN: (m = '') => `${m} quá nhỏ.`,
       UNIQUE: (m = '') => `${m} bị trùng lặp.`,
       MATCH: (m = '') => `${m} không hợp lệ.`,
+      COMPARE: (m = '') => `${m} không giống.`,
     },
     FieldName: {
       __V: 'Phiên bản',
@@ -89,6 +90,7 @@ export default {
       CHECK_BOX_CSV: 'File có tiêu đề',
       CODE: (m = '') => (m ? `Mã số ${m.toLowerCase()}` : 'Mã số'),
       COLOR: (m = '') => (m ? `Màu sắc ${m.toLowerCase()}` : 'Màu sắc'),
+      CONFIRM_PASSWORD: 'Xác nhận mật khẩu',
       CREATE_CATEGORIES: 'Tạo mới danh mục',
       CREATE_OD: 'Tạo mới công văn',
       CREATE_OFFICER: 'Tạo mới cán bộ',
@@ -114,9 +116,10 @@ export default {
       LAST_NAME: (m = '') => (m ? `Họ lót ${m.toLowerCase()}` : 'Họ lót'),
       NAME: (m = '') => (m ? `Tên ${m.toLowerCase()}` : 'Tên'),
       NOTATION: (m = '') => (m ? `Ký hiệu ${m.toLowerCase()}` : 'Ký hiệu'),
+      OLD_PASSWORD: 'Mật khẩu cũ',
       ORGANIZATION: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
       PAGE_AMOUNT: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
-      PASSWORD: (m = '') => (m ? `Mật khẩu ${m.toLowerCase()}` : 'Mật khẩu'),
+      PASSWORD: 'Mật khẩu',
       PATH: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
       PHONE_NUMBER: (m = '') => (m ? `Số điện thoại ${m.toLowerCase()}` : 'Số điện thoại'),
       POSITION: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
@@ -203,26 +206,14 @@ export default {
   Officer: {
     NAME: 'Cán bộ',
     CODE: 'OFFICER',
-    Form: {
-      ID: {
-        CODE: 'OFFICER_CODE',
-        EMAIL_ADDRESS: 'OFFICER_EMAIL_ADDRESS',
-        FILE: 'OFFICER_FILE',
-        FIRST_NAME: 'OFFICER_FIRST_NAME',
-        LAST_NAME: 'OFFICER_LAST_NAME',
-        ORGANIZATION: 'OFFICER_ORGANIZATION',
-        PASSWORD: 'OFFICER_PASSWORD',
-        PHONE_NUMBER: 'OFFICER_PHONE_NUMBER',
-        POSITION: 'OFFICER_POSITION',
-        RIGHT: 'OFFICER_RIGHT',
-        STATUS: 'OFFICER_STATUS',
-      },
+    Common: {
+      DESCRIPTION_PASSWORD: 'Mật khẩu phải bao gồm chữ hoa, chữ thường, chữ số và ký tự đặt biệt',
     },
   },
   OfficerStatus: {
-    Common: {
-      NAME: 'Trạng thái cán bộ',
-    },
+    NAME: 'Trạng thái cán bộ',
+    CODE: 'OFFICER_STATUS',
+    Common: {},
     Form: {
       ID: {
         DESCRIPTION: 'OFFICER_STATUS_DESCRIPTION',

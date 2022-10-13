@@ -49,7 +49,10 @@ const AppHeaderDropdown = () => {
           <CIcon icon={cilUser} className="me-2" />
           {Strings.Common.PROFILE}
         </CDropdownItem>
-        <CDropdownItem href="#">
+        <CDropdownItem
+          onClick={() => navigate(Screen.USER_CHANGE_PASSWORD)}
+          style={{ cursor: 'pointer' }}
+        >
           <CIcon icon={cilSettings} className="me-2" />
           {Strings.Common.CHANGE_PASSWORD}
         </CDropdownItem>

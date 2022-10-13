@@ -35,6 +35,7 @@ const Constants = {
     // User
     GET_USER: '/officer',
     PUT_USER: '/officer',
+    CHANGE_PASSWORD: '/officer/change-password',
     LOGIN: '/login',
 
     // Type
@@ -86,6 +87,15 @@ const Constants = {
     UPDATE_RIGHT: (id) => '/rights/' + id,
     DELETE_RIGHT: (id) => '/rights/' + id,
     DELETE_RIGHTS: '/rights',
+
+    // Officer Status
+    GET_OFFICER_STATUSES: (limit = 10, pageNumber = 1, filter = '') =>
+      `/officer-statuses?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+    GET_OFFICER_STATUS: (id) => `/rights/` + id,
+    CREATE_OFFICER_STATUS: '/officer-statuses',
+    UPDATE_OFFICER_STATUS: (id) => '/officer-statuses/' + id,
+    DELETE_OFFICER_STATUS: (id) => '/officer-statuses/' + id,
+    DELETE_OFFICER_STATUSES: '/officer-statuses',
   },
 
   /**

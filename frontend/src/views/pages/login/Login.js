@@ -87,9 +87,10 @@ const Login = () => {
         if (token) {
           dispatch(setLoading(true))
           await getUser()
-          const user = localStorage.getItem(Constants.StorageKeys.USER_INFO)
+          const user = JSON.parse(localStorage.getItem(Constants.StorageKeys.USER_INFO))
           dispatch(setLoading(false))
-          if (user) navigate(Screens.HOME, { replace: true })
+          if (user?.status.name == 'ACTIVATED') navigate(Screens.HOME, { replace: true })
+          else navigate(Screens.USER_CHANGE_PASSWORD, { replace: true })
         }
       }
     } catch (error) {
@@ -133,8 +134,14 @@ const Login = () => {
     try {
       const result = await authService.getInfo()
       const user = result.data.data
-      localStorage.setItem(Constants.StorageKeys.USER_INFO, JSON.stringify(user))
-      dispatch(setUser(user))
+      if (user.status.name === 'ACTIVATED') {
+        localStorage.setItem(Constants.StorageKeys.USER_INFO, JSON.stringify(user))
+        dispatch(setUser(user))
+      } else if (user.status.name === 'NEW') {
+        user.right.scope = -1
+        localStorage.setItem(Constants.StorageKeys.USER_INFO, JSON.stringify(user))
+        dispatch(setUser(user))
+      }
     } catch (error) {
       switch (error.status) {
         case 401:
@@ -235,7 +242,7 @@ const Login = () => {
                       </CInputGroupText>
                       <CFormFeedback invalid>
                         {err.password &&
-                          Strings.Form.Validation[err.password](Strings.Form.FieldName.PASSWORD())}
+                          Strings.Form.Validation[err.password](Strings.Form.FieldName.PASSWORD)}
                       </CFormFeedback>
                     </CInputGroup>
                     <CRow>

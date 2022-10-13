@@ -3,8 +3,8 @@ info:
   title: E-Office API's Document
   version: "1.0.0"
 servers:
+  - url: http://10.10.40.67:5000/v2
   - url: http://localhost:5000/v2
-  - url: http://10.10.42.249:5000/v2
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -1647,7 +1647,7 @@ paths:
           description: Dữ liệu không được chấp nhận
         500:
           description: Lỗi hệ thống
-  /officerStatuses:
+  /officer-statuses:
     get:
       summary: Lấy danh sách bản ghi
       tags:
@@ -1737,7 +1737,7 @@ paths:
           description: Dữ liệu không được chấp nhận
         500:
           description: Lỗi hệ thống
-  /officerStatuses/csv:
+  /officer-statuses/csv:
     post:
       summary: Thêm nhiều bản ghi
       tags:
@@ -1773,7 +1773,7 @@ paths:
           description: Dữ liệu không được chấp nhận
         500:
           description: Lỗi hệ thống
-  /officerStatuses/{id}:
+  /officer-statuses/{id}:
     get:
       summary: Lấy bản ghi theo id
       tags:

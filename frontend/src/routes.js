@@ -5,27 +5,48 @@ import Screens from './constants/screens'
 import Strings from './constants/strings'
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
-const Type = React.lazy(() => import('./views/type/Type'))
-const TypeCreateOrUpdate = React.lazy(() => import('./views/type/TypeCreateOrUpdate'))
-const TypeDetail = React.lazy(() => import('./views/type/TypeDetail'))
 const Language = React.lazy(() => import('./views/language/Language'))
 const LanguageCreateOrUpDate = React.lazy(() => import('./views/language/LanguageCreateOrUpdate'))
 const LanguageDetail = React.lazy(() => import('./views/language/LanguageDetail'))
-const User = React.lazy(() => import('./views/user/User'))
-const Security = React.lazy(() => import('./views/security/Security'))
-const SecurityCreateOrUpDate = React.lazy(() => import('./views/security/SecurityCreateOrUpdate'))
-const SecurityDetail = React.lazy(() => import('./views/security/SecurityDetail'))
+const OfficerStatus = React.lazy(() => import('./views/officerstatus/OfficerStatus'))
+const OfficerStatusCreateOrUpDate = React.lazy(() =>
+  import('./views/officerstatus/OfficerStatusCreateOrUpdate'),
+)
+const OfficerStatusDetail = React.lazy(() => import('./views/officerstatus/OfficerStatusDetail'))
 const Priority = React.lazy(() => import('./views/priority/Priority'))
 const PriorityCreateOrUpDate = React.lazy(() => import('./views/priority/PriorityCreateOrUpdate'))
 const PriorityDetail = React.lazy(() => import('./views/priority/PriorityDetail'))
 const Right = React.lazy(() => import('./views/right/Right'))
 const RightCreateOrUpDate = React.lazy(() => import('./views/right/RightCreateOrUpdate'))
 const RightDetail = React.lazy(() => import('./views/right/RightDetail'))
+const Security = React.lazy(() => import('./views/security/Security'))
+const SecurityCreateOrUpDate = React.lazy(() => import('./views/security/SecurityCreateOrUpdate'))
+const SecurityDetail = React.lazy(() => import('./views/security/SecurityDetail'))
+const Type = React.lazy(() => import('./views/type/Type'))
+const TypeCreateOrUpdate = React.lazy(() => import('./views/type/TypeCreateOrUpdate'))
+const TypeDetail = React.lazy(() => import('./views/type/TypeDetail'))
+const User = React.lazy(() => import('./views/user/User'))
+const UserChangePassword = React.lazy(() => import('./views/user/UserChangePassword'))
 
 const routes = [
   { path: '/', exact: true, name: { vi: 'Trang chủ', en: 'Home' } },
-  { path: '/dashboard', name: { vi: 'Trang chủ', en: 'Dashboard' }, element: Dashboard },
-  { path: Screens.OFFICER_INFO, name: { vi: vn.Officer.NAME, en: en.Officer.NAME }, element: User },
+  {
+    path: '/dashboard',
+    name: { vi: 'Trang chủ', en: 'Dashboard' },
+    element: Dashboard,
+  },
+  {
+    path: Screens.OFFICER_INFO,
+    name: { vi: vn.Officer.NAME, en: en.Officer.NAME },
+    element: User,
+    role: [0, 1],
+  },
+  {
+    path: Screens.USER_CHANGE_PASSWORD,
+    name: { vi: vn.Common.CHANGE_PASSWORD, en: en.Common.CHANGE_PASSWORD },
+    element: UserChangePassword,
+    role: [-1, 0, 1],
+  },
   {
     path: Screens.LANGUAGE,
     name: { vi: vn.Language.NAME, en: en.Language.NAME },
@@ -51,6 +72,34 @@ const routes = [
     path: Screens.LANGUAGE_UPDATE(),
     name: { vi: vn.Common.UPDATE, en: en.Common.UPDATE },
     element: LanguageCreateOrUpDate,
+    role: [0],
+    right: Strings.Common.UPDATE_CATEGORIES,
+  },
+  {
+    path: Screens.OFFICER_STATUS,
+    name: { vi: vn.OfficerStatus.NAME, en: en.OfficerStatus.NAME },
+    element: OfficerStatus,
+    role: [0],
+    right: Strings.Common.READ_CATEGORIES,
+  },
+  {
+    path: Screens.OFFICER_STATUS_DETAIL(),
+    name: { vi: vn.Common.DETAIL, en: en.Common.DETAIL },
+    element: OfficerStatusDetail,
+    role: [0],
+    right: Strings.Common.READ_CATEGORIES,
+  },
+  {
+    path: Screens.OFFICER_STATUS_CREATE,
+    name: { vi: vn.Common.CREATE, en: en.Common.CREATE },
+    element: OfficerStatusCreateOrUpDate,
+    role: [0],
+    right: Strings.Common.CREATE_CATEGORIES,
+  },
+  {
+    path: Screens.OFFICER_STATUS_UPDATE(),
+    name: { vi: vn.Common.UPDATE, en: en.Common.UPDATE },
+    element: OfficerStatusCreateOrUpDate,
     role: [0],
     right: Strings.Common.UPDATE_CATEGORIES,
   },

@@ -2,7 +2,6 @@ require("dotenv").config();
 const Constants = require("../constants");
 const typeModel = require("./../models/type.model");
 const { parse } = require("csv-parse/sync");
-const assert = require("assert");
 
 var typeService = {
   /**
@@ -256,10 +255,6 @@ var typeService = {
             Constants.String.Type.NOTATION
           ),
         };
-      const updatedType = await typeModel.findOneAndUpdate(
-        { _id: id, deleted: false },
-        type
-      );
       const result = await typeModel.findOne({ _id: id });
       return {
         status: Constants.ApiCode.SUCCESS,

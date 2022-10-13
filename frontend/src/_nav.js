@@ -5,7 +5,16 @@ import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 import Screens from './constants/screens'
 import vn from './commons/locales/vn'
 import en from './commons/locales/en'
-import { FaFile, FaHome, FaLanguage, FaRunning, FaShareAlt, FaShieldAlt, FaUserShield } from 'react-icons/fa'
+import {
+  FaFile,
+  FaHome,
+  FaLanguage,
+  FaRunning,
+  FaShareAlt,
+  FaShieldAlt,
+  FaUserCog,
+  FaUserShield,
+} from 'react-icons/fa'
 
 const _nav = [
   {
@@ -38,6 +47,16 @@ const _nav = [
   {
     component: CNavItem,
     name: {
+      vi: vn.OfficerStatus.NAME,
+      en: en.OfficerStatus.NAME,
+    },
+    role: [0],
+    to: Screens.OFFICER_STATUS,
+    icon: <FaUserCog className="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: {
       vi: vn.Security.NAME,
       en: en.Security.NAME,
     },
@@ -45,16 +64,7 @@ const _nav = [
     to: Screens.SECURITY,
     icon: <FaShieldAlt className="nav-icon" />,
   },
-  {
-    component: CNavItem,
-    name: {
-      vi: vn.Right.NAME,
-      en: en.Right.NAME,
-    },
-    role: [0],
-    to: Screens.RIGHT,
-    icon: <FaUserShield className="nav-icon" />,
-  },
+
   {
     component: CNavItem,
     name: {
