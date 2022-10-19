@@ -30,6 +30,12 @@ const Screens = {
   OFFICER_STATUS_CREATE: '/officer-statuses/create',
   OFFICER_STATUS_UPDATE: (id = ':id') => '/officer-statuses/update/' + id,
 
+  // Organization
+  ORGANIZATION: '/organizations',
+  ORGANIZATION_DETAIL: (id = ':id') => '/organizations/detail/' + id,
+  ORGANIZATION_CREATE: '/organizations/create',
+  ORGANIZATION_UPDATE: (id = ':id') => '/organizations/update/' + id,
+
   // Security
   SECURITY: '/securities',
   SECURITY_DETAIL: (id = ':id') => '/securities/detail/' + id,

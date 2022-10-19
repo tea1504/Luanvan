@@ -8,7 +8,9 @@ import en from './commons/locales/en'
 import {
   FaFile,
   FaHome,
+  FaInfoCircle,
   FaLanguage,
+  FaObjectGroup,
   FaRunning,
   FaShareAlt,
   FaShieldAlt,
@@ -57,6 +59,16 @@ const _nav = [
   {
     component: CNavItem,
     name: {
+      vi: vn.Organization.NAME,
+      en: en.Organization.NAME,
+    },
+    role: [0],
+    to: Screens.ORGANIZATION,
+    icon: <FaObjectGroup className="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: {
       vi: vn.Security.NAME,
       en: en.Security.NAME,
     },
@@ -72,7 +84,7 @@ const _nav = [
     },
     role: [0],
     to: Screens.STATUS,
-    icon: <FaShieldAlt className="nav-icon" />,
+    icon: <FaInfoCircle className="nav-icon" />,
   },
   {
     component: CNavItem,

@@ -92,3 +92,16 @@ export interface RightModel {
   updatedAt?: String;
   __v?: Number;
 }
+
+export interface OrganizationModel {
+  _id?: String;
+  name: String;
+  code: String;
+  emailAddress: String;
+  phoneNumber: String;
+  organ?: String;
+  deleted?: Boolean;
+  createdAt?: String;
+  updatedAt?: String;
+  __v?: Number;
+}

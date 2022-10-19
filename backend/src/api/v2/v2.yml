@@ -542,22 +542,6 @@ paths:
       responses:
         200:
           description: Đăng nhập thành công
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: number
-                    default: 200
-                  message:
-                    type: string
-                    default: đăng nhập thành công
-                  data:
-                    type: object
-                    properties:
-                      token:
-                        type: string
         400:
           description: Cú pháp không hợp lệ
         403:
@@ -574,42 +558,68 @@ paths:
       responses:
         200:
           description: Lấy bản ghi thành công
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: number
-                    default: 200
-                  message:
-                    type: string
-                    default: thành công
-                  data:
-                    type: object
-                    properties:
-                      code:
-                        type: string
-                      position:
-                        type: string
-                      firstName:
-                        type: string
-                      lastName:
-                        type: string
-                      emailAddress:
-                        type: string
-                      phoneNumber:
-                        type: string
-                      right:
-                        type: object
-                        properties:
-                          code:
-                            type: string
-                          name:
-                            type: string
-                      file:
-                        type: object
-                        $ref: "#/components/schemas/File"
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy người dùng hoặc liên kết
+        500:
+          description: Lỗi hệ thống
+    put:
+      summary: Cập nhật bản ghi cán bộ đang đăng nhập
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                emailAddress:
+                  type: string
+                phoneNumber:
+                  type: string
+                file:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          description: Lấy bản ghi thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy người dùng hoặc liên kết
+        500:
+          description: Lỗi hệ thống
+  /officer/change-password:
+    put:
+      summary: Cập nhật bản ghi cán bộ đang đăng nhập
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password: 
+                  type: string
+                confirmPassword: 
+                  type: string
+                oldPassword: 
+                  type: string
+      responses:
+        200:
+          description: Lấy bản ghi thành công
         401:
           description: Phiên đăng nhập hết hạn
         403:
@@ -1944,24 +1954,6 @@ paths:
           description: Dữ liệu không được chấp nhận
         500:
           description: Lỗi hệ thống
-  /rights/max-code:
-    get:
-      summary: Lấy bản ghi
-      tags:
-        - Right
-      responses:
-          200:
-            description: Lấy bản ghi thành công
-          401:
-            description: Phiên đăng nhập hết hạn
-          403:
-            description: Không có quyền truy cập
-          404:
-            description: Không tìm thấy loại văn bản hoặc liên kết
-          406:
-            description: Dữ liệu không được chấp nhận
-          500:
-            description: Lỗi hệ thống
   /rights/{id}:
     get:
       summary: Lấy bản ghi theo id
@@ -2033,6 +2025,258 @@ paths:
       responses:
         200:
           description: Thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+  /organizations:
+    get:
+      summary: Lấy danh sách loại văn bản
+      tags:
+        - Organization
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          required: true
+          description: Số lượng bản ghi
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+            default: 1
+          required: true
+          description: Trang
+        - in: query
+          name: filter
+          schema:
+            type: string
+          required: false
+          description: Lọc kết quả
+      responses:
+        200:
+          description: Truy vấn thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        500:
+          description: Lỗi hệ thống
+    post:
+      summary: Thêm mới loại văn bản
+      tags:
+        - Organization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Organization"
+      responses:
+        200:
+          description: OK
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+    delete:
+      summary: Xóa nhiều loại văn bản
+      tags:
+        - Organization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        200:
+          description: Xóa thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+  /organizations/csv:
+    post:
+      summary: Thêm nhiều bản ghi
+      tags:
+        - Organization
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema: 
+              type: object
+              properties:
+                text:
+                  type: string
+                  default: "1,1,\n2,2,\n3,3,"
+                title:
+                  type: boolean
+                  default: false
+                file:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          description: Thêm mới thành công
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+  /organizations/organ/{id}:
+    get:
+      summary: Lấy danh sách bản ghi
+      tags:
+        - Organization
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          required: true
+          description: Số lượng bản ghi
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+            default: 1
+          required: true
+          description: Trang
+        - in: query
+          name: filter
+          schema:
+            type: string
+          required: false
+          description: Lọc kết quả
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      responses:
+        200:
+          description: OK
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+  /organizations/{id}:
+    get:
+      summary: Lấy bản ghi 1 loại văn bản theo id
+      tags:
+        - Organization
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      responses:
+        200:
+          description: OK
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+    put:
+      summary: Cập nhật bản ghi 1 loại văn bản theo id
+      tags:
+        - Organization
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Organization"
+      responses:
+        200:
+          description: OK
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+    delete:
+      summary: Xóa bản ghi 1 loại văn bản theo id
+      tags:
+        - Organization
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      responses:
+        200:
+          description: Xóa thành công
         401:
           description: Phiên đăng nhập hết hạn
         403:

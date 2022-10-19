@@ -12,6 +12,7 @@ import prioritySlide from './slice/priority.slide'
 import rightSlide from './slice/right.slide'
 import officerStatusSlide from './slice/officerStatus.slide'
 import statusSlide from './slice/status.slide'
+import organizationSlide from './slice/organization.slide'
 
 const reducers = combineReducers({
   user: userSlice,
@@ -25,6 +26,7 @@ const reducers = combineReducers({
   right: rightSlide,
   officerStatus: officerStatusSlide,
   status: statusSlide,
+  organization: organizationSlide,
 })
 
 const persistConfig = {

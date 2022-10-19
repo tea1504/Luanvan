@@ -28,6 +28,9 @@ const StatusDetail = React.lazy(() => import('./views/status/StatusDetail'))
 const Type = React.lazy(() => import('./views/type/Type'))
 const TypeCreateOrUpdate = React.lazy(() => import('./views/type/TypeCreateOrUpdate'))
 const TypeDetail = React.lazy(() => import('./views/type/TypeDetail'))
+const Organization = React.lazy(() => import('./views/organization/Organization'))
+const OrganizationCreateOrUpdate = React.lazy(() => import('./views/organization/OrganizationCreateOrUpdate'))
+const OrganizationDetail = React.lazy(() => import('./views/organization/OrganizationDetail'))
 const User = React.lazy(() => import('./views/user/User'))
 const UserChangePassword = React.lazy(() => import('./views/user/UserChangePassword'))
 
@@ -103,6 +106,34 @@ const routes = [
     path: Screens.OFFICER_STATUS_UPDATE(),
     name: { vi: vn.Common.UPDATE, en: en.Common.UPDATE },
     element: OfficerStatusCreateOrUpDate,
+    role: [0],
+    right: Strings.Common.UPDATE_CATEGORIES,
+  },
+  {
+    path: Screens.ORGANIZATION,
+    name: { vi: vn.Organization.NAME, en: en.Organization.NAME },
+    element: Organization,
+    role: [0],
+    right: Strings.Common.READ_CATEGORIES,
+  },
+  {
+    path: Screens.ORGANIZATION_DETAIL(),
+    name: { vi: vn.Common.DETAIL, en: en.Common.DETAIL },
+    element: OrganizationDetail,
+    role: [0],
+    right: Strings.Common.READ_CATEGORIES,
+  },
+  {
+    path: Screens.ORGANIZATION_CREATE,
+    name: { vi: vn.Common.CREATE, en: en.Common.CREATE },
+    element: OrganizationCreateOrUpdate,
+    role: [0],
+    right: Strings.Common.CREATE_CATEGORIES,
+  },
+  {
+    path: Screens.ORGANIZATION_UPDATE(),
+    name: { vi: vn.Common.UPDATE, en: en.Common.UPDATE },
+    element: OrganizationCreateOrUpdate,
     role: [0],
     right: Strings.Common.UPDATE_CATEGORIES,
   },

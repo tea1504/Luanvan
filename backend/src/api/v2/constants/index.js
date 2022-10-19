@@ -62,10 +62,11 @@ const Constants = {
       CREATE_MULTI: "/csv",
     },
     Organization: {
-      ROOT: "/organization",
+      ROOT: "/organizations",
       SLASH: "/",
       ID: "/:id",
       CREATE_MULTI: "/csv",
+      ORGAN_ID: "/organ/:id",
     },
     OfficialDispatchTravel: {
       ROOT: "/officialdispatchtravel",
@@ -202,6 +203,7 @@ const Constants = {
       ERR_404: (m = "") => `không tìm thấy ${m}`,
       ERR_406: "dữ liệu không được chấp nhận",
       ERR_500: "lỗi hệ thống",
+      DELETE_406: "không thể xóa",
     },
     Organization: {
       _: "tổ chức",

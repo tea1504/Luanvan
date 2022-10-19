@@ -22,16 +22,6 @@ const Constants = {
   },
 
   ApiPath: {
-    GET_TEST: '/tests',
-    GET_TEST_2: '/test2',
-
-    // Book
-    GET_BOOKS: (limit, pageNumber) => `/books?limit=${limit}&&pageNumber=${pageNumber}`,
-    GET_BOOK: (id) => '/books/' + id,
-    CREATE_BOOK: '/books',
-    UPDATE_BOOK: (id) => '/books/' + id,
-    DELETE_BOOK: (id) => '/books/' + id,
-
     // User
     GET_USER: '/officer',
     PUT_USER: '/officer',
@@ -88,7 +78,7 @@ const Constants = {
     DELETE_PRIORITY: (id) => '/priorities/' + id,
     DELETE_PRIORITIES: '/priorities',
 
-    // Priority
+    // Right
     GET_RIGHTS: (limit = 10, pageNumber = 1, filter = '') =>
       `/rights?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
     GET_RIGHT: (id) => `/rights/` + id,
@@ -97,6 +87,18 @@ const Constants = {
     UPDATE_RIGHT: (id) => '/rights/' + id,
     DELETE_RIGHT: (id) => '/rights/' + id,
     DELETE_RIGHTS: '/rights',
+
+    // Organization
+    GET_ORGANIZATIONS: (limit = 5, pageNumber = 1, filter = '') =>
+      `/organizations?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+    GET_ORGANIZATIONS_BY_ORGAN_ID: (id = '', limit = 10, pageNumber = 1, filter = '') =>
+      `/organizations/organ/${id}?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+    GET_ORGANIZATION: (id = '') => `/organizations/` + id,
+    CREATE_ORGANIZATION: '/organizations',
+    CREATE_ORGANIZATIONS: '/organizations/csv',
+    UPDATE_ORGANIZATION: (id = '') => '/organizations/' + id,
+    DELETE_ORGANIZATION: (id = '') => '/organizations/' + id,
+    DELETE_ORGANIZATIONS: '/organizations',
 
     // Officer Status
     GET_OFFICER_STATUSES: (limit = 10, pageNumber = 1, filter = '') =>

@@ -64,6 +64,7 @@ export default {
       CANCEL: 'Bạn đã hủy thao tác xóa dữ liệu',
       FAILURE: 'Xóa dữ liệu thất bại',
       MESSAGE: 'Bạn muốn xóa dữ liệu ?',
+      WARNING: 'Các dữ liệu liên quan cũng sẽ bị xóa.',
       SUCCESS: 'Bạn đã xóa dữ liệu thành công',
       TITLE: 'Thao tác xóa',
     },
@@ -117,7 +118,7 @@ export default {
       NAME: (m = '') => (m ? `Tên ${m.toLowerCase()}` : 'Tên'),
       NOTATION: (m = '') => (m ? `Ký hiệu ${m.toLowerCase()}` : 'Ký hiệu'),
       OLD_PASSWORD: 'Mật khẩu cũ',
-      ORGANIZATION: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
+      ORGANIZATION: 'Tổ chức cấp trên',
       PAGE_AMOUNT: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
       PASSWORD: 'Mật khẩu',
       PATH: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
@@ -247,8 +248,10 @@ export default {
     },
   },
   Organization: {
+    NAME: 'Tổ chức',
+    CODE: 'ORGANIZATION',
     Common: {
-      NAME: 'Tổ chức',
+      SELECT: '- Chọn tổ chức cấp trên (nếu có) -',
     },
     Form: {
       ID: {
