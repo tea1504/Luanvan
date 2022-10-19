@@ -64,5 +64,11 @@ route.use(
   adminMiddleware,
   organizationRouter
 );
+route.use(
+  Constants.ApiPath.Officers.ROOT,
+  authMiddleware,
+  adminMiddleware,
+  officerRouter
+);
 
 module.exports = route;

@@ -109,11 +109,17 @@ export default function UserChangePassword() {
       try {
         dispatch(setLoading(true))
         await service.changePassword(state)
-        MySwal.fire({
+        dispatch(setLoading(false))
+        await MySwal.fire({
           title: Strings.Common.SUCCESS,
           icon: 'success',
           text: Strings.Message.Update.SUCCESS,
         })
+        if (loggedUser.status.name === 'NEW') {
+          localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
+          localStorage.clear(Constants.StorageKeys.USER_INFO)
+          navigate(Screens.LOGIN)
+        }
         updateState({
           password: '',
           confirmPassword: '',
@@ -122,7 +128,6 @@ export default function UserChangePassword() {
           showConfirmPassword: false,
           showOldPassword: false,
         })
-        dispatch(setLoading(false))
       } catch (error) {
         dispatch(setLoading(false))
         switch (error.status) {

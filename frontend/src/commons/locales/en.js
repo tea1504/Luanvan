@@ -63,7 +63,8 @@ export default {
     Delete: {
       CANCEL: 'Bạn đã hủy thao tác xóa dữ liệu',
       FAILURE: 'Xóa dữ liệu thất bại',
-      MESSAGE: 'Bạn muốn xóa dữ liệu ?',
+      MESSAGE: 'Bạn muốn xóa dữ liệu?',
+      MESSAGE_VAR: (v = '') => `Bạn muốn xóa dữ liệu ${v}?`,
       WARNING: 'Các dữ liệu liên quan cũng sẽ bị xóa.',
       SUCCESS: 'Bạn đã xóa dữ liệu thành công',
       TITLE: 'Thao tác xóa',
@@ -136,6 +137,7 @@ export default {
       SIGNER_INFO_POSITION: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
       SIZE: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
       STATUS: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
+      SUB_ORGAN: 'Tổ chức cấp dưới',
       SUBJECT: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
       TIME: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
       TRACE_HEADER_LIST: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),

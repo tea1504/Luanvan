@@ -1,6 +1,6 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
-import { cilBell, cilBook, cilCalculator, cilFile, cilHome, cilLanguage } from '@coreui/icons'
+import { cilBell, cilBook, cilCalculator } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 import Screens from './constants/screens'
 import vn from './commons/locales/vn'
@@ -12,8 +12,8 @@ import {
   FaLanguage,
   FaObjectGroup,
   FaRunning,
-  FaShareAlt,
   FaShieldAlt,
+  FaUser,
   FaUserCog,
   FaUserShield,
 } from 'react-icons/fa'
@@ -45,6 +45,16 @@ const _nav = [
     role: [0],
     to: Screens.LANGUAGE,
     icon: <FaLanguage className="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: {
+      vi: vn.Officer.NAME,
+      en: en.Officer.NAME,
+    },
+    role: [0],
+    to: Screens.OFFICER,
+    icon: <FaUser className="nav-icon" />,
   },
   {
     component: CNavItem,
@@ -115,6 +125,14 @@ const _nav = [
     role: [0],
     to: Screens.TYPE,
     icon: <FaFile className="nav-icon" />,
+  },
+  {
+    component: CNavTitle,
+    name: {
+      vi: 'TEST',
+      en: "Admin's functions",
+    },
+    role: [0],
   },
   {
     component: CNavGroup,

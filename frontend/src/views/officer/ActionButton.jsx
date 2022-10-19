@@ -8,20 +8,18 @@ import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import Screens from 'src/constants/screens'
 import { useDispatch } from 'react-redux'
-import { setData, setTotal } from 'src/store/slice/organization.slide'
+import { setData, setTotal } from 'src/store/slice/officer.slide'
 import Constants from 'src/constants'
 import Helpers from 'src/commons/helpers'
-import OrganizationService from 'src/services/organization.service'
-import { FaInfoCircle, FaPenSquare, FaTrash } from 'react-icons/fa'
 import OfficerService from 'src/services/officer.service'
+import { FaInfoCircle, FaPenSquare, FaTrash } from 'react-icons/fa'
 
-const service = new OrganizationService()
-const officerService = new OfficerService()
+const service = new OfficerService()
 const MySwal = withReactContent(Swal)
 
 const ActionButton = ({ data }) => {
   const loggedUser = useSelector((state) => state.user.user)
-  const store = useSelector((state) => state.organization)
+  const store = useSelector((state) => state.officer)
   const language = useSelector((state) => state.config.language)
   Strings.setLanguage(language)
   const navigate = useNavigate()
@@ -81,20 +79,6 @@ const ActionButton = ({ data }) => {
               await service.deleteMany(listSubOrgan.data.data.data.map((el) => el._id))
             else return
           }
-          const listOfficer = await officerService.getManyByOrganId(data._id, 10000)
-          if (listOfficer.data.data.data.length > 0) {
-            const check = await MySwal.fire({
-              title: Strings.Message.Delete.TITLE,
-              icon: 'info',
-              text: Strings.Message.Delete.MESSAGE_VAR(Strings.Officer.NAME),
-              showCancelButton: true,
-              cancelButtonText: Strings.Common.CANCEL,
-              confirmButtonText: Strings.Common.OK,
-            })
-            if (check.isConfirmed)
-              await officerService.deleteMany(listOfficer.data.data.data.map((el) => el._id))
-            else return
-          }
           await service.deleteOne(data._id)
           await getState()
           return MySwal.fire({
@@ -143,7 +127,7 @@ const ActionButton = ({ data }) => {
             color="info"
             className="m-1"
             onClick={() =>
-              navigate(Screens.ORGANIZATION_DETAIL(`${Helpers.toSlug(data.name)}.${data._id}`))
+              navigate(Screens.OFFICER_DETAIL(`${Helpers.toSlug(data.name)}.${data._id}`))
             }
           >
             <FaInfoCircle style={{ color: 'whitesmoke' }} />
@@ -156,7 +140,7 @@ const ActionButton = ({ data }) => {
             color="warning"
             className="m-1"
             onClick={() =>
-              navigate(Screens.ORGANIZATION_UPDATE(`${Helpers.toSlug(data.name)}.${data._id}`))
+              navigate(Screens.OFFICER_UPDATE(`${Helpers.toSlug(data.name)}.${data._id}`))
             }
           >
             <FaPenSquare style={{ color: 'whitesmoke' }} />

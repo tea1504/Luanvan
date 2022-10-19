@@ -29,8 +29,13 @@ const Type = React.lazy(() => import('./views/type/Type'))
 const TypeCreateOrUpdate = React.lazy(() => import('./views/type/TypeCreateOrUpdate'))
 const TypeDetail = React.lazy(() => import('./views/type/TypeDetail'))
 const Organization = React.lazy(() => import('./views/organization/Organization'))
-const OrganizationCreateOrUpdate = React.lazy(() => import('./views/organization/OrganizationCreateOrUpdate'))
+const OrganizationCreateOrUpdate = React.lazy(() =>
+  import('./views/organization/OrganizationCreateOrUpdate'),
+)
 const OrganizationDetail = React.lazy(() => import('./views/organization/OrganizationDetail'))
+const Officer = React.lazy(() => import('./views/officer/Officer'))
+const OfficerCreateOrUpdate = React.lazy(() => import('./views/officer/OfficerCreateOrUpdate'))
+const OfficerDetail = React.lazy(() => import('./views/officer/OfficerDetail'))
 const User = React.lazy(() => import('./views/user/User'))
 const UserChangePassword = React.lazy(() => import('./views/user/UserChangePassword'))
 
@@ -132,6 +137,34 @@ const routes = [
   },
   {
     path: Screens.ORGANIZATION_UPDATE(),
+    name: { vi: vn.Common.UPDATE, en: en.Common.UPDATE },
+    element: OrganizationCreateOrUpdate,
+    role: [0],
+    right: Strings.Common.UPDATE_CATEGORIES,
+  },
+  {
+    path: Screens.OFFICER,
+    name: { vi: vn.Officer.NAME, en: en.Officer.NAME },
+    element: Officer,
+    role: [0],
+    right: Strings.Common.READ_CATEGORIES,
+  },
+  {
+    path: Screens.OFFICER_DETAIL(),
+    name: { vi: vn.Common.DETAIL, en: en.Common.DETAIL },
+    element: OrganizationDetail,
+    role: [0],
+    right: Strings.Common.READ_CATEGORIES,
+  },
+  {
+    path: Screens.OFFICER_CREATE,
+    name: { vi: vn.Common.CREATE, en: en.Common.CREATE },
+    element: OrganizationCreateOrUpdate,
+    role: [0],
+    right: Strings.Common.CREATE_CATEGORIES,
+  },
+  {
+    path: Screens.OFFICER_UPDATE(),
     name: { vi: vn.Common.UPDATE, en: en.Common.UPDATE },
     element: OrganizationCreateOrUpdate,
     role: [0],

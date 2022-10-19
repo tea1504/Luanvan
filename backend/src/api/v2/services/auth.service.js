@@ -192,8 +192,8 @@ var authService = {
         "./../../../../public/",
         officer.file.path
       );
-      if (file && fs.existsSync(pathFile)) fs.unlinkSync(pathFile);
       if (!officer) return { status: 404, message: "không tìm thấy thông tin" };
+      if (file && fs.existsSync(pathFile)) fs.unlinkSync(pathFile);
       const UpdatedOfficer = await officerModel.findById(id);
       return {
         status: Constants.ApiCode.SUCCESS,
@@ -258,6 +258,8 @@ var authService = {
       officer.password.push({
         value: await bcrypt.hash(data.password, parseInt(process.env.SALT)),
       });
+      const status = await officerStatusModel.findOne({ name: "ACTIVATED" });
+      officer.status = status;
       officer.save();
       return {
         status: Constants.ApiCode.SUCCESS,

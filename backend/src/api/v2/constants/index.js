@@ -24,11 +24,12 @@ const Constants = {
       PUT_INFO: "/officer",
       CHANGE_PASSWORD: "/officer/change-password",
     },
-    Officer: {
+    Officers: {
       ROOT: "/officers",
       SLASH: "/",
       ID: "/:id",
       CREATE_MULTI: "/csv",
+      ORGAN_ID: "/organ/:id",
     },
     Type: {
       ROOT: "/types",

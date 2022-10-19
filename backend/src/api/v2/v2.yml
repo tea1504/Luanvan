@@ -2287,3 +2287,311 @@ paths:
           description: Dữ liệu không được chấp nhận
         500:
           description: Lỗi hệ thống
+  /officers:
+    get:
+      summary: Lấy danh sách loại văn bản
+      tags:
+        - Officer
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          required: true
+          description: Số lượng bản ghi
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+            default: 1
+          required: true
+          description: Trang
+        - in: query
+          name: filter
+          schema:
+            type: string
+          required: false
+          description: Lọc kết quả
+      responses:
+        200:
+          description: Truy vấn thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        500:
+          description: Lỗi hệ thống
+    post:
+      summary: Thêm mới loại văn bản
+      tags:
+        - Officer
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                code: 
+                  type: string
+                  default: 111111
+                position:
+                  type: string
+                  default: Admin
+                firstName:
+                  type: string
+                  default: Hòa
+                lastName:
+                  type: string
+                  default: Trần Văn
+                emailAddress:
+                  type: string
+                  default: example@gmail.com
+                phoneNumber:
+                  type: string
+                  default: "0912883745"
+                organ: 
+                  type: string
+                  default: 6f7267616e30303030303031
+                right: 
+                  type: string
+                  default: "726967687430303030303030"
+                avatar:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          description: OK
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+    delete:
+      summary: Xóa nhiều loại văn bản
+      tags:
+        - Officer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        200:
+          description: Xóa thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+  /officers/csv:
+    post:
+      summary: Thêm nhiều bản ghi
+      tags:
+        - Officer
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema: 
+              type: object
+              properties:
+                text:
+                  type: string
+                  default: "1,1,\n2,2,\n3,3,"
+                title:
+                  type: boolean
+                  default: false
+                file:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          description: Thêm mới thành công
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+  /officers/organ/{id}:
+    get:
+      summary: Lấy danh sách bản ghi
+      tags:
+        - Officer
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          required: true
+          description: Số lượng bản ghi
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+            default: 1
+          required: true
+          description: Trang
+        - in: query
+          name: filter
+          schema:
+            type: string
+          required: false
+          description: Lọc kết quả
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      responses:
+        200:
+          description: OK
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+  /officers/{id}:
+    get:
+      summary: Lấy bản ghi 1 loại văn bản theo id
+      tags:
+        - Officer
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      responses:
+        200:
+          description: OK
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+    put:
+      summary: Cập nhật bản ghi 1 loại văn bản theo id
+      tags:
+        - Officer
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                position:
+                  type: string
+                  default: Admin
+                firstName:
+                  type: string
+                  default: Hòa
+                lastName:
+                  type: string
+                  default: Trần Văn
+                emailAddress:
+                  type: string
+                  default: example@gmail.com
+                phoneNumber:
+                  type: string
+                  default: "0912883745"
+                organ: 
+                  type: string
+                  default: 6f7267616e30303030303031
+                right: 
+                  type: string
+                  default: "726967687430303030303030"
+                status: 
+                  type: string
+                  default: 6f6666696365725374613031
+                avatar:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          description: OK
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+    delete:
+      summary: Xóa bản ghi 1 loại văn bản theo id
+      tags:
+        - Officer
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      responses:
+        200:
+          description: Xóa thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống

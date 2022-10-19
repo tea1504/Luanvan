@@ -100,6 +100,18 @@ const Constants = {
     DELETE_ORGANIZATION: (id = '') => '/organizations/' + id,
     DELETE_ORGANIZATIONS: '/organizations',
 
+    // Organization
+    GET_OFFICERS: (limit = 5, pageNumber = 1, filter = '') =>
+      `/officers?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+    GET_OFFICERS_BY_ORGAN_ID: (id = '', limit = 10, pageNumber = 1, filter = '') =>
+      `/officers/organ/${id}?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+    GET_OFFICER: (id = '') => `/officers/` + id,
+    CREATE_OFFICER: '/officers',
+    CREATE_OFFICERS: '/officers/csv',
+    UPDATE_OFFICER: (id = '') => '/officers/' + id,
+    DELETE_OFFICER: (id = '') => '/officers/' + id,
+    DELETE_OFFICERS: '/officers',
+
     // Officer Status
     GET_OFFICER_STATUSES: (limit = 10, pageNumber = 1, filter = '') =>
       `/officer-statuses?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,

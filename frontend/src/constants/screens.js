@@ -36,6 +36,12 @@ const Screens = {
   ORGANIZATION_CREATE: '/organizations/create',
   ORGANIZATION_UPDATE: (id = ':id') => '/organizations/update/' + id,
 
+  // Officer
+  OFFICER: '/officers',
+  OFFICER_DETAIL: (id = ':id') => '/officers/detail/' + id,
+  OFFICER_CREATE: '/officers/create',
+  OFFICER_UPDATE: (id = ':id') => '/officers/update/' + id,
+
   // Security
   SECURITY: '/securities',
   SECURITY_DETAIL: (id = ':id') => '/securities/detail/' + id,
