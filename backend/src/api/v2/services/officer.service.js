@@ -242,12 +242,33 @@ var officerService = {
         };
       const status = await officerStatusModel.findOne({ name: "NEW" });
       data.status = status._id;
-      data.file = {
-        name: file.originalname,
-        path: "avatars/" + file.filename,
-        typeFile: file.mimetype,
-        size: file.size,
-      };
+      if (file) {
+        data.file = {
+          name: file.originalname,
+          path: `${Constants.String.Common.AVATAR_FOLDER}/${file.filename}`,
+          typeFile: file.mimetype,
+          size: file.size,
+        };
+      } else {
+        const pathFileSrc = path.join(
+          __dirname,
+          "./../../../../public/",
+          `${Constants.String.Common.AVATAR_FOLDER}/${Constants.String.Common.AVATAR_DEFAULT}`
+        );
+        const imgPath = `${
+          Constants.String.Common.AVATAR_FOLDER
+        }/avatar_${Date.now()}.webp`;
+        const pathFileDest = path.join(
+          __dirname,
+          "./../../../../public/",
+          imgPath
+        );
+        fs.copyFileSync(pathFileSrc, pathFileDest);
+        data.file = {
+          name: Constants.String.Common.AVATAR_DEFAULT,
+          path: imgPath,
+        };
+      }
       const password = Helpers.generatePassword();
       data.password = [
         { value: await bcrypt.hash(password, parseInt(process.env.SALT)) },

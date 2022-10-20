@@ -145,6 +145,15 @@ const Constants = {
     GREEN_COLOR: '#008000',
     RED_COLOR: '#dc2626',
     WHITE_COLOR: '#FFFFFF',
+    ERROR_COLOR: '#E55353',
+    BORDER_COLOR: '#B1B7C1',
+
+    INVALID_FROM_FEEDBACK: {
+      color: '#e55353',
+      width: '100%',
+      marginTop: '0.25rem',
+      fontSize: '0.875rem',
+    },
 
     // New - Analysis - Processing - Processed - Cancelled - Close
     STATUS_COLOR: ['#27AE60', '#FEC600', '#24EBC7', '#00AFF0', '#D3D3D3', '#CED4DA'],

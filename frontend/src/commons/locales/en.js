@@ -211,6 +211,9 @@ export default {
     CODE: 'OFFICER',
     Common: {
       DESCRIPTION_PASSWORD: 'Mật khẩu phải bao gồm chữ hoa, chữ thường, chữ số và ký tự đặt biệt',
+      SELECT_ORGAN: '- Chọn tổ chức -',
+      SELECT_RIGHT: '- Chọn quyền -',
+      SELECT_STATUS: '- Chọn trạng thái (Mặc định là NEW) -',
     },
   },
   OfficerStatus: {

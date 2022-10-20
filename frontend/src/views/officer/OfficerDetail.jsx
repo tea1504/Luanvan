@@ -1,4 +1,5 @@
 import {
+  CBadge,
   CButton,
   CCard,
   CCardBody,
@@ -11,6 +12,7 @@ import {
   CTableDataCell,
   CTableHeaderCell,
   CTableRow,
+  CTooltip,
 } from '@coreui/react'
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
@@ -36,14 +38,18 @@ export default function OfficerDetail() {
   const language = useSelector((state) => state.config.language)
   Strings.setLanguage(language)
 
-  const [filter, setFilter] = useState('')
   const store = useSelector((state) => state.officer.data)
   const [state, setState] = useState({
     _id: '',
-    name: '',
-    notation: '',
-    description: '',
-    color: '',
+    code: '',
+    firstName: '',
+    lastName: '',
+    emailAddress: '',
+    phoneNumber: '',
+    position: '',
+    organ: {},
+    right: {},
+    status: {},
     deleted: false,
     createdAt: '',
     updatedAt: '',
@@ -51,18 +57,6 @@ export default function OfficerDetail() {
   })
   const updateState = (newState) => {
     setState((prevState) => ({
-      ...prevState,
-      ...newState,
-    }))
-  }
-  const [organ, setOrgan] = useState({
-    data: [],
-    total: 0,
-    rowsPerPage: 5,
-    page: 1,
-  })
-  const updateOrgan = (newState) => {
-    setOrgan((prevState) => ({
       ...prevState,
       ...newState,
     }))
@@ -110,57 +104,9 @@ export default function OfficerDetail() {
     }
   }
 
-  const getOrgan = async (rowsPerPage = 5, page = 1, filter = '') => {
-    try {
-      dispatch(setLoading(true))
-      const result = await service.getManyByOrganId(id, rowsPerPage, page, filter)
-      updateOrgan(result.data.data)
-      dispatch(setLoading(false))
-    } catch (error) {
-      dispatch(setLoading(false))
-      switch (error.status) {
-        case 401:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          }).then(() => {
-            localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
-            localStorage.clear(Constants.StorageKeys.USER_INFO)
-            navigate(Screens.LOGIN)
-          })
-          break
-        default:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          })
-          break
-      }
-    }
-  }
-
-  const handlePerRowsChange = (newPerPage, page) => {
-    getOrgan(newPerPage, page)
-    updateOrgan({ rowsPerPage: newPerPage, page: page })
-  }
-
-  const handlePageChange = (page) => {
-    console.log(organ)
-    updateOrgan({ page: page })
-    getOrgan(organ.rowsPerPage, page)
-  }
-
-  const handleOnChangeFilter = (str) => {
-    setFilter(str)
-    getOrgan(organ.rowsPerPage, organ.page, str)
-  }
-
   useEffect(() => {
     const list = id.split('.')
     getState(list[list.length - 1])
-    getOrgan()
   }, [])
 
   return (
@@ -169,7 +115,7 @@ export default function OfficerDetail() {
         <CCol>
           <CCard className="mb-3 border-secondary border-top-5">
             <CCardHeader className="text-center py-3" component="h3">
-              {Strings.Officer.NAME} {state.name}
+              {Strings.Officer.NAME} {state.lastName} {state.firstName}
             </CCardHeader>
             <CCardBody>
               <CTable bordered responsive>
@@ -185,34 +131,89 @@ export default function OfficerDetail() {
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2">
-                    {Strings.Form.FieldName.NAME(Strings.Officer.NAME)}
-                  </CTableHeaderCell>
-                  <CTableDataCell colSpan={3}>{state.name}</CTableDataCell>
-                </CTableRow>
-                <CTableRow>
-                  <CTableHeaderCell className="py-2">
                     {Strings.Form.FieldName.CODE(Strings.Officer.NAME)}
                   </CTableHeaderCell>
                   <CTableDataCell>{state.code}</CTableDataCell>
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2">
+                    {Strings.Form.FieldName.LAST_NAME(Strings.Officer.NAME)}
+                  </CTableHeaderCell>
+                  <CTableDataCell>{state.lastName}</CTableDataCell>
+                  <CTableHeaderCell>
+                    {Strings.Form.FieldName.FIRST_NAME(Strings.Officer.NAME)}
+                  </CTableHeaderCell>
+                  <CTableDataCell>{state.firstName}</CTableDataCell>
+                </CTableRow>
+                <CTableRow>
+                  <CTableHeaderCell className="py-2">
                     {Strings.Form.FieldName.EMAIL_ADDRESS(Strings.Officer.NAME)}
                   </CTableHeaderCell>
                   <CTableDataCell>{state.emailAddress}</CTableDataCell>
-                  <CTableHeaderCell className="py-2">
+                  <CTableHeaderCell>
                     {Strings.Form.FieldName.PHONE_NUMBER(Strings.Officer.NAME)}
                   </CTableHeaderCell>
                   <CTableDataCell>{state.phoneNumber}</CTableDataCell>
+                </CTableRow>
+                <CTableRow>
+                  <CTableHeaderCell className="py-2">{Strings.OfficerStatus.NAME}</CTableHeaderCell>
+                  <CTableDataCell colSpan={3}>
+                    <CTooltip
+                      content={Helpers.htmlDecode(state.status.description)}
+                      placement="right"
+                    >
+                      <CBadge style={{ background: state.status.color }}>
+                        {state.status.name}
+                      </CBadge>
+                    </CTooltip>
+                  </CTableDataCell>
+                </CTableRow>
+                <CTableRow>
+                  <CTableHeaderCell className="py-2">{Strings.Organization.NAME}</CTableHeaderCell>
+                  <CTableDataCell>
+                    <span
+                      style={{ cursor: 'pointer' }}
+                      className="m-0 p-0"
+                      onClick={() => {
+                        navigate(
+                          Screens.ORGANIZATION_DETAIL(
+                            `${Helpers.toSlug(state.organ.name)}.${state.organ._id}`,
+                          ),
+                        )
+                      }}
+                    >
+                      {state.organ.name}
+                    </span>
+                  </CTableDataCell>
+                  <CTableHeaderCell className="py-2">
+                    {Strings.Form.FieldName.POSITION(Strings.Officer.NAME)}
+                  </CTableHeaderCell>
+                  <CTableDataCell>{state.position}</CTableDataCell>
+                </CTableRow>
+                <CTableRow>
+                  <CTableHeaderCell className="py-2">{Strings.Right.NAME}</CTableHeaderCell>
+                  <CTableDataCell>
+                    <span
+                      style={{ cursor: 'pointer' }}
+                      className="m-0 p-0"
+                      onClick={() => {
+                        navigate(
+                          Screens.RIGHT_DETAIL(
+                            `${Helpers.toSlug(state.right.name)}.${state.right._id}`,
+                          ),
+                        )
+                      }}
+                    >
+                      {state.right.name}
+                    </span>
+                  </CTableDataCell>
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2">
                     {Strings.Form.FieldName.CREATED_AT}
                   </CTableHeaderCell>
                   <CTableDataCell>{Helpers.formatDateFromString(state.createdAt)}</CTableDataCell>
-                  <CTableHeaderCell className="py-2">
-                    {Strings.Form.FieldName.UPDATED_AT}
-                  </CTableHeaderCell>
+                  <CTableHeaderCell>{Strings.Form.FieldName.UPDATED_AT}</CTableHeaderCell>
                   <CTableDataCell>{Helpers.formatDateFromString(state.updatedAt)}</CTableDataCell>
                 </CTableRow>
               </CTable>

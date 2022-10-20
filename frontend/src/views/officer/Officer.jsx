@@ -253,7 +253,7 @@ export default function Officer() {
                       <CButton
                         color="primary"
                         variant="outline"
-                        onClick={() => navigate(Screens.ORGANIZATION_CREATE)}
+                        onClick={() => navigate(Screens.OFFICER_CREATE)}
                       >
                         <CIcon icon={cibAddthis} /> {Strings.Common.ADD_NEW}
                       </CButton>

@@ -188,6 +188,10 @@ const Constants = {
   StorageKeys: {},
 
   String: {
+    Common: {
+      AVATAR_DEFAULT: "default.webp",
+      AVATAR_FOLDER: "avatars",
+    },
     Message: {
       REQUIRED: (m = "") => `bạn phải nhập ${m}`,
       MAX_LENGTH: (m = "") => `${m} quá dài`,

@@ -52,6 +52,7 @@
     "react-localization": "^1.0.19",
     "react-redux": "^7.2.6",
     "react-router-dom": "^6.2.2",
+    "react-select": "^5.5.2",
     "redux": "4.1.2",
     "redux-persist": "^6.0.0",
     "simplebar-react": "^2.3.6",

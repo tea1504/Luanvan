@@ -127,7 +127,11 @@ const ActionButton = ({ data }) => {
             color="info"
             className="m-1"
             onClick={() =>
-              navigate(Screens.OFFICER_DETAIL(`${Helpers.toSlug(data.name)}.${data._id}`))
+              navigate(
+                Screens.OFFICER_DETAIL(
+                  `${Helpers.toSlug(data.lastName + ' ' + data.firstName)}.${data._id}`,
+                ),
+              )
             }
           >
             <FaInfoCircle style={{ color: 'whitesmoke' }} />
@@ -140,7 +144,7 @@ const ActionButton = ({ data }) => {
             color="warning"
             className="m-1"
             onClick={() =>
-              navigate(Screens.OFFICER_UPDATE(`${Helpers.toSlug(data.name)}.${data._id}`))
+              navigate(Screens.OFFICER_UPDATE(`${Helpers.toSlug(data.lastName + ' ' + data.firstName)}.${data._id}`))
             }
           >
             <FaPenSquare style={{ color: 'whitesmoke' }} />

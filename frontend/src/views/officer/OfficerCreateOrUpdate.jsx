@@ -1,5 +1,3 @@
-import { CKEditor } from '@ckeditor/ckeditor5-react'
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
 import {
   CButton,
   CCard,
@@ -20,7 +18,6 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import Helpers from 'src/commons/helpers'
-import ckEditorConfig from 'src/configs/ckEditor.config'
 import Constants from 'src/constants'
 import Screens from 'src/constants/screens'
 import Strings from 'src/constants/strings'
@@ -30,8 +27,15 @@ import withReactContent from 'sweetalert2-react-content'
 import { useDispatch } from 'react-redux'
 import { setLoading } from 'src/store/slice/config.slice'
 import Required from 'src/components/Required'
+import OrganizationService from 'src/services/organization.service'
+import OfficerStatusService from 'src/services/officerStatus.service'
+import RightService from 'src/services/right.service'
+import Select from 'react-select'
 
 const service = new OfficerService()
+const organizationService = new OrganizationService()
+const officerStatusService = new OfficerStatusService()
+const rightService = new RightService()
 const MySwal = withReactContent(Swal)
 
 export default function OfficerCreateOrUpdate() {
@@ -48,11 +52,15 @@ export default function OfficerCreateOrUpdate() {
   const store = useSelector((state) => state.officer.data)
 
   const [state, setState] = useState({
-    name: '',
     code: '',
+    firstName: '',
+    lastName: '',
     emailAddress: '',
     phoneNumber: '',
-    organ: '',
+    position: '',
+    organ: null,
+    right: null,
+    status: null,
   })
   const updateState = (newState) => {
     setState((prevState) => ({
@@ -62,11 +70,15 @@ export default function OfficerCreateOrUpdate() {
   }
 
   const [error, setError] = useState({
-    name: null,
     code: null,
+    firstName: null,
+    lastName: null,
     emailAddress: null,
     phoneNumber: null,
+    position: null,
     organ: null,
+    right: null,
+    status: null,
   })
   const updateError = (newState) => {
     setError((prevState) => ({
@@ -75,14 +87,16 @@ export default function OfficerCreateOrUpdate() {
     }))
   }
 
-  const [organ, setOrgan] = useState([{ label: Strings.Officer.Common.SELECT, value: -1 }])
+  const [organ, setOrgan] = useState([])
+  const [right, setRight] = useState([])
+  const [status, setStatus] = useState([])
 
   const getState = async (id = '') => {
     if (store.length > 0) {
       const s = store.find((el) => el._id === id)
       if (!s) {
         await getStateFromServer(id)
-      } else updateState(s)
+      } else updateState({ ...s, organ: s.organ._id, status: s.status._id, right: s.right._id })
     } else {
       await getStateFromServer(id)
     }
@@ -93,6 +107,14 @@ export default function OfficerCreateOrUpdate() {
       dispatch(setLoading(true))
       const result = await service.getOne(id)
       updateState(result.data.data)
+      updateState(
+        updateState({
+          ...result.data.data,
+          organ: result.data.data.organ._id,
+          status: result.data.data.status._id,
+          right: result.data.data.right._id,
+        }),
+      )
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
@@ -119,18 +141,84 @@ export default function OfficerCreateOrUpdate() {
     }
   }
 
-  const getOfficer = async () => {
+  const getOrganization = async () => {
     try {
       dispatch(setLoading(true))
-      setOrgan([{ label: Strings.Officer.Common.SELECT, value: -1 }])
-      const result = await service.getMany(10000, 1)
+      setOrgan([])
+      const result = await organizationService.getMany(10000, 1)
       result.data.data.data.map((el) => {
         var item = { value: el._id, label: `${el.name} (${el.code})` }
-        if (id) {
-          const list = id.split('.')
-          if (el._id === list[list.length - 1]) item.disabled = true
-        }
         setOrgan((prevState) => [...prevState, item])
+      })
+      dispatch(setLoading(false))
+    } catch (error) {
+      dispatch(setLoading(false))
+      switch (error.status) {
+        case 401:
+          MySwal.fire({
+            title: Strings.Message.COMMON_ERROR,
+            icon: 'error',
+            text: error.message,
+          }).then(() => {
+            localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
+            localStorage.clear(Constants.StorageKeys.USER_INFO)
+            navigate(Screens.LOGIN)
+          })
+          break
+        default:
+          MySwal.fire({
+            title: Strings.Message.COMMON_ERROR,
+            icon: 'error',
+            text: error.message,
+          })
+          break
+      }
+    }
+  }
+
+  const getRight = async () => {
+    try {
+      dispatch(setLoading(true))
+      setRight([])
+      const result = await rightService.getMany(10000, 1)
+      result.data.data.data.map((el) => {
+        var item = { value: el._id, label: el.name }
+        setRight((prevState) => [...prevState, item])
+      })
+      dispatch(setLoading(false))
+    } catch (error) {
+      dispatch(setLoading(false))
+      switch (error.status) {
+        case 401:
+          MySwal.fire({
+            title: Strings.Message.COMMON_ERROR,
+            icon: 'error',
+            text: error.message,
+          }).then(() => {
+            localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
+            localStorage.clear(Constants.StorageKeys.USER_INFO)
+            navigate(Screens.LOGIN)
+          })
+          break
+        default:
+          MySwal.fire({
+            title: Strings.Message.COMMON_ERROR,
+            icon: 'error',
+            text: error.message,
+          })
+          break
+      }
+    }
+  }
+
+  const getStatus = async () => {
+    try {
+      dispatch(setLoading(true))
+      setStatus([])
+      const result = await officerStatusService.getMany(10000, 1)
+      result.data.data.data.map((el) => {
+        var item = { value: el._id, label: `${el.name} - ${Helpers.htmlDecode(el.description)}` }
+        setStatus((prevState) => [...prevState, item])
       })
       dispatch(setLoading(false))
     } catch (error) {
@@ -160,14 +248,25 @@ export default function OfficerCreateOrUpdate() {
 
   const validate = () => {
     var flag = true
-    if (Helpers.isNullOrEmpty(state.name)) {
+    if (Helpers.isNullOrEmpty(state.position)) {
       updateError({
-        name: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED),
+        position: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED),
       })
       flag = false
-    } else if (state.name.length > 200) {
+    } else if (state.position.length > 100) {
       updateError({
-        name: Helpers.propName(Strings, Strings.Form.Validation.MAX_LENGTH),
+        position: Helpers.propName(Strings, Strings.Form.Validation.MAX_LENGTH),
+      })
+      flag = false
+    }
+    if (Helpers.isNullOrEmpty(state.firstName)) {
+      updateError({
+        firstName: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED),
+      })
+      flag = false
+    } else if (state.firstName.length > 10) {
+      updateError({
+        firstName: Helpers.propName(Strings, Strings.Form.Validation.MAX_LENGTH),
       })
       flag = false
     }
@@ -179,6 +278,17 @@ export default function OfficerCreateOrUpdate() {
     } else if (state.code.length > 10) {
       updateError({
         code: Helpers.propName(Strings, Strings.Form.Validation.MAX_LENGTH),
+      })
+      flag = false
+    }
+    if (Helpers.isNullOrEmpty(state.lastName)) {
+      updateError({
+        lastName: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED),
+      })
+      flag = false
+    } else if (state.lastName.length > 40) {
+      updateError({
+        lastName: Helpers.propName(Strings, Strings.Form.Validation.MAX_LENGTH),
       })
       flag = false
     }
@@ -205,17 +315,33 @@ export default function OfficerCreateOrUpdate() {
       flag = false
       updateError({ phoneNumber: Helpers.propName(Strings, Strings.Form.Validation.MATCH) })
     }
+    if (Helpers.isNullOrEmpty(state.organ)) {
+      updateError({
+        organ: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED),
+      })
+      flag = false
+    }
+    if (Helpers.isNullOrEmpty(state.right)) {
+      updateError({
+        right: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED),
+      })
+      flag = false
+    }
     return flag
   }
 
   const handleSubmitForm = async (e) => {
     e.preventDefault()
     updateError({
-      name: null,
       code: null,
+      firstName: null,
+      lastName: null,
       emailAddress: null,
       phoneNumber: null,
+      position: null,
       organ: null,
+      right: null,
+      status: null,
     })
     if (validate()) {
       try {
@@ -227,7 +353,17 @@ export default function OfficerCreateOrUpdate() {
             icon: 'success',
             text: Strings.Message.Create.SUCCESS,
           })
-          updateState({ name: '', code: '', emailAddress: '', phoneNumber: '', organ: '' })
+          updateState({
+            code: '',
+            firstName: '',
+            lastName: '',
+            emailAddress: '',
+            phoneNumber: '',
+            position: '',
+            organ: null,
+            right: null,
+            status: null,
+          })
         } else {
           const result = await service.updateOne(id, state)
           MySwal.fire({
@@ -269,11 +405,14 @@ export default function OfficerCreateOrUpdate() {
       await getState(list[list.length - 1])
     } else
       updateState({
-        name: '',
         code: '',
+        firstName: '',
+        lastName: '',
         emailAddress: '',
         phoneNumber: '',
-        organ: '',
+        organ: null,
+        right: null,
+        status: null,
       })
   }
 
@@ -286,12 +425,16 @@ export default function OfficerCreateOrUpdate() {
   useEffect(() => {
     if (id) {
       if (!loggedUser.right.updateCategories) navigate(Screens.E403)
-      getOfficer()
       const list = id.split('.')
       getState(list[list.length - 1])
+      getOrganization()
+      getRight()
+      getStatus()
     } else {
       if (!loggedUser.right.createCategories) navigate(Screens.E403)
-      getOfficer()
+      getOrganization()
+      getRight()
+      getStatus()
     }
   }, [])
 
@@ -305,40 +448,11 @@ export default function OfficerCreateOrUpdate() {
             </CCardHeader>
             <CCardBody>
               <CForm noValidate className="row g-3">
-                <CCol xs={12}>
-                  <CFormLabel
-                    htmlFor={Helpers.makeID(
-                      Strings.Officer.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.NAME),
-                    )}
-                  >
-                    {Strings.Form.FieldName.NAME(Strings.Officer.NAME)}{' '}
-                    <Required mes={Strings.Form.Validation.REQUIRED()} />
-                  </CFormLabel>
-                  <CFormInput
-                    invalid={!Helpers.isNullOrEmpty(error.name)}
-                    type="text"
-                    id={Helpers.makeID(
-                      Strings.Officer.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.NAME),
-                    )}
-                    placeholder={Strings.Form.FieldName.NAME(Strings.Officer.NAME)}
-                    value={state.name}
-                    onChange={(e) => updateState({ name: e.target.value })}
-                    onKeyPress={handleKeypress}
-                  />
-                  <CFormFeedback invalid>
-                    {error.name &&
-                      Strings.Form.Validation[error.name](
-                        Strings.Form.FieldName.NAME(Strings.Officer.NAME),
-                      )}
-                  </CFormFeedback>
-                </CCol>
                 <CCol xs={12} md={12}>
                   <CFormLabel
                     htmlFor={Helpers.makeID(
                       Strings.Officer.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.NOTATION),
+                      Helpers.propName(Strings, Strings.Form.FieldName.CODE),
                     )}
                   >
                     {Strings.Form.FieldName.CODE(Strings.Officer.NAME)}{' '}
@@ -360,6 +474,64 @@ export default function OfficerCreateOrUpdate() {
                     {error.code &&
                       Strings.Form.Validation[error.code](
                         Strings.Form.FieldName.CODE(Strings.Officer.NAME),
+                      )}
+                  </CFormFeedback>
+                </CCol>
+                <CCol xs={12} md={6}>
+                  <CFormLabel
+                    htmlFor={Helpers.makeID(
+                      Strings.Officer.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.LAST_NAME),
+                    )}
+                  >
+                    {Strings.Form.FieldName.LAST_NAME(Strings.Officer.NAME)}{' '}
+                    <Required mes={Strings.Form.Validation.REQUIRED()} />
+                  </CFormLabel>
+                  <CFormInput
+                    invalid={!Helpers.isNullOrEmpty(error.lastName)}
+                    type="text"
+                    id={Helpers.makeID(
+                      Strings.Officer.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.LAST_NAME),
+                    )}
+                    placeholder={Strings.Form.FieldName.LAST_NAME(Strings.Officer.NAME)}
+                    value={state.lastName}
+                    onChange={(e) => updateState({ lastName: e.target.value })}
+                    onKeyPress={handleKeypress}
+                  />
+                  <CFormFeedback invalid>
+                    {error.lastName &&
+                      Strings.Form.Validation[error.lastName](
+                        Strings.Form.FieldName.LAST_NAME(Strings.Officer.NAME),
+                      )}
+                  </CFormFeedback>
+                </CCol>
+                <CCol xs={12} md={6}>
+                  <CFormLabel
+                    htmlFor={Helpers.makeID(
+                      Strings.Officer.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.FIRST_NAME),
+                    )}
+                  >
+                    {Strings.Form.FieldName.FIRST_NAME(Strings.Officer.NAME)}{' '}
+                    <Required mes={Strings.Form.Validation.REQUIRED()} />
+                  </CFormLabel>
+                  <CFormInput
+                    invalid={!Helpers.isNullOrEmpty(error.firstName)}
+                    type="text"
+                    id={Helpers.makeID(
+                      Strings.Officer.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.FIRST_NAME),
+                    )}
+                    placeholder={Strings.Form.FieldName.FIRST_NAME(Strings.Officer.NAME)}
+                    value={state.firstName}
+                    onChange={(e) => updateState({ firstName: e.target.value })}
+                    onKeyPress={handleKeypress}
+                  />
+                  <CFormFeedback invalid>
+                    {error.firstName &&
+                      Strings.Form.Validation[error.firstName](
+                        Strings.Form.FieldName.FIRST_NAME(Strings.Officer.NAME),
                       )}
                   </CFormFeedback>
                 </CCol>
@@ -423,31 +595,122 @@ export default function OfficerCreateOrUpdate() {
                       )}
                   </CFormFeedback>
                 </CCol>
-                <CCol xs={12} md={12}>
+                <CCol xs={12}>
                   <CFormLabel
                     htmlFor={Helpers.makeID(
                       Strings.Officer.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.OFFICER),
+                      Helpers.propName(Strings, Strings.Form.FieldName.POSITION),
                     )}
                   >
-                    {Strings.Form.FieldName.OFFICER}
+                    {Strings.Form.FieldName.POSITION(Strings.Officer.NAME)}{' '}
+                    <Required mes={Strings.Form.Validation.REQUIRED()} />
                   </CFormLabel>
-                  <CFormSelect
+                  <CFormInput
+                    invalid={!Helpers.isNullOrEmpty(error.position)}
+                    type="text"
+                    className="w-100"
                     id={Helpers.makeID(
                       Strings.Officer.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.OFFICER),
+                      Helpers.propName(Strings, Strings.Form.FieldName.POSITION),
                     )}
-                    invalid={!Helpers.isNullOrEmpty(error.organ)}
-                    options={organ}
-                    value={state.organ}
-                    onChange={(e) => {
-                      console.log(e.target.value)
-                      if (e.target.value === '-1') updateState({ organ: null })
-                      else updateState({ organ: e.target.value })
-                    }}
+                    placeholder={Strings.Form.FieldName.POSITION(Strings.Officer.NAME)}
+                    value={state.position}
+                    onChange={(e) => updateState({ position: e.target.value })}
+                    onKeyPress={handleKeypress}
                   />
                   <CFormFeedback invalid>
-                    {error.organ && Strings.Form.Validation[error.organ](Strings.Officer.NAME)}
+                    {error.position &&
+                      Strings.Form.Validation[error.position](
+                        Strings.Form.FieldName.POSITION(Strings.Officer.NAME),
+                      )}
+                  </CFormFeedback>
+                </CCol>
+                <CCol xs={12}>
+                  <CFormLabel htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Right.CODE)}>
+                    {Strings.Right.NAME} <Required mes={Strings.Form.Validation.REQUIRED()} />
+                  </CFormLabel>
+                  <Select
+                    id={Helpers.makeID(Strings.Officer.CODE, Strings.Right.CODE)}
+                    value={
+                      right.filter((el) => el.value === state.right).length > 0
+                        ? right.filter((el) => el.value === state.right)[0]
+                        : null
+                    }
+                    options={right}
+                    placeholder={Strings.Officer.Common.SELECT_RIGHT}
+                    onChange={(selectedItem) => updateState({ right: selectedItem.value })}
+                    isClearable
+                    styles={{
+                      control: (provided, state) => ({
+                        ...provided,
+                        borderColor: error.right
+                          ? Constants.Styles.ERROR_COLOR
+                          : Constants.Styles.BORDER_COLOR,
+                      }),
+                    }}
+                  />
+                  <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
+                    {error.right && Strings.Form.Validation[error.right](Strings.Right.NAME)}
+                  </CFormFeedback>
+                </CCol>
+                <CCol xs={12} md={6}>
+                  <CFormLabel
+                    htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Organization.CODE)}
+                  >
+                    {Strings.Organization.NAME}{' '}
+                    <Required mes={Strings.Form.Validation.REQUIRED()} />
+                  </CFormLabel>
+                  <Select
+                    id={Helpers.makeID(Strings.Officer.CODE, Strings.Organization.CODE)}
+                    value={
+                      organ.filter((el) => el.value === state.organ).length > 0
+                        ? organ.filter((el) => el.value === state.organ)[0]
+                        : null
+                    }
+                    options={organ}
+                    placeholder={Strings.Officer.Common.SELECT_ORGAN}
+                    onChange={(selectedItem) => updateState({ organ: selectedItem.value })}
+                    styles={{
+                      control: (provided, state) => ({
+                        ...provided,
+                        borderColor: error.organ
+                          ? Constants.Styles.ERROR_COLOR
+                          : Constants.Styles.BORDER_COLOR,
+                      }),
+                    }}
+                  />
+                  <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
+                    {error.organ && Strings.Form.Validation[error.organ](Strings.Organization.NAME)}
+                  </CFormFeedback>
+                </CCol>
+                <CCol xs={12} md={6}>
+                  <CFormLabel
+                    htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.OfficerStatus.CODE)}
+                  >
+                    {Strings.OfficerStatus.NAME}
+                  </CFormLabel>
+                  <Select
+                    id={Helpers.makeID(Strings.Officer.CODE, Strings.OfficerStatus.CODE)}
+                    value={
+                      status.filter((el) => el.value === state.status).length > 0
+                        ? status.filter((el) => el.value === state.status)[0]
+                        : null
+                    }
+                    options={status}
+                    placeholder={Strings.Officer.Common.SELECT_STATUS}
+                    onChange={(selectedItem) => updateState({ status: selectedItem.value })}
+                    styles={{
+                      control: (provided, state) => ({
+                        ...provided,
+                        borderColor: error.status
+                          ? Constants.Styles.ERROR_COLOR
+                          : Constants.Styles.BORDER_COLOR,
+                      }),
+                    }}
+                  />
+                  <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
+                    {error.status &&
+                      Strings.Form.Validation[error.status](Strings.Organization.NAME)}
                   </CFormFeedback>
                 </CCol>
               </CForm>

@@ -64,7 +64,7 @@ export default {
       CANCEL: 'Bạn đã hủy thao tác xóa dữ liệu',
       FAILURE: 'Xóa dữ liệu thất bại',
       MESSAGE: 'Bạn muốn xóa dữ liệu?',
-      MESSAGE_VAR: (v = '') => `Bạn muốn xóa các dữ liệu ${v}?`,
+      MESSAGE_VAR: (v = '') => `Bạn muốn xóa dữ liệu ${v}?`,
       WARNING: 'Các dữ liệu liên quan cũng sẽ bị xóa.',
       SUCCESS: 'Bạn đã xóa dữ liệu thành công',
       TITLE: 'Thao tác xóa',
@@ -211,6 +211,9 @@ export default {
     CODE: 'OFFICER',
     Common: {
       DESCRIPTION_PASSWORD: 'Mật khẩu phải bao gồm chữ hoa, chữ thường, chữ số và ký tự đặt biệt',
+      SELECT_ORGAN: '- Chọn tổ chức -',
+      SELECT_RIGHT: '- Chọn quyền -',
+      SELECT_STATUS: '- Chọn trạng thái (Mặc định là NEW) -',
     },
   },
   OfficerStatus: {
