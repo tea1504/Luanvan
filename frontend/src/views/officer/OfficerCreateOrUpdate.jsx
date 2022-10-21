@@ -7,10 +7,12 @@ import {
   CCol,
   CContainer,
   CForm,
+  CFormCheck,
   CFormFeedback,
   CFormInput,
   CFormLabel,
   CFormSelect,
+  CImage,
   CRow,
   CSpinner,
 } from '@coreui/react'
@@ -31,6 +33,7 @@ import OrganizationService from 'src/services/organization.service'
 import OfficerStatusService from 'src/services/officerStatus.service'
 import RightService from 'src/services/right.service'
 import Select from 'react-select'
+import Resources from 'src/commons/resources'
 
 const service = new OfficerService()
 const organizationService = new OrganizationService()
@@ -58,6 +61,10 @@ export default function OfficerCreateOrUpdate() {
     emailAddress: '',
     phoneNumber: '',
     position: '',
+    sendEmail: true,
+    file: {},
+    avatarTemp: null,
+    avatar: null,
     organ: null,
     right: null,
     status: null,
@@ -76,6 +83,8 @@ export default function OfficerCreateOrUpdate() {
     emailAddress: null,
     phoneNumber: null,
     position: null,
+    avatarTemp: null,
+    avatar: null,
     organ: null,
     right: null,
     status: null,
@@ -339,6 +348,8 @@ export default function OfficerCreateOrUpdate() {
       emailAddress: null,
       phoneNumber: null,
       position: null,
+      avatarTemp: null,
+      avatar: null,
       organ: null,
       right: null,
       status: null,
@@ -351,7 +362,7 @@ export default function OfficerCreateOrUpdate() {
           MySwal.fire({
             title: Strings.Common.SUCCESS,
             icon: 'success',
-            text: Strings.Message.Create.SUCCESS,
+            text: Strings.Officer.Common.ALERT_PASSWORD(result.data.data.password),
           })
           updateState({
             code: '',
@@ -360,6 +371,9 @@ export default function OfficerCreateOrUpdate() {
             emailAddress: '',
             phoneNumber: '',
             position: '',
+            file: {},
+            avatarTemp: null,
+            avatar: null,
             organ: null,
             right: null,
             status: null,
@@ -410,6 +424,8 @@ export default function OfficerCreateOrUpdate() {
         lastName: '',
         emailAddress: '',
         phoneNumber: '',
+        avatarTemp: null,
+        avatar: null,
         organ: null,
         right: null,
         status: null,
@@ -420,6 +436,11 @@ export default function OfficerCreateOrUpdate() {
     if (e.charCode === 13) {
       handleSubmitForm(e)
     }
+  }
+
+  const handleInputFileOnChange = (e) => {
+    const file = Array.from(e.target.files)[0]
+    updateState({ avatar: file, avatarTemp: URL.createObjectURL(file) })
   }
 
   useEffect(() => {
@@ -435,6 +456,9 @@ export default function OfficerCreateOrUpdate() {
       getOrganization()
       getRight()
       getStatus()
+    }
+    return () => {
+      URL.revokeObjectURL(state.avatarTemp)
     }
   }, [])
 
@@ -713,6 +737,47 @@ export default function OfficerCreateOrUpdate() {
                       Strings.Form.Validation[error.status](Strings.Organization.NAME)}
                   </CFormFeedback>
                 </CCol>
+                <CCol sx={12}>
+                  {id && (
+                    <CImage
+                      rounded
+                      thumbnail
+                      className="shadow"
+                      src={
+                        state.avatarTemp
+                          ? state.avatarTemp
+                          : `${process.env.REACT_APP_BASE_URL}/${
+                              state.file.path
+                            }?token=${localStorage.getItem(Constants.StorageKeys.ACCESS_TOKEN)}`
+                      }
+                      width={200}
+                    />
+                  )}
+                  {!id && (
+                    <CImage
+                      rounded
+                      thumbnail
+                      className="shadow"
+                      src={state.avatarTemp ? state.avatarTemp : Resources.Images.ERR_404}
+                      width={200}
+                    />
+                  )}
+                  <CFormInput type="file" onChange={handleInputFileOnChange} className="mt-1" />
+                </CCol>
+                {!id && (
+                  <CCol xs={12}>
+                    <CFormCheck
+                      id={Helpers.makeID(
+                        Strings.Right.CODE,
+                        Helpers.propName(Strings, Strings.Form.FieldName.READ_OD),
+                      )}
+                      value={state.sendEmail}
+                      checked={state.sendEmail}
+                      label={Strings.Officer.Common.SEND_EMAIL}
+                      onChange={() => updateState({ sendEmail: !state.sendEmail })}
+                    />
+                  </CCol>
+                )}
               </CForm>
             </CCardBody>
             <CCardFooter>

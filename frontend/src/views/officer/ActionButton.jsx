@@ -65,20 +65,6 @@ const ActionButton = ({ data }) => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const listSubOrgan = await service.getManyByOrganId(data._id, 10000)
-          if (listSubOrgan.data.data.data.length > 0) {
-            const check = await MySwal.fire({
-              title: Strings.Message.Delete.TITLE,
-              icon: 'info',
-              text: Strings.Message.Delete.MESSAGE_VAR(Strings.Form.FieldName.SUB_ORGAN),
-              showCancelButton: true,
-              cancelButtonText: Strings.Common.CANCEL,
-              confirmButtonText: Strings.Common.OK,
-            })
-            if (check.isConfirmed)
-              await service.deleteMany(listSubOrgan.data.data.data.map((el) => el._id))
-            else return
-          }
           await service.deleteOne(data._id)
           await getState()
           return MySwal.fire({

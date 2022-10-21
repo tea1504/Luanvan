@@ -159,6 +159,26 @@ class ApiProcessor {
   }
 
   /**
+   * Call api with PUT method.
+   *
+   * @param {import("./../commons/interfaces").IRequest} request Request
+   * @return {Promise<import("./../commons/interfaces").IResult>}
+   */
+  static putFormData(request) {
+    request.method = Method.PUT
+    request.contentType = ContentType.FORM_DATA
+    return new Promise((resolve, reject) => {
+      request.onSuccess = (result) => {
+        resolve(result)
+      }
+      request.onError = (error) => {
+        reject(error)
+      }
+      ApiProcessor.instance.fetch(request)
+    })
+  }
+
+  /**
    * Call api with DELETE method.
    *
    * @param {import("./../commons/interfaces").IRequest} request Request

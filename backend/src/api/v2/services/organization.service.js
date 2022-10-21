@@ -237,6 +237,16 @@ var organizationService = {
             Constants.String.Organization.PHONE_NUMBER
           ),
         };
+      if (data.organ) {
+        const organ = await model.findById(data.organ);
+        if (!organ)
+          return {
+            status: Constants.ApiCode.NOT_FOUND,
+            message: Constants.String.Message.ERR_404(
+              Constants.String.Organization._
+            ),
+          };
+      }
       const newItem = await model.create(data);
       return {
         status: Constants.ApiCode.SUCCESS,

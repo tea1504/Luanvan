@@ -21,7 +21,7 @@ class OfficerService extends BaseService {
     return result
   }
   async createOne(type) {
-    const result = await this.api.post({
+    const result = await this.api.postFormData({
       path: Constants.ApiPath.CREATE_OFFICER,
       data: type,
     })
@@ -35,7 +35,7 @@ class OfficerService extends BaseService {
     return result
   }
   async updateOne(id, type) {
-    const result = await this.api.put({
+    const result = await this.api.putFormData({
       path: Constants.ApiPath.UPDATE_OFFICER(id),
       data: type,
     })

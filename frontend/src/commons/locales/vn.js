@@ -214,6 +214,8 @@ export default {
       SELECT_ORGAN: '- Chọn tổ chức -',
       SELECT_RIGHT: '- Chọn quyền -',
       SELECT_STATUS: '- Chọn trạng thái (Mặc định là NEW) -',
+      SEND_EMAIL: 'Gửi email thông báo mật khẩu cho người dùng.',
+      ALERT_PASSWORD: (password = '') => `Mật khẩu là ${password}`,
     },
   },
   OfficerStatus: {

@@ -7,6 +7,7 @@ import {
   CCardHeader,
   CCol,
   CContainer,
+  CImage,
   CRow,
   CTable,
   CTableDataCell,
@@ -50,6 +51,7 @@ export default function OfficerDetail() {
     organ: {},
     right: {},
     status: {},
+    file: {},
     deleted: false,
     createdAt: '',
     updatedAt: '',
@@ -130,30 +132,32 @@ export default function OfficerDetail() {
                   <CTableDataCell>{state.__v}</CTableDataCell>
                 </CTableRow>
                 <CTableRow>
+                  <CTableDataCell rowSpan={4} className="py-2 text-center">
+                    {state.file.path && (
+                      <CImage
+                        src={`${process.env.REACT_APP_BASE_URL}/${
+                          state.file.path
+                        }?token=${localStorage.getItem(Constants.StorageKeys.ACCESS_TOKEN)}`}
+                        height={200}
+                      />
+                    )}
+                  </CTableDataCell>
                   <CTableHeaderCell className="py-2">
                     {Strings.Form.FieldName.CODE(Strings.Officer.NAME)}
                   </CTableHeaderCell>
-                  <CTableDataCell>{state.code}</CTableDataCell>
+                  <CTableDataCell colSpan={2}>{state.code}</CTableDataCell>
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2">
                     {Strings.Form.FieldName.LAST_NAME(Strings.Officer.NAME)}
                   </CTableHeaderCell>
-                  <CTableDataCell>{state.lastName}</CTableDataCell>
-                  <CTableHeaderCell>
-                    {Strings.Form.FieldName.FIRST_NAME(Strings.Officer.NAME)}
-                  </CTableHeaderCell>
-                  <CTableDataCell>{state.firstName}</CTableDataCell>
+                  <CTableDataCell colSpan={2}>{state.lastName}</CTableDataCell>
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2">
-                    {Strings.Form.FieldName.EMAIL_ADDRESS(Strings.Officer.NAME)}
+                    {Strings.Form.FieldName.FIRST_NAME(Strings.Officer.NAME)}
                   </CTableHeaderCell>
-                  <CTableDataCell>{state.emailAddress}</CTableDataCell>
-                  <CTableHeaderCell>
-                    {Strings.Form.FieldName.PHONE_NUMBER(Strings.Officer.NAME)}
-                  </CTableHeaderCell>
-                  <CTableDataCell>{state.phoneNumber}</CTableDataCell>
+                  <CTableDataCell colSpan={2}>{state.firstName}</CTableDataCell>
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2">{Strings.OfficerStatus.NAME}</CTableHeaderCell>
@@ -167,6 +171,16 @@ export default function OfficerDetail() {
                       </CBadge>
                     </CTooltip>
                   </CTableDataCell>
+                </CTableRow>
+                <CTableRow>
+                  <CTableHeaderCell className="py-2">
+                    {Strings.Form.FieldName.EMAIL_ADDRESS(Strings.Officer.NAME)}
+                  </CTableHeaderCell>
+                  <CTableDataCell>{state.emailAddress}</CTableDataCell>
+                  <CTableHeaderCell>
+                    {Strings.Form.FieldName.PHONE_NUMBER(Strings.Officer.NAME)}
+                  </CTableHeaderCell>
+                  <CTableDataCell>{state.phoneNumber}</CTableDataCell>
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2">{Strings.Organization.NAME}</CTableHeaderCell>

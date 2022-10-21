@@ -1,5 +1,3 @@
-import { CKEditor } from '@ckeditor/ckeditor5-react'
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
 import {
   CButton,
   CCard,
@@ -21,7 +19,6 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import Helpers from 'src/commons/helpers'
-import ckEditorConfig from 'src/configs/ckEditor.config'
 import Constants from 'src/constants'
 import Screens from 'src/constants/screens'
 import Strings from 'src/constants/strings'

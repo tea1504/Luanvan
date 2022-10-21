@@ -2349,7 +2349,7 @@ paths:
                   default: Trần Văn
                 emailAddress:
                   type: string
-                  default: example@gmail.com
+                  default: tranvanhoa1504.2000@gmail.com
                 phoneNumber:
                   type: string
                   default: "0912883745"
@@ -2359,9 +2359,15 @@ paths:
                 right: 
                   type: string
                   default: "726967687430303030303030"
+                status: 
+                  type: string
+                  default: 6f6666696365725374613030
                 avatar:
                   type: string
                   format: binary
+                sendEmail:
+                  type: boolean
+                  default: true
       responses:
         200:
           description: OK

@@ -354,6 +354,14 @@ async function start() {
         updateOfficer: true,
         updateRight: true,
       },
+      {
+        _id: "right0000002",
+        name: "default",
+        readOD: true,
+        updateOD: true,
+        deleteOD: true,
+        scope: 1,
+      },
     ]);
   }
 
@@ -553,6 +561,26 @@ async function start() {
         },
         status: "officerSta00",
         right: "right0000001",
+      },
+      {
+        _id: "officer00003",
+        code: "000003",
+        position: "Cán bộ",
+        firstName: "Bình",
+        lastName: "Trần Văn",
+        emailAddress: "tranvanhoa1504.2000@gmail.com",
+        phoneNumber: "0786182882",
+        password: [
+          { _id: "officer3pass", value: password },
+          { time: new Date("2022-09-25T12:54:45.880Z"), value: oldPassword },
+        ],
+        organ: "organ0000002",
+        file: {
+          name: "3.jpg",
+          path: "avatars/3.jpg",
+        },
+        status: "officerSta01",
+        right: "right0000002",
       }
     );
   }

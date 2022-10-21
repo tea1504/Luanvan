@@ -1,7 +1,5 @@
 import { CBadge, CImage } from '@coreui/react'
 import React from 'react'
-import { useSelector } from 'react-redux'
-import Helpers from 'src/commons/helpers'
 import Constants from 'src/constants'
 import Strings from 'src/constants/strings'
 import ActionButton from './ActionButton'

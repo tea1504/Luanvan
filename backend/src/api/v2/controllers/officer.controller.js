@@ -73,6 +73,8 @@ const officerController = {
         firstName,
         lastName,
         right,
+        status,
+        sendEmail,
       } = req.body;
       if (!position)
         return res.status(Constants.ApiCode.BAD_REQUEST).json({
@@ -140,6 +142,8 @@ const officerController = {
           firstName,
           lastName,
           right,
+          status,
+          sendEmail,
         },
         file
       );
