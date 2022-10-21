@@ -36,6 +36,11 @@ const OrganizationDetail = React.lazy(() => import('./views/organization/Organiz
 const Officer = React.lazy(() => import('./views/officer/Officer'))
 const OfficerCreateOrUpdate = React.lazy(() => import('./views/officer/OfficerCreateOrUpdate'))
 const OfficerDetail = React.lazy(() => import('./views/officer/OfficerDetail'))
+const IOD = React.lazy(() => import('./views/incomingOfficialDispatch/IOD'))
+const IODCreateOrUpdate = React.lazy(() =>
+  import('./views/incomingOfficialDispatch/IODCreateOrUpdate'),
+)
+const IODDetail = React.lazy(() => import('./views/incomingOfficialDispatch/IODDetail'))
 const User = React.lazy(() => import('./views/user/User'))
 const UserChangePassword = React.lazy(() => import('./views/user/UserChangePassword'))
 
@@ -309,6 +314,34 @@ const routes = [
     element: TypeCreateOrUpdate,
     role: [0],
     right: Strings.Common.UPDATE_CATEGORIES,
+  },
+  {
+    path: Screens.IOD,
+    name: { vi: vn.IncomingOfficialDispatch.NAME, en: en.IncomingOfficialDispatch.NAME },
+    element: IOD,
+    role: [0, 1],
+    right: Strings.Common.READ_OD,
+  },
+  {
+    path: Screens.IOD_DETAIL(),
+    name: { vi: vn.Common.DETAIL, en: en.Common.DETAIL },
+    element: IODDetail,
+    role: [0, 1],
+    right: Strings.Common.READ_OD,
+  },
+  {
+    path: Screens.IOD_CREATE,
+    name: { vi: vn.Common.CREATE, en: en.Common.CREATE },
+    element: IODCreateOrUpdate,
+    role: [0, 1],
+    right: Strings.Common.CREATE_OD,
+  },
+  {
+    path: Screens.IOD_UPDATE(),
+    name: { vi: vn.Common.UPDATE, en: en.Common.UPDATE },
+    element: IODCreateOrUpdate,
+    role: [0, 1],
+    right: Strings.Common.UPDATE_OD,
   },
 ]
 

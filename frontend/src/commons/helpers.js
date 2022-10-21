@@ -425,9 +425,9 @@ const Helpers = {
   //   return parse(text);
   // },
 
-  formatDateFromString: (dateString = '') => {
-    var date = new Date(dateString)
-    var options = {
+  formatDateFromString: (
+    dateString = '',
+    options = {
       weekday: 'long',
       year: 'numeric',
       month: '2-digit',
@@ -435,7 +435,9 @@ const Helpers = {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
-    }
+    },
+  ) => {
+    var date = new Date(dateString)
     const language = localStorage.getItem(Constants.StorageKeys.LANGUAGE)
     if (language) return date.toLocaleDateString(language, options)
     return date.toLocaleDateString(Constants.DefaultLanguage, options)

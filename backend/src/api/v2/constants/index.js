@@ -70,13 +70,13 @@ const Constants = {
       ORGAN_ID: "/organ/:id",
     },
     OfficialDispatchTravel: {
-      ROOT: "/officialdispatchtravel",
+      ROOT: "/official-dispatch-travel",
       SLASH: "/",
       ID: "/:id",
       CREATE_MULTI: "/csv",
     },
     IncomingOfficialDispatch: {
-      ROOT: "/incomingofficialdispatch",
+      ROOT: "/incoming-official-dispatch",
       SLASH: "/",
       ID: "/:id",
       CREATE_MULTI: "/csv",

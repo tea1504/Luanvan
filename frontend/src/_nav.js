@@ -7,6 +7,7 @@ import vn from './commons/locales/vn'
 import en from './commons/locales/en'
 import {
   FaFile,
+  FaFileImport,
   FaHome,
   FaInfoCircle,
   FaLanguage,
@@ -25,8 +26,18 @@ const _nav = [
       vi: 'Trang chủ',
       en: 'Home',
     },
-    to: '/dashboard',
+    to: Screens.HOME,
     icon: <FaHome className="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: {
+      vi: vn.IncomingOfficialDispatch.NAME,
+      en: en.IncomingOfficialDispatch.NAME,
+    },
+    // role: [0, 1],
+    to: Screens.IOD,
+    icon: <FaFileImport className="nav-icon" />,
   },
   {
     component: CNavTitle,

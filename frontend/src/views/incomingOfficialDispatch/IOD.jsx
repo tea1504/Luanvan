@@ -8,25 +8,14 @@ import {
   CCardHeader,
   CCol,
   CContainer,
-  CFormCheck,
   CFormInput,
-  CFormLabel,
-  CFormText,
-  CFormTextarea,
   CInputGroup,
   CInputGroupText,
-  CModal,
-  CModalBody,
-  CModalFooter,
-  CModalHeader,
-  CModalTitle,
   CRow,
-  CSpinner,
-  CTooltip,
 } from '@coreui/react'
 import React, { useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { FaEraser, FaFileCsv, FaPlusSquare } from 'react-icons/fa'
+import { FaEraser, FaPlusSquare } from 'react-icons/fa'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import Helpers from 'src/commons/helpers'
@@ -34,17 +23,17 @@ import configs from 'src/configs'
 import Constants from 'src/constants'
 import Screens from 'src/constants/screens'
 import Strings from 'src/constants/strings'
-import LanguageService from 'src/services/language.service'
+import IODService from 'src/services/IOD.service'
 import { setLoading } from 'src/store/slice/config.slice'
-import { setData, setPage, setRowPerPage, setTotal } from 'src/store/slice/language.slide'
+import { setData, setPage, setRowPerPage, setTotal } from 'src/store/slice/IOD.slide'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
-import languageColumns from './languageColumns'
+import IODColumns from './IODColumns'
 
-const service = new LanguageService()
+const service = new IODService()
 const MySwal = withReactContent(Swal)
 
-export default function Language() {
+export default function IOD() {
   const dispatch = useDispatch()
   let loading = useSelector((state) => state.config.loading)
   let loggedUser = useSelector((state) => state.user.user)
@@ -54,12 +43,11 @@ export default function Language() {
   Strings.setLanguage(language)
   const navigate = useNavigate()
 
-  const store = useSelector((state) => state.language)
+  const store = useSelector((state) => state.IOD)
 
   const [filter, setFilter] = useState('')
   const [selectionRows, setSelectionRows] = useState([])
   const [toggleCleared, setToggleCleared] = useState(false)
-  const [visible, setVisible] = useState(false)
   const [add, setAdd] = useState({ text: '', file: null, title: false })
   const updateAdd = (newState) => {
     setAdd((prevState) => ({
@@ -174,38 +162,6 @@ export default function Language() {
     })
   }
 
-  const handleSubmitCSV = async () => {
-    dispatch(setLoading(true))
-    try {
-      await service.createMany(add)
-      setVisible(false)
-      updateAdd({ text: '', file: null, title: false })
-    } catch (error) {
-      switch (error.status) {
-        case 401:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          }).then(() => {
-            localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
-            localStorage.clear(Constants.StorageKeys.USER_INFO)
-            navigate(Screens.LOGIN)
-          })
-          break
-        default:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          })
-          break
-      }
-    }
-    await getState(store.rowsPerPage, store.page, filter)
-    dispatch(setLoading(false))
-  }
-
   useEffect(() => {
     getState(store.rowsPerPage, store.page, filter)
   }, [])
@@ -216,11 +172,11 @@ export default function Language() {
         <CCol>
           <CCard className="mb-3 border-secondary border-top-5">
             <CCardHeader className="text-center py-3" component="h3">
-              {Strings.Language.NAME}
+              {Strings.IncomingOfficialDispatch.NAME}
             </CCardHeader>
             <CCardBody>
               <CRow className="py-1">
-                <CCol xs={12} sm={6} className="mt-1">
+                <CCol xs={12} sm={3} className="mt-1">
                   <CInputGroup className="flex-nowrap">
                     <CFormInput
                       placeholder={Strings.Common.FILTER}
@@ -238,7 +194,7 @@ export default function Language() {
                 </CCol>
                 <CCol className="text-end mt-1">
                   <CButtonGroup role="group">
-                    {loggedUser?.right[Strings.Common.DELETE_CATEGORIES] &&
+                    {loggedUser?.right[Strings.Common.DELETE_OD] &&
                       selectionRows.length != 0 && (
                         <CButton
                           color="danger"
@@ -249,18 +205,13 @@ export default function Language() {
                           <FaPlusSquare /> {Strings.Common.DELETE_MULTI}
                         </CButton>
                       )}
-                    {loggedUser?.right[Strings.Common.CREATE_CATEGORIES] && (
+                    {loggedUser?.right[Strings.Common.CREATE_OD] && (
                       <CButton
                         color="primary"
                         variant="outline"
-                        onClick={() => navigate(Screens.LANGUAGE_CREATE)}
+                        onClick={() => navigate(Screens.IOD_CREATE)}
                       >
                         <CIcon icon={cibAddthis} /> {Strings.Common.ADD_NEW}
-                      </CButton>
-                    )}
-                    {loggedUser?.right[Strings.Common.CREATE_CATEGORIES] && (
-                      <CButton color="primary" variant="outline" onClick={() => setVisible(true)}>
-                        <FaFileCsv /> {Strings.Common.ADD_MULTI_NEW}
                       </CButton>
                     )}
                   </CButtonGroup>
@@ -270,7 +221,7 @@ export default function Language() {
                 <CCol>
                   <DataTable
                     {...configs.dataTable.props}
-                    columns={languageColumns}
+                    columns={IODColumns}
                     data={store.data}
                     onChangeRowsPerPage={handlePerRowsChange}
                     onChangePage={handlePageChange}
@@ -287,58 +238,6 @@ export default function Language() {
           </CCard>
         </CCol>
       </CRow>
-      <CModal
-        alignment="center"
-        size="xl"
-        visible={visible}
-        onClose={() => {
-          setVisible(false)
-          updateAdd({ text: '', title: false })
-        }}
-        backdrop="static"
-      >
-        <CModalHeader>
-          <CModalTitle>{Strings.Language.NAME}</CModalTitle>
-        </CModalHeader>
-        <CModalBody>
-          <CFormLabel>{Strings.Form.FieldName.CSV(Strings.Language.NAME)}</CFormLabel>
-          <CFormTextarea
-            rows="3"
-            value={add.text}
-            onChange={(e) => updateAdd({ text: e.target.value })}
-          ></CFormTextarea>
-          <CFormText component="span">
-            <div dangerouslySetInnerHTML={{ __html: Strings.Language.Common.DESCRIPTION }}></div>
-          </CFormText>
-          <CFormLabel>{Strings.Form.FieldName.FILE_CSV(Strings.Language.NAME)}</CFormLabel>
-          <CFormInput type="file" onChange={(e) => updateAdd({ file: e.target.files[0] })} />
-          <CTooltip content={Strings.Language.Common.TITLE}>
-            <CFormCheck
-              id="id"
-              label={Strings.Form.FieldName.CHECK_BOX_CSV}
-              checked={add.title}
-              onChange={() => updateAdd({ title: !add.title })}
-            />
-          </CTooltip>
-          <CFormText className="d-inline d-sm-none" component="span">
-            <div dangerouslySetInnerHTML={{ __html: Strings.Language.Common.TITLE }}></div>
-          </CFormText>
-        </CModalBody>
-        <CModalFooter>
-          <CButton
-            color="secondary"
-            onClick={() => {
-              setVisible(false)
-              updateAdd({ text: '' })
-            }}
-          >
-            {Strings.Common.CANCEL}
-          </CButton>
-          <CButton color="primary" onClick={handleSubmitCSV}>
-            {loading && <CSpinner size="sm" />} {Strings.Common.SUBMIT}
-          </CButton>
-        </CModalFooter>
-      </CModal>
     </CContainer>
   )
 }

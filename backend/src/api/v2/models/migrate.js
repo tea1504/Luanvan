@@ -597,75 +597,143 @@ async function start() {
   console.log("Migrate Incoming Official Dispatch");
   {
     await _IOD.deleteMany();
-    await _IOD.create({
-      _id: "IOD000000001",
-      code: 1,
-      issuedDate: Date.now(),
-      subject: "Subject",
-      type: "type00000001",
-      language: "language0001",
-      pageAmount: 1,
-      signerInfoName: "Tên Người Ký",
-      signerInfoPosition: "Giám đốc",
-      dueDate: Date.now(),
-      arrivalNumber: 1,
-      arrivalDate: Date.now(),
-      priority: "priority0001",
-      security: "security0001",
-      organ: "organ0000001",
-      approver: "officer00001",
-      importer: "officer00001",
-      handler: ["officer00001", "officer00001"],
-      traceHeaderList: [
-        {
-          officer: "officer00001",
-          command: "người nào đó đã thêm",
-          date: Date.now(),
-          header: "Thêm mới",
-          status: "status000001",
-        },
-        {
-          officer: "officer00001",
-          command: "người nào đó đã thêm",
-          date: Date.now(),
-          header: "Thêm mới",
-          status: "status000001",
-        },
-      ],
-      file: [
-        {
-          name: "123",
-          path: "123",
-        },
-        {
-          name: "123",
-          path: "123",
-        },
-      ],
-    });
+    await _IOD.create([
+      {
+        _id: "IOD000000001",
+        code: 1,
+        issuedDate: Date.now(),
+        subject: "Subject",
+        type: "type00000001",
+        language: "language0001",
+        pageAmount: 1,
+        signerInfoName: "Tên Người Ký",
+        signerInfoPosition: "Giám đốc",
+        dueDate: Date.now(),
+        arrivalNumber: 1,
+        arrivalDate: Date.now(),
+        priority: "priority0001",
+        security: "security0001",
+        organ: "organ0000001",
+        approver: "officer00001",
+        importer: "officer00001",
+        handler: ["officer00001", "officer00001"],
+        traceHeaderList: [
+          {
+            officer: "officer00001",
+            command: "người nào đó đã thêm",
+            date: Date.now(),
+            header: "Thêm mới",
+            status: "status000001",
+          },
+          {
+            officer: "officer00001",
+            command: "người nào đó đã thêm",
+            date: Date.now(),
+            header: "Thêm mới",
+            status: "status000001",
+          },
+        ],
+        file: [
+          {
+            name: "123",
+            path: "123",
+          },
+          {
+            name: "123",
+            path: "123",
+          },
+        ],
+      },
+      {
+        _id: "IOD000000002",
+        code: 2,
+        issuedDate: Date.now(),
+        subject: "Subject",
+        type: "type00000001",
+        language: "language0001",
+        pageAmount: 1,
+        signerInfoName: "Tên Người Ký",
+        signerInfoPosition: "Giám đốc",
+        dueDate: Date.now(),
+        arrivalNumber: 1,
+        arrivalDate: Date.now(),
+        priority: "priority0001",
+        security: "security0001",
+        organ: "organ0000002",
+        approver: "officer00001",
+        importer: "officer00001",
+        handler: ["officer00001", "officer00001"],
+        traceHeaderList: [
+          {
+            officer: "officer00001",
+            command: "người nào đó đã thêm",
+            date: Date.now(),
+            header: "Thêm mới",
+            status: "status000001",
+          },
+          {
+            officer: "officer00001",
+            command: "người nào đó đã thêm",
+            date: Date.now(),
+            header: "Thêm mới",
+            status: "status000001",
+          },
+        ],
+        file: [
+          {
+            name: "123",
+            path: "123",
+          },
+          {
+            name: "123",
+            path: "123",
+          },
+        ],
+      },
+    ]);
   }
 
   console.log("Migrate Official Dispatch Travel");
   {
     await _ODT.deleteMany();
-    await _ODT.create({
-      _id: "ODT000000001",
-      code: 1,
-      issuedDate: Date.now(),
-      subject: "Subject",
-      type: "type00000001",
-      language: "language0001",
-      pageAmount: 1,
-      signerInfoName: "Tên Người Ký",
-      signerInfoPosition: "Giám đốc",
-      dueDate: Date.now(),
-      issuedAmount: 1,
-      priority: "priority0001",
-      security: "security0001",
-      organ: "organ0000001",
-      approver: "officer00001",
-      importer: "officer00001",
-    });
+    await _ODT.create([
+      {
+        _id: "ODT000000001",
+        code: 1,
+        issuedDate: Date.now(),
+        subject: "Subject",
+        type: "type00000001",
+        language: "language0001",
+        pageAmount: 1,
+        signerInfoName: "Tên Người Ký",
+        signerInfoPosition: "Giám đốc",
+        dueDate: Date.now(),
+        issuedAmount: 1,
+        priority: "priority0001",
+        security: "security0001",
+        organ: "organ0000001",
+        approver: "officer00001",
+        importer: "officer00001",
+      },
+      {
+        _id: "ODT000000002",
+        code: 2,
+        issuedDate: Date.now(),
+        subject: "Subject",
+        type: "type00000001",
+        language: "language0001",
+        pageAmount: 1,
+        signerInfoName: "Tên Người Ký",
+        signerInfoPosition: "Giám đốc",
+        dueDate: Date.now(),
+        issuedAmount: 1,
+        priority: "priority0001",
+        security: "security0001",
+        organ: "organ0000002",
+        approver: "officer00001",
+        importer: "officer00001",
+      },
+    ]);
   }
 
   console.log("Done");

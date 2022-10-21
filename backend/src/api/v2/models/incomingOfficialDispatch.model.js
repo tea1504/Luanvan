@@ -2,6 +2,13 @@ require("dotenv").config();
 var mongoose = require("mongoose");
 var databaseConfig = require("../../../config/database.config");
 const Constants = require("../constants");
+const languageModel = require("./language.model");
+const officerModel = require("./officer.model");
+const organizationModel = require("./organization.model");
+const priorityModel = require("./priority.model");
+const securityModel = require("./security.model");
+const typeModel = require("./type.model");
+const statusModel = require("./status.model");
 
 mongoose.connect(databaseConfig.v2.path);
 
@@ -38,7 +45,7 @@ const incomingOfficialDispatchSchema = new mongoose.Schema(
     },
     type: {
       type: mongoose.ObjectId,
-      ref: "types",
+      ref: typeModel,
       required: [
         true,
         Constants.String.Message.REQUIRED(Constants.String.IOD.TYPE),
@@ -46,7 +53,7 @@ const incomingOfficialDispatchSchema = new mongoose.Schema(
     },
     language: {
       type: mongoose.ObjectId,
-      ref: "language",
+      ref: languageModel,
       required: [
         true,
         Constants.String.Message.REQUIRED(Constants.String.IOD.LANGUAGE),
@@ -120,7 +127,7 @@ const incomingOfficialDispatchSchema = new mongoose.Schema(
     },
     priority: {
       type: mongoose.ObjectId,
-      ref: "priorities",
+      ref: priorityModel,
       required: [
         true,
         Constants.String.Message.REQUIRED(Constants.String.IOD.PRIORITY),
@@ -128,7 +135,7 @@ const incomingOfficialDispatchSchema = new mongoose.Schema(
     },
     security: {
       type: mongoose.ObjectId,
-      ref: "securities",
+      ref: securityModel,
       required: [
         true,
         Constants.String.Message.REQUIRED(Constants.String.IOD.SECURITY),
@@ -136,7 +143,7 @@ const incomingOfficialDispatchSchema = new mongoose.Schema(
     },
     organ: {
       type: mongoose.ObjectId,
-      ref: "organizations",
+      ref: organizationModel,
       required: [
         true,
         Constants.String.Message.REQUIRED(Constants.String.IOD.ORGAN),
@@ -144,23 +151,23 @@ const incomingOfficialDispatchSchema = new mongoose.Schema(
     },
     approver: {
       type: mongoose.ObjectId,
-      ref: "officers",
+      ref: officerModel,
       required: false,
     },
     importer: {
       type: mongoose.ObjectId,
-      ref: "officers",
+      ref: officerModel,
       required: [
         true,
         Constants.String.Message.REQUIRED(Constants.String.IOD.IMPORTER),
       ],
     },
-    handler: [{ type: mongoose.ObjectId, ref: "officers", required: false }],
+    handler: [{ type: mongoose.ObjectId, ref: officerModel, required: false }],
     traceHeaderList: [
       {
         officer: {
           type: mongoose.ObjectId,
-          ref: "officers",
+          ref: officerModel,
           required: [
             true,
             Constants.String.Message.REQUIRED(
@@ -210,7 +217,7 @@ const incomingOfficialDispatchSchema = new mongoose.Schema(
         },
         status: {
           type: mongoose.ObjectId,
-          ref: "status",
+          ref: statusModel,
           required: [
             true,
             Constants.String.Message.REQUIRED(

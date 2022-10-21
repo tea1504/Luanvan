@@ -2601,3 +2601,40 @@ paths:
           description: Dữ liệu không được chấp nhận
         500:
           description: Lỗi hệ thống
+  /incoming-official-dispatch:
+    get:
+      summary: Lấy danh sách loại văn bản
+      tags:
+        - Incoming Official Dispatch
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          required: true
+          description: Số lượng bản ghi
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+            default: 1
+          required: true
+          description: Trang
+        - in: query
+          name: filter
+          schema:
+            type: string
+          required: false
+          description: Lọc kết quả
+      responses:
+        200:
+          description: Truy vấn thành công
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        500:
+          description: Lỗi hệ thống

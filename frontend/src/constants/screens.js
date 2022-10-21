@@ -66,6 +66,12 @@ const Screens = {
   RIGHT_CREATE: '/rights/create',
   RIGHT_UPDATE: (id = ':id') => '/rights/update/' + id,
 
+  // Incoming Official Dispatch
+  IOD: '/cong-van-den',
+  IOD_DETAIL: (id = ':id') => '/cong-van-den/chi-tiet/' + id,
+  IOD_CREATE: '/cong-van-den/tao-moi',
+  IOD_UPDATE: (id = ':id') => '/cong-van-den/cap-nhat/' + id,
+
   // user
   OFFICER_INFO: '/officer',
   USER_CHANGE_PASSWORD: '/officer/change-password',

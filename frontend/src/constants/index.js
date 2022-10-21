@@ -112,6 +112,18 @@ const Constants = {
     DELETE_OFFICER: (id = '') => '/officers/' + id,
     DELETE_OFFICERS: '/officers',
 
+    // Incoming Official Dispatch
+    GET_IODS: (limit = 5, pageNumber = 1, filter = '') =>
+      `/incoming-official-dispatch?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+    GET_IODS_BY_ORGAN_ID: (id = '', limit = 10, pageNumber = 1, filter = '') =>
+      `/incoming-official-dispatch/organ/${id}?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+    GET_IOD: (id = '') => `/incoming-official-dispatch/` + id,
+    CREATE_IOD: '/incoming-official-dispatch',
+    CREATE_IODS: '/incoming-official-dispatch/csv',
+    UPDATE_IOD: (id = '') => '/incoming-official-dispatch/' + id,
+    DELETE_IOD: (id = '') => '/incoming-official-dispatch/' + id,
+    DELETE_IODS: '/incoming-official-dispatch',
+
     // Officer Status
     GET_OFFICER_STATUSES: (limit = 10, pageNumber = 1, filter = '') =>
       `/officer-statuses?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
