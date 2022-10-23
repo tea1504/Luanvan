@@ -117,7 +117,9 @@ export default function TypeDetail() {
                   <CTableDataCell>{state.__v}</CTableDataCell>
                 </CTableRow>
                 <CTableRow>
-                  <CTableHeaderCell className="py-2">{Strings.Form.FieldName.NAME(Strings.Type.NAME)}</CTableHeaderCell>
+                  <CTableHeaderCell className="py-2">
+                    {Strings.Form.FieldName.NAME(Strings.Type.NAME)}
+                  </CTableHeaderCell>
                   <CTableDataCell colSpan={3}>{state.name}</CTableDataCell>
                 </CTableRow>
                 <CTableRow>
@@ -133,8 +135,16 @@ export default function TypeDetail() {
                     {Strings.Form.FieldName.NOTATION(Strings.Type.NAME)}
                   </CTableHeaderCell>
                   <CTableDataCell>{state.notation}</CTableDataCell>
-                  <CTableHeaderCell className="py-2">{Strings.Form.FieldName.COLOR(Strings.Type.NAME)}</CTableHeaderCell>
-                  <CTableDataCell className="text-center" style={{ backgroundColor: state.color }}>
+                  <CTableHeaderCell className="py-2">
+                    {Strings.Form.FieldName.COLOR(Strings.Type.NAME)}
+                  </CTableHeaderCell>
+                  <CTableDataCell
+                    className="text-center"
+                    style={{
+                      backgroundColor: state.color,
+                      color: Helpers.getTextColorByBackgroundColor(state.color),
+                    }}
+                  >
                     {state.color}
                   </CTableDataCell>
                 </CTableRow>
@@ -151,7 +161,7 @@ export default function TypeDetail() {
               </CTable>
             </CCardBody>
             <CCardFooter>
-              <CButton className="w-100" onClick={() => navigate(Screens.TYPE)}>
+              <CButton className="w-100" onClick={() => navigate(-1)}>
                 {Strings.Common.BACK}
               </CButton>
             </CCardFooter>

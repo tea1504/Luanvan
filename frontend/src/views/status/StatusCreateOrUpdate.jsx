@@ -337,7 +337,7 @@ export default function StatusCreateOrUpdate() {
                     disabled={loading}
                     variant="outline"
                     color="secondary"
-                    onClick={() => navigate(Screens.STATUS)}
+                    onClick={() => navigate(-1)}
                   >
                     {Strings.Common.BACK}
                   </CButton>

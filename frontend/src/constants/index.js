@@ -118,6 +118,7 @@ const Constants = {
     GET_IODS_BY_ORGAN_ID: (id = '', limit = 10, pageNumber = 1, filter = '') =>
       `/incoming-official-dispatch/organ/${id}?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
     GET_IOD: (id = '') => `/incoming-official-dispatch/` + id,
+    GET_FILE_IOD: (id = '') => `/incoming-official-dispatch/file/` + id,
     CREATE_IOD: '/incoming-official-dispatch',
     CREATE_IODS: '/incoming-official-dispatch/csv',
     UPDATE_IOD: (id = '') => '/incoming-official-dispatch/' + id,

@@ -338,7 +338,7 @@ export default function OfficerStatusCreateOrUpdate() {
                     disabled={loading}
                     variant="outline"
                     color="secondary"
-                    onClick={() => navigate(Screens.OFFICER_STATUS)}
+                    onClick={() => navigate(-1)}
                   >
                     {Strings.Common.BACK}
                   </CButton>

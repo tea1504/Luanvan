@@ -107,7 +107,7 @@ const ActionButton = ({ data }) => {
 
   return (
     <div>
-      {loggedUser.right[Strings.Common.READ_CATEGORIES] && (
+      {loggedUser.right[Strings.Common.READ_OD] && (
         <CTooltip content={Strings.Common.DETAIL}>
           <CButton
             color="info"
@@ -120,7 +120,7 @@ const ActionButton = ({ data }) => {
           </CButton>
         </CTooltip>
       )}
-      {loggedUser.right[Strings.Common.UPDATE_CATEGORIES] && (
+      {loggedUser.right[Strings.Common.UPDATE_OD] && (
         <CTooltip content={Strings.Common.EDIT}>
           <CButton
             color="warning"
@@ -133,7 +133,7 @@ const ActionButton = ({ data }) => {
           </CButton>
         </CTooltip>
       )}
-      {loggedUser.right[Strings.Common.DELETE_CATEGORIES] && (
+      {loggedUser.right[Strings.Common.DELETE_OD] && (
         <CTooltip content={Strings.Common.DELETE}>
           <CButton color="danger" className="m-1" onClick={handleDeleteButton}>
             <FaTrash style={{ color: 'whitesmoke' }} />

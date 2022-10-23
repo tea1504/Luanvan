@@ -132,7 +132,14 @@ export default function SecurityDetail() {
                   <CTableHeaderCell className="py-2">
                     {Strings.Form.FieldName.COLOR(Strings.Security.NAME)}
                   </CTableHeaderCell>
-                  <CTableDataCell colSpan={3} className="text-center" style={{ backgroundColor: state.color }}>
+                  <CTableDataCell
+                    colSpan={3}
+                    className="text-center"
+                    style={{
+                      backgroundColor: state.color,
+                      color: Helpers.getTextColorByBackgroundColor(state.color),
+                    }}
+                  >
                     {state.color}
                   </CTableDataCell>
                 </CTableRow>
@@ -149,7 +156,7 @@ export default function SecurityDetail() {
               </CTable>
             </CCardBody>
             <CCardFooter>
-              <CButton className="w-100" onClick={() => navigate(Screens.SECURITY)}>
+              <CButton className="w-100" onClick={() => navigate(-1)}>
                 {Strings.Common.BACK}
               </CButton>
             </CCardFooter>

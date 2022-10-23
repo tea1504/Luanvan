@@ -375,7 +375,7 @@ export default function LanguageCreateOrUpdate() {
                     disabled={loading}
                     variant="outline"
                     color="secondary"
-                    onClick={() => navigate(Screens.LANGUAGE)}
+                    onClick={() => navigate(-1)}
                   >
                     {Strings.Common.BACK}
                   </CButton>

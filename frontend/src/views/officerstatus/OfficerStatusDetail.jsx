@@ -135,7 +135,10 @@ export default function OfficerStatusDetail() {
                   <CTableDataCell
                     colSpan={3}
                     className="text-center"
-                    style={{ backgroundColor: state.color }}
+                    style={{
+                      backgroundColor: state.color,
+                      color: Helpers.getTextColorByBackgroundColor(state.color),
+                    }}
                   >
                     {state.color}
                   </CTableDataCell>
@@ -153,7 +156,7 @@ export default function OfficerStatusDetail() {
               </CTable>
             </CCardBody>
             <CCardFooter>
-              <CButton className="w-100" onClick={() => navigate(Screens.OFFICER_STATUS)}>
+              <CButton className="w-100" onClick={() => navigate(-1)}>
                 {Strings.Common.BACK}
               </CButton>
             </CCardFooter>

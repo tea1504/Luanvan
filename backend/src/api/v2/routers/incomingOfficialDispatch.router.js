@@ -22,9 +22,19 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage });
 
 route.get(
-  Constants.ApiPath.Language.SLASH,
+  Constants.ApiPath.IncomingOfficialDispatch.SLASH,
   readOD,
   controller.getManyByUserOrgan
+);
+route.get(
+  Constants.ApiPath.IncomingOfficialDispatch.FILE,
+  readOD,
+  controller.getFile
+);
+route.get(
+  Constants.ApiPath.IncomingOfficialDispatch.ID,
+  readOD,
+  controller.getOne
 );
 
 module.exports = route;

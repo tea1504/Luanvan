@@ -166,7 +166,12 @@ export default function OfficerDetail() {
                       content={Helpers.htmlDecode(state.status.description)}
                       placement="right"
                     >
-                      <CBadge style={{ background: state.status.color }}>
+                      <CBadge
+                        style={{
+                          background: state.status.color,
+                          color: Helpers.getTextColorByBackgroundColor(state.status.color),
+                        }}
+                      >
                         {state.status.name}
                       </CBadge>
                     </CTooltip>
@@ -233,7 +238,7 @@ export default function OfficerDetail() {
               </CTable>
             </CCardBody>
             <CCardFooter>
-              <CButton className="w-100" onClick={() => navigate(Screens.OFFICER)}>
+              <CButton className="w-100" onClick={() => navigate(-1)}>
                 {Strings.Common.BACK}
               </CButton>
             </CCardFooter>

@@ -258,7 +258,7 @@ export default function OrganizationDetail() {
               </CTable>
             </CCardBody>
             <CCardFooter>
-              <CButton className="w-100" onClick={() => navigate(Screens.ORGANIZATION)}>
+              <CButton className="w-100" onClick={() => navigate(-1)}>
                 {Strings.Common.BACK}
               </CButton>
             </CCardFooter>

@@ -297,7 +297,7 @@ export default function UserChangePassword() {
                     disabled={loading}
                     variant="outline"
                     color="secondary"
-                    onClick={() => navigate(Screens.HOME)}
+                    onClick={() => navigate(-1)}
                   >
                     {Strings.Common.BACK}
                   </CButton>

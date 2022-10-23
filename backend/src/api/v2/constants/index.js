@@ -80,6 +80,7 @@ const Constants = {
       SLASH: "/",
       ID: "/:id",
       CREATE_MULTI: "/csv",
+      FILE: "/file/:id",
     },
     OfficerStatus: {
       ROOT: "/officer-statuses",

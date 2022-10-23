@@ -621,7 +621,7 @@ async function start() {
           {
             officer: "officer00001",
             command: "người nào đó đã thêm",
-            date: Date.now(),
+            date: "2022-10-21T02:07:22.647Z",
             header: "Thêm mới",
             status: "status000001",
           },
@@ -635,12 +635,28 @@ async function start() {
         ],
         file: [
           {
-            name: "123",
-            path: "123",
+            name: "test.pdf",
+            path: "uploads/test.pdf",
           },
           {
-            name: "123",
-            path: "123",
+            name: "NhatKy.docx",
+            path: "uploads/NhatKy.docx",
+          },
+          {
+            name: "type.csv",
+            path: "uploads/type.csv",
+          },
+          {
+            name: "từ.xlsx",
+            path: "uploads/từ.xlsx",
+          },
+          {
+            name: "New Project.png",
+            path: "uploads/New Project.png",
+          },
+          {
+            name: "New Project.svg",
+            path: "uploads/New Project.svg",
           },
         ],
       },
@@ -667,7 +683,7 @@ async function start() {
           {
             officer: "officer00001",
             command: "người nào đó đã thêm",
-            date: Date.now(),
+            date: "2022-10-21T02:07:22.647Z",
             header: "Thêm mới",
             status: "status000001",
           },

@@ -477,7 +477,7 @@ export default function OrganizationCreateOrUpdate() {
                     disabled={loading}
                     variant="outline"
                     color="secondary"
-                    onClick={() => navigate(Screens.ORGANIZATION)}
+                    onClick={() => navigate(-1)}
                   >
                     {Strings.Common.BACK}
                   </CButton>

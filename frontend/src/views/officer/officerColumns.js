@@ -1,5 +1,6 @@
 import { CBadge, CImage } from '@coreui/react'
 import React from 'react'
+import Helpers from 'src/commons/helpers'
 import Constants from 'src/constants'
 import Strings from 'src/constants/strings'
 import ActionButton from './ActionButton'
@@ -45,7 +46,13 @@ export default [
   {
     name: Strings.OfficerStatus.NAME,
     cell: (row) => (
-      <CBadge style={{ background: row.status.color }} shape="rounded-pill">
+      <CBadge
+        style={{
+          background: row.status.color,
+          color: Helpers.getTextColorByBackgroundColor(row.status.color),
+        }}
+        shape="rounded-pill"
+      >
         {row.status.name}
       </CBadge>
     ),
@@ -53,11 +60,7 @@ export default [
   },
   {
     name: Strings.Right.NAME,
-    cell: (row) => (
-      <CBadge color="primary" shape="rounded-pill">
-        {row.right.name}
-      </CBadge>
-    ),
+    selector: (row) => row.right.name,
     sortable: true,
   },
   {

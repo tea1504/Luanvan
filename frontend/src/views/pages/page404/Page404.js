@@ -17,7 +17,7 @@ const Page404 = () => {
       }}
     >
       <CButton
-        onClick={() => navigate('/', { replace: true })}
+        onClick={() => navigate(-1, { replace: true })}
         color="link"
         className="text-white vh-100 vw-100"
         title="Click vào điểm bất kỳ để về trang chủ"

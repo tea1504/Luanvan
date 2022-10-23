@@ -137,7 +137,13 @@ export default function LanguageDetail() {
                   <CTableHeaderCell className="py-2">
                     {Strings.Form.FieldName.COLOR(Strings.Language.NAME)}
                   </CTableHeaderCell>
-                  <CTableDataCell className="text-center" style={{ backgroundColor: lang.color }}>
+                  <CTableDataCell
+                    className="text-center"
+                    style={{
+                      backgroundColor: lang.color,
+                      color: Helpers.getTextColorByBackgroundColor(lang.color),
+                    }}
+                  >
                     {lang.color}
                   </CTableDataCell>
                 </CTableRow>
@@ -154,7 +160,7 @@ export default function LanguageDetail() {
               </CTable>
             </CCardBody>
             <CCardFooter>
-              <CButton className="w-100" onClick={() => navigate(Screens.LANGUAGE)}>
+              <CButton className="w-100" onClick={() => navigate(-1)}>
                 {Strings.Common.BACK}
               </CButton>
             </CCardFooter>

@@ -520,6 +520,28 @@ const Helpers = {
   makeID: (str1 = '', str2 = '') => {
     return str1.toUpperCase() + '_' + str2.toUpperCase()
   },
+  formatBytes: (bytes, decimals = 2) => {
+    if (!+bytes) return '0 Bytes'
+
+    const k = 1024
+    const dm = decimals < 0 ? 0 : decimals
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
+  },
+  getTextColorByBackgroundColor: (color = '#000000') => {
+    var c = color.substring(1) // strip #
+    var rgb = parseInt(c, 16) // convert rrggbb to decimal
+    var r = (rgb >> 16) & 0xff // extract red
+    var g = (rgb >> 8) & 0xff // extract green
+    var b = (rgb >> 0) & 0xff // extract blue
+
+    var luma = 0.2126 * r + 0.7152 * g + 0.0722 * b // per ITU-R BT.709
+
+    return luma < 140 ? '#ffffff' : '#000000'
+  },
 }
 
 export default Helpers

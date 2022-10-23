@@ -14,6 +14,12 @@ class OfficerService extends BaseService {
     })
     return result
   }
+  async getFile(id) {
+    const result = await this.api.get({
+      path: Constants.ApiPath.GET_FILE_IOD(id),
+    })
+    return result
+  }
   async getManyByOrganId(id, limit = 10, pageNumber = 1, filter = '') {
     const result = await this.api.get({
       path: Constants.ApiPath.GET_OFFICERS_BY_ORGAN_ID(id, limit, pageNumber, filter),
