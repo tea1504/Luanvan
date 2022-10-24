@@ -1,6 +1,7 @@
 import { CBadge } from '@coreui/react'
 import React from 'react'
 import Helpers from 'src/commons/helpers'
+import Constants from 'src/constants'
 import Strings from 'src/constants/strings'
 import ActionButton from './ActionButton'
 
@@ -38,7 +39,14 @@ export default [
   },
   {
     name: Strings.Form.FieldName.CODE(),
-    selector: (row) => `${row.code}/${row.organ.code}-${row.type.notation}`,
+    selector: (row) =>
+      Helpers.getMaVanBan(
+        row.code,
+        row.organ.code,
+        row.type.notation,
+        row.issuedDate,
+        localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
+      ),
     sortable: true,
   },
   {

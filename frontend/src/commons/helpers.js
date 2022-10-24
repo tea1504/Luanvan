@@ -424,7 +424,17 @@ const Helpers = {
   // stringToHTML: (text) => {
   //   return parse(text);
   // },
+  formatDateForInput: (date) => {
+    var d = new Date(date),
+      month = '' + (d.getMonth() + 1),
+      day = '' + d.getDate(),
+      year = d.getFullYear()
 
+    if (month.length < 2) month = '0' + month
+    if (day.length < 2) day = '0' + day
+
+    return [year, month, day].join('-')
+  },
   formatDateFromString: (
     dateString = '',
     options = {
@@ -541,6 +551,23 @@ const Helpers = {
     var luma = 0.2126 * r + 0.7152 * g + 0.0722 * b // per ITU-R BT.709
 
     return luma < 140 ? '#ffffff' : '#000000'
+  },
+  getMaVanBan: (code, organ, type, date, c = 1) => {
+    console.log(c)
+    const d = new Date(date ?? Date.now())
+    switch (c) {
+      case 1:
+      case '1':
+        return `${code}/${d.getFullYear()}/${type}-${organ}`
+      case 2:
+      case '2':
+        return `${code}/${type}-${organ}`
+      case 3:
+      case '3':
+        return `${code}/${organ}-${type}`
+      default:
+        return `${code}/${d.getFullYear()}/${type}-${organ}`
+    }
   },
 }
 

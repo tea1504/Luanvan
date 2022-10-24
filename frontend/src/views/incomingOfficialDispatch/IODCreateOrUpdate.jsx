@@ -12,6 +12,7 @@ import {
   CFormInput,
   CFormLabel,
   CFormSelect,
+  CFormText,
   CImage,
   CRow,
   CSpinner,
@@ -23,25 +24,38 @@ import Helpers from 'src/commons/helpers'
 import Constants from 'src/constants'
 import Screens from 'src/constants/screens'
 import Strings from 'src/constants/strings'
-import OfficerService from 'src/services/officer.service'
+import IODService from 'src/services/IOD.service'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import { useDispatch } from 'react-redux'
 import { setLoading } from 'src/store/slice/config.slice'
 import Required from 'src/components/Required'
 import OrganizationService from 'src/services/organization.service'
-import OfficerStatusService from 'src/services/officerStatus.service'
+import StatusService from 'src/services/status.service'
 import RightService from 'src/services/right.service'
 import Select from 'react-select'
 import Resources from 'src/commons/resources'
+import TypeService from 'src/services/type.service'
+import LanguageService from 'src/services/language.service'
+import PriorityService from 'src/services/priority.service'
+import SecurityService from 'src/services/security.service'
+import OfficerService from 'src/services/officer.service'
+import ckEditorConfig from 'src/configs/ckEditor.config'
+import { CKEditor } from '@ckeditor/ckeditor5-react'
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
 
-const service = new OfficerService()
+const service = new IODService()
 const organizationService = new OrganizationService()
-const officerStatusService = new OfficerStatusService()
+const statusService = new StatusService()
+const typeService = new TypeService()
+const languageService = new LanguageService()
+const priorityService = new PriorityService()
+const securityService = new SecurityService()
+const officerService = new OfficerService()
 const rightService = new RightService()
 const MySwal = withReactContent(Swal)
 
-export default function OfficerCreateOrUpdate() {
+export default function IODCreateOrUpdate() {
   const { id } = useParams()
   const dispatch = useDispatch()
   let loggedUser = useSelector((state) => state.user.user)
@@ -52,22 +66,30 @@ export default function OfficerCreateOrUpdate() {
   const language = useSelector((state) => state.config.language)
   Strings.setLanguage(language)
 
-  const store = useSelector((state) => state.officer.data)
+  const store = useSelector((state) => state.IOD.data)
 
   const [state, setState] = useState({
-    code: '',
-    firstName: '',
-    lastName: '',
-    emailAddress: '',
-    phoneNumber: '',
-    position: '',
-    sendEmail: true,
-    file: {},
-    avatarTemp: null,
-    avatar: null,
+    code: 0,
+    issuedDate: 0,
+    subject: '',
+    type: null,
+    language: null,
+    pageAmount: 0,
+    description: '',
+    signerInfoName: '',
+    signerInfoPosition: '',
+    dueDate: 0,
+    arrivalNumber: 0,
+    arrivalDate: 0,
+    priority: null,
+    security: null,
     organ: null,
-    right: null,
-    status: null,
+    approver: null,
+    importer: null,
+    handler: [],
+    file: [],
+    fileTemp: null,
+    traceHeaderList: [],
   })
   const updateState = (newState) => {
     setState((prevState) => ({
@@ -78,16 +100,25 @@ export default function OfficerCreateOrUpdate() {
 
   const [error, setError] = useState({
     code: null,
-    firstName: null,
-    lastName: null,
-    emailAddress: null,
-    phoneNumber: null,
-    position: null,
-    avatarTemp: null,
-    avatar: null,
+    issuedDate: null,
+    subject: null,
+    type: null,
+    language: null,
+    pageAmount: null,
+    description: null,
+    signerInfoName: null,
+    signerInfoPosition: null,
+    dueDate: null,
+    arrivalNumber: null,
+    arrivalDate: null,
+    priority: null,
+    security: null,
     organ: null,
-    right: null,
-    status: null,
+    approver: null,
+    importer: null,
+    handler: null,
+    file: null,
+    traceHeaderList: null,
   })
   const updateError = (newState) => {
     setError((prevState) => ({
@@ -97,15 +128,33 @@ export default function OfficerCreateOrUpdate() {
   }
 
   const [organ, setOrgan] = useState([])
-  const [right, setRight] = useState([])
+  const [type, setType] = useState([])
   const [status, setStatus] = useState([])
+  const [lang, setLang] = useState([])
+  const [priority, setPriority] = useState([])
+  const [security, setSecurity] = useState([])
+  const [officer, setOfficer] = useState([])
 
   const getState = async (id = '') => {
     if (store.length > 0) {
       const s = store.find((el) => el._id === id)
       if (!s) {
         await getStateFromServer(id)
-      } else updateState({ ...s, organ: s.organ._id, status: s.status._id, right: s.right._id })
+      } else
+        updateState({
+          ...s,
+          type: s.type._id,
+          language: s.language._id,
+          priority: s.priority._id,
+          security: s.security._id,
+          organ: s.organ._id,
+          approver: s.approver._id,
+          importer: s.importer._id,
+          issuedDate: new Date(s.issuedDate).getTime(),
+          arrivalDate: new Date(s.arrivalDate).getTime(),
+          dueDate: new Date(s.dueDate).getTime(),
+          handler: s.handler.map((el) => el._id),
+        })
     } else {
       await getStateFromServer(id)
     }
@@ -115,15 +164,20 @@ export default function OfficerCreateOrUpdate() {
     try {
       dispatch(setLoading(true))
       const result = await service.getOne(id)
-      updateState(result.data.data)
-      updateState(
-        updateState({
-          ...result.data.data,
-          organ: result.data.data.organ._id,
-          status: result.data.data.status._id,
-          right: result.data.data.right._id,
-        }),
-      )
+      updateState({
+        ...result.data.data,
+        type: result.data.data.type._id,
+        language: result.data.data.language._id,
+        priority: result.data.data.priority._id,
+        security: result.data.data.security._id,
+        organ: result.data.data.organ._id,
+        approver: result.data.data.approver._id,
+        importer: result.data.data.importer._id,
+        issuedDate: new Date(result.data.data.issuedDate).getTime(),
+        arrivalDate: new Date(result.data.data.arrivalDate).getTime(),
+        dueDate: new Date(result.data.data.dueDate).getTime(),
+        handler: result.data.data.handler.map((el) => el._id),
+      })
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
@@ -185,14 +239,14 @@ export default function OfficerCreateOrUpdate() {
     }
   }
 
-  const getRight = async () => {
+  const getStatus = async () => {
     try {
       dispatch(setLoading(true))
-      setRight([])
-      const result = await rightService.getMany(10000, 1)
+      setStatus([])
+      const result = await statusService.getMany(10000, 1)
       result.data.data.data.map((el) => {
-        var item = { value: el._id, label: el.name }
-        setRight((prevState) => [...prevState, item])
+        var item = { value: el._id, label: `${el.name} - ${Helpers.htmlDecode(el.description)}` }
+        setStatus((prevState) => [...prevState, item])
       })
       dispatch(setLoading(false))
     } catch (error) {
@@ -220,14 +274,119 @@ export default function OfficerCreateOrUpdate() {
     }
   }
 
-  const getStatus = async () => {
+  const getType = async () => {
     try {
       dispatch(setLoading(true))
-      setStatus([])
-      const result = await officerStatusService.getMany(10000, 1)
+      setType([])
+      const result = await typeService.getMany(10000, 1)
       result.data.data.data.map((el) => {
-        var item = { value: el._id, label: `${el.name} - ${Helpers.htmlDecode(el.description)}` }
-        setStatus((prevState) => [...prevState, item])
+        var item = { value: el._id, label: `${el.name} - ${el.notation}` }
+        setType((prevState) => [...prevState, item])
+      })
+      dispatch(setLoading(false))
+    } catch (error) {
+      dispatch(setLoading(false))
+      switch (error.status) {
+        case 401:
+          MySwal.fire({
+            title: Strings.Message.COMMON_ERROR,
+            icon: 'error',
+            text: error.message,
+          }).then(() => {
+            localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
+            localStorage.clear(Constants.StorageKeys.USER_INFO)
+            navigate(Screens.LOGIN)
+          })
+          break
+        default:
+          MySwal.fire({
+            title: Strings.Message.COMMON_ERROR,
+            icon: 'error',
+            text: error.message,
+          })
+          break
+      }
+    }
+  }
+
+  const getLanguage = async () => {
+    try {
+      dispatch(setLoading(true))
+      setLang([])
+      const result = await languageService.getMany(10000, 1)
+      result.data.data.data.map((el) => {
+        var item = { value: el._id, label: `${el.name} - ${el.notation}` }
+        setLang((prevState) => [...prevState, item])
+      })
+      dispatch(setLoading(false))
+    } catch (error) {
+      dispatch(setLoading(false))
+      switch (error.status) {
+        case 401:
+          MySwal.fire({
+            title: Strings.Message.COMMON_ERROR,
+            icon: 'error',
+            text: error.message,
+          }).then(() => {
+            localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
+            localStorage.clear(Constants.StorageKeys.USER_INFO)
+            navigate(Screens.LOGIN)
+          })
+          break
+        default:
+          MySwal.fire({
+            title: Strings.Message.COMMON_ERROR,
+            icon: 'error',
+            text: error.message,
+          })
+          break
+      }
+    }
+  }
+
+  const getPriority = async () => {
+    try {
+      dispatch(setLoading(true))
+      setPriority([])
+      const result = await priorityService.getMany(10000, 1)
+      result.data.data.data.map((el) => {
+        var item = { value: el._id, label: `${el.name}` }
+        setPriority((prevState) => [...prevState, item])
+      })
+      dispatch(setLoading(false))
+    } catch (error) {
+      dispatch(setLoading(false))
+      switch (error.status) {
+        case 401:
+          MySwal.fire({
+            title: Strings.Message.COMMON_ERROR,
+            icon: 'error',
+            text: error.message,
+          }).then(() => {
+            localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
+            localStorage.clear(Constants.StorageKeys.USER_INFO)
+            navigate(Screens.LOGIN)
+          })
+          break
+        default:
+          MySwal.fire({
+            title: Strings.Message.COMMON_ERROR,
+            icon: 'error',
+            text: error.message,
+          })
+          break
+      }
+    }
+  }
+
+  const getSecurity = async () => {
+    try {
+      dispatch(setLoading(true))
+      setSecurity([])
+      const result = await securityService.getMany(10000, 1)
+      result.data.data.data.map((el) => {
+        var item = { value: el._id, label: `${el.name}` }
+        setSecurity((prevState) => [...prevState, item])
       })
       dispatch(setLoading(false))
     } catch (error) {
@@ -343,16 +502,25 @@ export default function OfficerCreateOrUpdate() {
     e.preventDefault()
     updateError({
       code: null,
-      firstName: null,
-      lastName: null,
-      emailAddress: null,
-      phoneNumber: null,
-      position: null,
-      avatarTemp: null,
-      avatar: null,
+      issuedDate: null,
+      subject: null,
+      type: null,
+      language: null,
+      pageAmount: null,
+      description: null,
+      signerInfoName: null,
+      signerInfoPosition: null,
+      dueDate: null,
+      arrivalNumber: null,
+      arrivalDate: null,
+      priority: null,
+      security: null,
       organ: null,
-      right: null,
-      status: null,
+      approver: null,
+      importer: null,
+      handler: null,
+      file: null,
+      traceHeaderList: null,
     })
     if (validate()) {
       try {
@@ -362,21 +530,30 @@ export default function OfficerCreateOrUpdate() {
           MySwal.fire({
             title: Strings.Common.SUCCESS,
             icon: 'success',
-            text: Strings.Officer.Common.ALERT_PASSWORD(result.data.data.password),
+            text: Strings.IOD.Common.ALERT_PASSWORD(result.data.data.password),
           })
           updateState({
-            code: '',
-            firstName: '',
-            lastName: '',
-            emailAddress: '',
-            phoneNumber: '',
-            position: '',
-            file: {},
-            avatarTemp: null,
-            avatar: null,
+            code: 0,
+            issuedDate: 0,
+            subject: '',
+            type: null,
+            language: null,
+            pageAmount: 0,
+            description: '',
+            signerInfoName: '',
+            signerInfoPosition: '',
+            dueDate: 0,
+            arrivalNumber: 0,
+            arrivalDate: 0,
+            priority: null,
+            security: null,
             organ: null,
-            right: null,
-            status: null,
+            approver: null,
+            importer: null,
+            handler: [],
+            file: [],
+            fileTemp: null,
+            traceHeaderList: [],
           })
         } else {
           const result = await service.updateOne(id, state)
@@ -419,16 +596,27 @@ export default function OfficerCreateOrUpdate() {
       await getState(list[list.length - 1])
     } else
       updateState({
-        code: '',
-        firstName: '',
-        lastName: '',
-        emailAddress: '',
-        phoneNumber: '',
-        avatarTemp: null,
-        avatar: null,
+        code: 0,
+        issuedDate: 0,
+        subject: '',
+        type: null,
+        language: null,
+        pageAmount: 0,
+        description: '',
+        signerInfoName: '',
+        signerInfoPosition: '',
+        dueDate: 0,
+        arrivalNumber: 0,
+        arrivalDate: 0,
+        priority: null,
+        security: null,
         organ: null,
-        right: null,
-        status: null,
+        approver: null,
+        importer: null,
+        handler: [],
+        file: [],
+        fileTemp: null,
+        traceHeaderList: [],
       })
   }
 
@@ -440,7 +628,7 @@ export default function OfficerCreateOrUpdate() {
 
   const handleInputFileOnChange = (e) => {
     const file = Array.from(e.target.files)[0]
-    updateState({ avatar: file, avatarTemp: URL.createObjectURL(file) })
+    updateState({ file: file, fileTemp: URL.createObjectURL(file) })
   }
 
   useEffect(() => {
@@ -449,16 +637,22 @@ export default function OfficerCreateOrUpdate() {
       const list = id.split('.')
       getState(list[list.length - 1])
       getOrganization()
-      getRight()
       getStatus()
+      getType()
+      getLanguage()
+      getPriority()
+      getSecurity()
     } else {
       if (!loggedUser.right.createCategories) navigate(Screens.E403)
       getOrganization()
-      getRight()
       getStatus()
+      getType()
+      getLanguage()
+      getPriority()
+      getSecurity()
     }
     return () => {
-      URL.revokeObjectURL(state.avatarTemp)
+      URL.revokeObjectURL(state.fileTemp)
     }
   }, [])
 
@@ -468,316 +662,443 @@ export default function OfficerCreateOrUpdate() {
         <CCol>
           <CCard className="mb-3 border-secondary border-top-5">
             <CCardHeader className="text-center py-3" component="h3">
-              {Strings.Officer.NAME}
+              {Strings.IncomingOfficialDispatch.NAME}
             </CCardHeader>
             <CCardBody>
               <CForm noValidate className="row g-3">
-                <CCol xs={12} md={12}>
+                {/* ISSUED_DATE */}
+                <CCol xs={12}>
                   <CFormLabel
                     htmlFor={Helpers.makeID(
-                      Strings.Officer.CODE,
+                      Strings.IncomingOfficialDispatch.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.ISSUED_DATE),
+                    )}
+                  >
+                    {Strings.Form.FieldName.ISSUED_DATE(Strings.IncomingOfficialDispatch.NAME)}{' '}
+                    <Required mes={Strings.Form.Validation.REQUIRED()} />
+                  </CFormLabel>
+                  <CFormInput
+                    invalid={!Helpers.isNullOrEmpty(error.issuedDate)}
+                    type="date"
+                    id={Helpers.makeID(
+                      Strings.IncomingOfficialDispatch.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.ISSUED_DATE),
+                    )}
+                    placeholder={Strings.Form.FieldName.ISSUED_DATE(
+                      Strings.IncomingOfficialDispatch.NAME,
+                    )}
+                    value={Helpers.formatDateForInput(state.issuedDate ?? '')}
+                    onChange={(e) =>
+                      updateState({ issuedDate: new Date(e.target.value).getTime() })
+                    }
+                    onKeyPress={handleKeypress}
+                  />
+                  <CFormFeedback invalid>
+                    {error.issuedDate &&
+                      Strings.Form.Validation[error.issuedDate](
+                        Strings.Form.FieldName.ISSUED_DATE(Strings.IncomingOfficialDispatch.NAME),
+                      )}
+                  </CFormFeedback>
+                </CCol>
+                {/* CODE */}
+                <CCol xs={12}>
+                  <CFormLabel
+                    htmlFor={Helpers.makeID(
+                      Strings.IncomingOfficialDispatch.CODE,
                       Helpers.propName(Strings, Strings.Form.FieldName.CODE),
                     )}
                   >
-                    {Strings.Form.FieldName.CODE(Strings.Officer.NAME)}{' '}
+                    {Strings.Form.FieldName.CODE(Strings.IncomingOfficialDispatch.NAME)}{' '}
                     <Required mes={Strings.Form.Validation.REQUIRED()} />
                   </CFormLabel>
                   <CFormInput
                     invalid={!Helpers.isNullOrEmpty(error.code)}
-                    type="text"
+                    type="number"
+                    min={1}
                     id={Helpers.makeID(
-                      Strings.Officer.CODE,
+                      Strings.IncomingOfficialDispatch.CODE,
                       Helpers.propName(Strings, Strings.Form.FieldName.CODE),
                     )}
-                    placeholder={Strings.Form.FieldName.CODE(Strings.Officer.NAME)}
+                    placeholder={Strings.Form.FieldName.CODE(Strings.IncomingOfficialDispatch.NAME)}
                     value={state.code}
-                    onChange={(e) => updateState({ code: e.target.value })}
+                    onChange={(e) => updateState({ code: parseInt(e.target.value) })}
                     onKeyPress={handleKeypress}
                   />
                   <CFormFeedback invalid>
                     {error.code &&
                       Strings.Form.Validation[error.code](
-                        Strings.Form.FieldName.CODE(Strings.Officer.NAME),
+                        Strings.Form.FieldName.CODE(Strings.IncomingOfficialDispatch.NAME),
                       )}
                   </CFormFeedback>
+                  <CFormText>
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: Strings.IncomingOfficialDispatch.Common.DESCRIPTION_CODE,
+                      }}
+                    ></div>
+                  </CFormText>
                 </CCol>
-                <CCol xs={12} md={6}>
-                  <CFormLabel
-                    htmlFor={Helpers.makeID(
-                      Strings.Officer.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.LAST_NAME),
-                    )}
-                  >
-                    {Strings.Form.FieldName.LAST_NAME(Strings.Officer.NAME)}{' '}
-                    <Required mes={Strings.Form.Validation.REQUIRED()} />
-                  </CFormLabel>
-                  <CFormInput
-                    invalid={!Helpers.isNullOrEmpty(error.lastName)}
-                    type="text"
-                    id={Helpers.makeID(
-                      Strings.Officer.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.LAST_NAME),
-                    )}
-                    placeholder={Strings.Form.FieldName.LAST_NAME(Strings.Officer.NAME)}
-                    value={state.lastName}
-                    onChange={(e) => updateState({ lastName: e.target.value })}
-                    onKeyPress={handleKeypress}
-                  />
-                  <CFormFeedback invalid>
-                    {error.lastName &&
-                      Strings.Form.Validation[error.lastName](
-                        Strings.Form.FieldName.LAST_NAME(Strings.Officer.NAME),
-                      )}
-                  </CFormFeedback>
-                </CCol>
-                <CCol xs={12} md={6}>
-                  <CFormLabel
-                    htmlFor={Helpers.makeID(
-                      Strings.Officer.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.FIRST_NAME),
-                    )}
-                  >
-                    {Strings.Form.FieldName.FIRST_NAME(Strings.Officer.NAME)}{' '}
-                    <Required mes={Strings.Form.Validation.REQUIRED()} />
-                  </CFormLabel>
-                  <CFormInput
-                    invalid={!Helpers.isNullOrEmpty(error.firstName)}
-                    type="text"
-                    id={Helpers.makeID(
-                      Strings.Officer.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.FIRST_NAME),
-                    )}
-                    placeholder={Strings.Form.FieldName.FIRST_NAME(Strings.Officer.NAME)}
-                    value={state.firstName}
-                    onChange={(e) => updateState({ firstName: e.target.value })}
-                    onKeyPress={handleKeypress}
-                  />
-                  <CFormFeedback invalid>
-                    {error.firstName &&
-                      Strings.Form.Validation[error.firstName](
-                        Strings.Form.FieldName.FIRST_NAME(Strings.Officer.NAME),
-                      )}
-                  </CFormFeedback>
-                </CCol>
-                <CCol xs={12} md={6}>
-                  <CFormLabel
-                    htmlFor={Helpers.makeID(
-                      Strings.Officer.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.EMAIL_ADDRESS),
-                    )}
-                  >
-                    {Strings.Form.FieldName.EMAIL_ADDRESS(Strings.Officer.NAME)}{' '}
-                    <Required mes={Strings.Form.Validation.REQUIRED()} />
-                  </CFormLabel>
-                  <CFormInput
-                    invalid={!Helpers.isNullOrEmpty(error.emailAddress)}
-                    type="email"
-                    className="w-100"
-                    id={Helpers.makeID(
-                      Strings.Officer.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.EMAIL_ADDRESS),
-                    )}
-                    placeholder={Strings.Form.FieldName.EMAIL_ADDRESS(Strings.Officer.NAME)}
-                    value={state.emailAddress}
-                    onChange={(e) => updateState({ emailAddress: e.target.value })}
-                    onKeyPress={handleKeypress}
-                  />
-                  <CFormFeedback invalid>
-                    {error.emailAddress &&
-                      Strings.Form.Validation[error.emailAddress](
-                        Strings.Form.FieldName.EMAIL_ADDRESS(Strings.Officer.NAME),
-                      )}
-                  </CFormFeedback>
-                </CCol>
-                <CCol xs={12} md={6}>
-                  <CFormLabel
-                    htmlFor={Helpers.makeID(
-                      Strings.Officer.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.PHONE_NUMBER),
-                    )}
-                  >
-                    {Strings.Form.FieldName.PHONE_NUMBER(Strings.Officer.NAME)}{' '}
-                    <Required mes={Strings.Form.Validation.REQUIRED()} />
-                  </CFormLabel>
-                  <CFormInput
-                    invalid={!Helpers.isNullOrEmpty(error.phoneNumber)}
-                    type="text"
-                    className="w-100"
-                    id={Helpers.makeID(
-                      Strings.Officer.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.PHONE_NUMBER),
-                    )}
-                    placeholder={Strings.Form.FieldName.PHONE_NUMBER(Strings.Officer.NAME)}
-                    value={state.phoneNumber}
-                    onChange={(e) => updateState({ phoneNumber: e.target.value })}
-                    onKeyPress={handleKeypress}
-                  />
-                  <CFormFeedback invalid>
-                    {error.phoneNumber &&
-                      Strings.Form.Validation[error.phoneNumber](
-                        Strings.Form.FieldName.PHONE_NUMBER(Strings.Officer.NAME),
-                      )}
-                  </CFormFeedback>
-                </CCol>
+                {/* ARRIVAL_DATE */}
                 <CCol xs={12}>
                   <CFormLabel
                     htmlFor={Helpers.makeID(
-                      Strings.Officer.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.POSITION),
+                      Strings.IncomingOfficialDispatch.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.ARRIVAL_DATE),
                     )}
                   >
-                    {Strings.Form.FieldName.POSITION(Strings.Officer.NAME)}{' '}
+                    {Strings.Form.FieldName.ARRIVAL_DATE}{' '}
                     <Required mes={Strings.Form.Validation.REQUIRED()} />
                   </CFormLabel>
                   <CFormInput
-                    invalid={!Helpers.isNullOrEmpty(error.position)}
-                    type="text"
-                    className="w-100"
+                    invalid={!Helpers.isNullOrEmpty(error.arrivalDate)}
+                    type="date"
                     id={Helpers.makeID(
-                      Strings.Officer.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.POSITION),
+                      Strings.IncomingOfficialDispatch.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.ARRIVAL_DATE),
                     )}
-                    placeholder={Strings.Form.FieldName.POSITION(Strings.Officer.NAME)}
-                    value={state.position}
-                    onChange={(e) => updateState({ position: e.target.value })}
+                    placeholder={Strings.Form.FieldName.ARRIVAL_DATE}
+                    value={Helpers.formatDateForInput(state.arrivalDate ?? '')}
+                    onChange={(e) =>
+                      updateState({ arrivalDate: new Date(e.target.value).getTime() })
+                    }
                     onKeyPress={handleKeypress}
                   />
                   <CFormFeedback invalid>
-                    {error.position &&
-                      Strings.Form.Validation[error.position](
-                        Strings.Form.FieldName.POSITION(Strings.Officer.NAME),
+                    {error.arrivalDate &&
+                      Strings.Form.Validation[error.arrivalDate](
+                        Strings.Form.FieldName.ISSUED_DATE(Strings.IncomingOfficialDispatch.NAME),
                       )}
                   </CFormFeedback>
                 </CCol>
+                {/* ARRIVAL_NUMBER */}
                 <CCol xs={12}>
-                  <CFormLabel htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Right.CODE)}>
-                    {Strings.Right.NAME} <Required mes={Strings.Form.Validation.REQUIRED()} />
+                  <CFormLabel
+                    htmlFor={Helpers.makeID(
+                      Strings.IncomingOfficialDispatch.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.ARRIVAL_NUMBER),
+                    )}
+                  >
+                    {Strings.Form.FieldName.ARRIVAL_NUMBER}{' '}
+                    <Required mes={Strings.Form.Validation.REQUIRED()} />
                   </CFormLabel>
-                  <Select
-                    id={Helpers.makeID(Strings.Officer.CODE, Strings.Right.CODE)}
-                    value={
-                      right.filter((el) => el.value === state.right).length > 0
-                        ? right.filter((el) => el.value === state.right)[0]
-                        : null
-                    }
-                    options={right}
-                    placeholder={Strings.Officer.Common.SELECT_RIGHT}
-                    onChange={(selectedItem) => updateState({ right: selectedItem.value })}
-                    isClearable
-                    styles={{
-                      control: (provided, state) => ({
-                        ...provided,
-                        borderColor: error.right
-                          ? Constants.Styles.ERROR_COLOR
-                          : Constants.Styles.BORDER_COLOR,
-                      }),
-                    }}
+                  <CFormInput
+                    invalid={!Helpers.isNullOrEmpty(error.arrivalNumber)}
+                    type="number"
+                    min={1}
+                    id={Helpers.makeID(
+                      Strings.IncomingOfficialDispatch.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.ARRIVAL_NUMBER),
+                    )}
+                    placeholder={Strings.Form.FieldName.ARRIVAL_NUMBER}
+                    value={state.arrivalNumber}
+                    onChange={(e) => updateState({ arrivalNumber: parseInt(e.target.value) })}
+                    onKeyPress={handleKeypress}
                   />
-                  <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
-                    {error.right && Strings.Form.Validation[error.right](Strings.Right.NAME)}
+                  <CFormFeedback invalid>
+                    {error.arrivalNumber &&
+                      Strings.Form.Validation[error.arrivalNumber](
+                        Strings.Form.FieldName.ARRIVAL_NUMBER,
+                      )}
                   </CFormFeedback>
                 </CCol>
-                <CCol xs={12} md={6}>
-                  <CFormLabel
-                    htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Organization.CODE)}
-                  >
-                    {Strings.Organization.NAME}{' '}
+                {/* TYPE */}
+                <CCol xs={12}>
+                  <CFormLabel htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Type.CODE)}>
+                    {Strings.Form.FieldName.TYPE(Strings.IncomingOfficialDispatch.NAME)}{' '}
                     <Required mes={Strings.Form.Validation.REQUIRED()} />
                   </CFormLabel>
                   <Select
-                    id={Helpers.makeID(Strings.Officer.CODE, Strings.Organization.CODE)}
+                    id={Helpers.makeID(Strings.Officer.CODE, Strings.Type.CODE)}
                     value={
-                      organ.filter((el) => el.value === state.organ).length > 0
-                        ? organ.filter((el) => el.value === state.organ)[0]
+                      type.filter((el) => el.value === state.type).length > 0
+                        ? type.filter((el) => el.value === state.type)[0]
                         : null
                     }
-                    options={organ}
-                    placeholder={Strings.Officer.Common.SELECT_ORGAN}
-                    onChange={(selectedItem) => updateState({ organ: selectedItem.value })}
+                    options={type}
+                    placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_TYPE}
+                    onChange={(selectedItem) => {
+                      if (selectedItem) updateState({ type: selectedItem.value })
+                      else updateState({ type: null })
+                    }}
                     styles={{
                       control: (provided, state) => ({
                         ...provided,
-                        borderColor: error.organ
+                        borderColor: error.type
                           ? Constants.Styles.ERROR_COLOR
                           : Constants.Styles.BORDER_COLOR,
                       }),
                     }}
+                    isClearable={Helpers.isNullOrEmpty(id)}
                   />
                   <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
-                    {error.organ && Strings.Form.Validation[error.organ](Strings.Organization.NAME)}
+                    {error.type && Strings.Form.Validation[error.type](Strings.Type.NAME)}
                   </CFormFeedback>
                 </CCol>
-                <CCol xs={12} md={6}>
-                  <CFormLabel
-                    htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.OfficerStatus.CODE)}
-                  >
-                    {Strings.OfficerStatus.NAME}
+                {/* LANGUAGE */}
+                <CCol xs={12}>
+                  <CFormLabel htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Language.CODE)}>
+                    {Strings.Form.FieldName.LANGUAGE(Strings.IncomingOfficialDispatch.NAME)}{' '}
+                    <Required mes={Strings.Form.Validation.REQUIRED()} />
                   </CFormLabel>
                   <Select
-                    id={Helpers.makeID(Strings.Officer.CODE, Strings.OfficerStatus.CODE)}
+                    id={Helpers.makeID(Strings.Officer.CODE, Strings.Language.CODE)}
                     value={
-                      status.filter((el) => el.value === state.status).length > 0
-                        ? status.filter((el) => el.value === state.status)[0]
+                      lang.filter((el) => el.value === state.language).length > 0
+                        ? lang.filter((el) => el.value === state.language)[0]
                         : null
                     }
-                    options={status}
-                    placeholder={Strings.Officer.Common.SELECT_STATUS}
-                    onChange={(selectedItem) => updateState({ status: selectedItem.value })}
+                    options={lang}
+                    placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_LANGUAGE}
+                    onChange={(selectedItem) => {
+                      if (selectedItem) updateState({ language: selectedItem.value })
+                      else updateState({ language: null })
+                    }}
                     styles={{
                       control: (provided, state) => ({
                         ...provided,
-                        borderColor: error.status
+                        borderColor: error.lang
                           ? Constants.Styles.ERROR_COLOR
                           : Constants.Styles.BORDER_COLOR,
                       }),
                     }}
+                    isClearable={Helpers.isNullOrEmpty(id)}
                   />
                   <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
-                    {error.status &&
-                      Strings.Form.Validation[error.status](Strings.Organization.NAME)}
+                    {error.lang && Strings.Form.Validation[error.lang](Strings.Language.NAME)}
                   </CFormFeedback>
                 </CCol>
-                <CCol sx={12}>
-                  {id && (
-                    <CImage
-                      rounded
-                      thumbnail
-                      className="shadow"
-                      src={
-                        state.avatarTemp
-                          ? state.avatarTemp
-                          : `${process.env.REACT_APP_BASE_URL}/${
-                              state.file.path
-                            }?token=${localStorage.getItem(Constants.StorageKeys.ACCESS_TOKEN)}`
-                      }
-                      width={200}
-                    />
-                  )}
-                  {!id && (
-                    <CImage
-                      rounded
-                      thumbnail
-                      className="shadow"
-                      src={state.avatarTemp ? state.avatarTemp : Resources.Images.ERR_404}
-                      width={200}
-                    />
-                  )}
-                  <CFormInput type="file" onChange={handleInputFileOnChange} className="mt-1" />
+                {/* SUBJECT */}
+                <CCol xs={12}>
+                  <CFormLabel
+                    htmlFor={Helpers.makeID(
+                      Strings.Language.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.SUBJECT),
+                    )}
+                  >
+                    {Strings.Form.FieldName.SUBJECT(Strings.IncomingOfficialDispatch.NAME)}{' '}
+                    <Required mes={Strings.Form.Validation.REQUIRED()} />
+                  </CFormLabel>
+                  <CKEditor
+                    id={Helpers.makeID(
+                      Strings.IncomingOfficialDispatch.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.DESCRIPTION),
+                    )}
+                    editor={ClassicEditor}
+                    config={ckEditorConfig}
+                    data={state.subject}
+                    onChange={(event, editor) => {
+                      const data = editor.getData()
+                      updateState({ subject: data })
+                    }}
+                  />
+                  <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
+                    {error.description &&
+                      Strings.Form.Validation[error.description](Strings.Language.NAME)}
+                  </CFormFeedback>
                 </CCol>
-                {!id && (
-                  <CCol xs={12}>
-                    <CFormCheck
-                      id={Helpers.makeID(
-                        Strings.Right.CODE,
-                        Helpers.propName(Strings, Strings.Form.FieldName.READ_OD),
+                {/* PAGE_AMOUNT */}
+                <CCol xs={12}>
+                  <CFormLabel
+                    htmlFor={Helpers.makeID(
+                      Strings.IncomingOfficialDispatch.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.PAGE_AMOUNT),
+                    )}
+                  >
+                    {Strings.Form.FieldName.PAGE_AMOUNT(Strings.IncomingOfficialDispatch.NAME)}{' '}
+                    <Required mes={Strings.Form.Validation.REQUIRED()} />
+                  </CFormLabel>
+                  <CFormInput
+                    invalid={!Helpers.isNullOrEmpty(error.pageAmount)}
+                    type="number"
+                    min={1}
+                    id={Helpers.makeID(
+                      Strings.IncomingOfficialDispatch.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.PAGE_AMOUNT),
+                    )}
+                    placeholder={Strings.Form.FieldName.PAGE_AMOUNT(
+                      Strings.IncomingOfficialDispatch.NAME,
+                    )}
+                    value={state.pageAmount}
+                    onChange={(e) => updateState({ pageAmount: parseInt(e.target.value) })}
+                    onKeyPress={handleKeypress}
+                  />
+                  <CFormFeedback invalid>
+                    {error.pageAmount &&
+                      Strings.Form.Validation[error.pageAmount](
+                        Strings.Form.FieldName.PAGE_AMOUNT(Strings.IncomingOfficialDispatch.NAME),
                       )}
-                      value={state.sendEmail}
-                      checked={state.sendEmail}
-                      label={Strings.Officer.Common.SEND_EMAIL}
-                      onChange={() => updateState({ sendEmail: !state.sendEmail })}
-                    />
-                  </CCol>
-                )}
+                  </CFormFeedback>
+                </CCol>
+                {/* SIGNER_INFO_NAME */}
+                <CCol xs={12}>
+                  <CFormLabel
+                    htmlFor={Helpers.makeID(
+                      Strings.IncomingOfficialDispatch.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.SIGNER_INFO_NAME),
+                    )}
+                  >
+                    {Strings.Form.FieldName.SIGNER_INFO_NAME(Strings.IncomingOfficialDispatch.NAME)}{' '}
+                    <Required mes={Strings.Form.Validation.REQUIRED()} />
+                  </CFormLabel>
+                  <CFormInput
+                    invalid={!Helpers.isNullOrEmpty(error.signerInfoName)}
+                    type="text"
+                    id={Helpers.makeID(
+                      Strings.IncomingOfficialDispatch.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.SIGNER_INFO_NAME),
+                    )}
+                    placeholder={Strings.Form.FieldName.SIGNER_INFO_NAME(
+                      Strings.IncomingOfficialDispatch.NAME,
+                    )}
+                    value={state.signerInfoName}
+                    onChange={(e) => updateState({ signerInfoName: e.target.value })}
+                    onKeyPress={handleKeypress}
+                  />
+                  <CFormFeedback invalid>
+                    {error.signerInfoName &&
+                      Strings.Form.Validation[error.signerInfoName](
+                        Strings.Form.FieldName.SIGNER_INFO_NAME(
+                          Strings.IncomingOfficialDispatch.NAME,
+                        ),
+                      )}
+                  </CFormFeedback>
+                </CCol>
+                {/* SIGNER_INFO_POSITION */}
+                <CCol xs={12}>
+                  <CFormLabel
+                    htmlFor={Helpers.makeID(
+                      Strings.IncomingOfficialDispatch.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.SIGNER_INFO_POSITION),
+                    )}
+                  >
+                    {Strings.Form.FieldName.SIGNER_INFO_POSITION(
+                      Strings.IncomingOfficialDispatch.NAME,
+                    )}{' '}
+                    <Required mes={Strings.Form.Validation.REQUIRED()} />
+                  </CFormLabel>
+                  <CFormInput
+                    invalid={!Helpers.isNullOrEmpty(error.signerInfoPosition)}
+                    type="text"
+                    id={Helpers.makeID(
+                      Strings.IncomingOfficialDispatch.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.SIGNER_INFO_POSITION),
+                    )}
+                    placeholder={Strings.Form.FieldName.SIGNER_INFO_POSITION(
+                      Strings.IncomingOfficialDispatch.NAME,
+                    )}
+                    value={state.signerInfoPosition}
+                    onChange={(e) => updateState({ signerInfoPosition: e.target.value })}
+                    onKeyPress={handleKeypress}
+                  />
+                  <CFormFeedback invalid>
+                    {error.signerInfoPosition &&
+                      Strings.Form.Validation[error.signerInfoPosition](
+                        Strings.Form.FieldName.SIGNER_INFO_POSITION(
+                          Strings.IncomingOfficialDispatch.NAME,
+                        ),
+                      )}
+                  </CFormFeedback>
+                </CCol>
+                {/* DUE_DATE */}
+                <CCol xs={12}>
+                  <CFormLabel
+                    htmlFor={Helpers.makeID(
+                      Strings.IncomingOfficialDispatch.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.DUE_DATE),
+                    )}
+                  >
+                    {Strings.Form.FieldName.DUE_DATE(Strings.IncomingOfficialDispatch.NAME)}{' '}
+                    <Required mes={Strings.Form.Validation.REQUIRED()} />
+                  </CFormLabel>
+                  <CFormInput
+                    invalid={!Helpers.isNullOrEmpty(error.dueDate)}
+                    type="date"
+                    id={Helpers.makeID(
+                      Strings.IncomingOfficialDispatch.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.DUE_DATE),
+                    )}
+                    placeholder={Strings.Form.FieldName.DUE_DATE(
+                      Strings.IncomingOfficialDispatch.NAME,
+                    )}
+                    value={Helpers.formatDateForInput(state.dueDate ?? '')}
+                    onChange={(e) => updateState({ dueDate: new Date(e.target.value).getTime() })}
+                    onKeyPress={handleKeypress}
+                  />
+                  <CFormFeedback invalid>
+                    {error.dueDate &&
+                      Strings.Form.Validation[error.dueDate](
+                        Strings.Form.FieldName.DUE_DATE(Strings.IncomingOfficialDispatch.NAME),
+                      )}
+                  </CFormFeedback>
+                </CCol>
+                {/* PRIORITY */}
+                <CCol xs={12}>
+                  <CFormLabel htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Priority.CODE)}>
+                    {Strings.Form.FieldName.PRIORITY(Strings.IncomingOfficialDispatch.NAME)}{' '}
+                    <Required mes={Strings.Form.Validation.REQUIRED()} />
+                  </CFormLabel>
+                  <Select
+                    id={Helpers.makeID(Strings.Officer.CODE, Strings.Priority.CODE)}
+                    value={
+                      priority.filter((el) => el.value === state.priority).length > 0
+                        ? priority.filter((el) => el.value === state.priority)[0]
+                        : null
+                    }
+                    options={priority}
+                    placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_PRIORITY}
+                    onChange={(selectedItem) => {
+                      if (selectedItem) updateState({ priority: selectedItem.value })
+                      else updateState({ priority: null })
+                    }}
+                    styles={{
+                      control: (provided, state) => ({
+                        ...provided,
+                        borderColor: error.priority
+                          ? Constants.Styles.ERROR_COLOR
+                          : Constants.Styles.BORDER_COLOR,
+                      }),
+                    }}
+                    isClearable={Helpers.isNullOrEmpty(id)}
+                  />
+                  <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
+                    {error.priority &&
+                      Strings.Form.Validation[error.priority](Strings.Priority.NAME)}
+                  </CFormFeedback>
+                </CCol>
+                {/* SECURITY */}
+                <CCol xs={12}>
+                  <CFormLabel htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Security.CODE)}>
+                    {Strings.Form.FieldName.SECURITY(Strings.IncomingOfficialDispatch.NAME)}{' '}
+                    <Required mes={Strings.Form.Validation.REQUIRED()} />
+                  </CFormLabel>
+                  <Select
+                    id={Helpers.makeID(Strings.Officer.CODE, Strings.Security.CODE)}
+                    value={
+                      security.filter((el) => el.value === state.security).length > 0
+                        ? security.filter((el) => el.value === state.security)[0]
+                        : null
+                    }
+                    options={security}
+                    placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_SECURITY}
+                    onChange={(selectedItem) => {
+                      if (selectedItem) updateState({ security: selectedItem.value })
+                      else updateState({ security: null })
+                    }}
+                    styles={{
+                      control: (provided, state) => ({
+                        ...provided,
+                        borderColor: error.security
+                          ? Constants.Styles.ERROR_COLOR
+                          : Constants.Styles.BORDER_COLOR,
+                      }),
+                    }}
+                    isClearable={Helpers.isNullOrEmpty(id)}
+                  />
+                  <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
+                    {error.security &&
+                      Strings.Form.Validation[error.security](Strings.Security.NAME)}
+                  </CFormFeedback>
+                </CCol>
               </CForm>
             </CCardBody>
             <CCardFooter>

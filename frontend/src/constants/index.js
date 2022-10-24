@@ -222,6 +222,7 @@ const Constants = {
     CONFIG_FOLDABLE: 'FOLDABLE',
     CONFIG_SIDEBAR_SHOW: 'SIDEBAR_SHOW',
     LANGUAGE: 'LANGUAGE',
+    FORMAT_CODE_OD: 'FORMAT_CODE_OD',
   },
 
   MomentWeekDay: {

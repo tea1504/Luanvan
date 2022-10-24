@@ -115,15 +115,12 @@ export default function OfficerCreateOrUpdate() {
     try {
       dispatch(setLoading(true))
       const result = await service.getOne(id)
-      updateState(result.data.data)
-      updateState(
-        updateState({
-          ...result.data.data,
-          organ: result.data.data.organ._id,
-          status: result.data.data.status._id,
-          right: result.data.data.right._id,
-        }),
-      )
+      updateState({
+        ...result.data.data,
+        organ: result.data.data.organ._id,
+        status: result.data.data.status._id,
+        right: result.data.data.right._id,
+      })
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))

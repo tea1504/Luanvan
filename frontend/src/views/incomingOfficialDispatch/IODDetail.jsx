@@ -22,11 +22,13 @@ import React, { useEffect, useState } from 'react'
 import {
   FaEye,
   FaFile,
+  FaFileCsv,
   FaFileDownload,
   FaFileExcel,
   FaFileWord,
   FaImage,
   FaRegFilePdf,
+  FaVectorSquare,
 } from 'react-icons/fa'
 import { useDispatch } from 'react-redux'
 import { useSelector } from 'react-redux'
@@ -196,14 +198,21 @@ export default function IODDetail() {
           result.icon = <FaFileExcel size="2rem" />
           result.color = 'success'
           break
+        case 'csv':
+          result.icon = <FaFileCsv size="2rem" />
+          result.color = 'success'
+          break
         case 'apng':
         case 'avif':
         case 'gif':
         case 'jprg':
         case 'png':
         case 'webp':
-        case 'csv':
           result.icon = <FaImage size="2rem" />
+          result.color = 'warning'
+          break
+        case 'svg':
+          result.icon = <FaVectorSquare size="2rem" />
           result.color = 'warning'
           break
         default:
@@ -298,7 +307,13 @@ export default function IODDetail() {
                   <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
                     {Strings.Form.FieldName.CODE(Strings.IncomingOfficialDispatch.NAME)}
                   </CTableHeaderCell>
-                  <CTableDataCell>{state.code}</CTableDataCell>
+                  <CTableDataCell>{`${state.code} (${Helpers.getMaVanBan(
+                    state.code,
+                    state.organ.code,
+                    state.type.notation,
+                    state.issuedDate,
+                    localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
+                  )})`}</CTableDataCell>
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>

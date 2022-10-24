@@ -1,7 +1,7 @@
 import Constants from 'src/constants'
 import BaseService from './base.service'
 
-class OfficerService extends BaseService {
+class IODService extends BaseService {
   async getMany(limit = 10, pageNumber = 1, filter = '') {
     const result = await this.api.get({
       path: Constants.ApiPath.GET_IODS(limit, pageNumber, filter),
@@ -62,4 +62,4 @@ class OfficerService extends BaseService {
   }
 }
 
-export default OfficerService
+export default IODService
