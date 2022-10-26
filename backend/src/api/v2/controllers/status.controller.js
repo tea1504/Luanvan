@@ -1,5 +1,4 @@
 const Constants = require("../constants");
-const statusModel = require("../models/status.model");
 const statusService = require("./../services/status.service");
 var fs = require("fs");
 

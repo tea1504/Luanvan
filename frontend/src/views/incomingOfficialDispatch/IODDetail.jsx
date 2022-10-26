@@ -646,7 +646,7 @@ export default function IODDetail() {
       >
         <CModalHeader></CModalHeader>
         <CModalBody className="p-0" style={{ height: '85vh' }}>
-          <ODPreview link={link} />
+          <ODPreview data={link} />
         </CModalBody>
       </CModal>
     </CContainer>

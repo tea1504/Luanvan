@@ -115,7 +115,7 @@ export default {
       DUE_DATE: (m = '') => (m ? `Hạn giải quyết ${m.toLowerCase()}` : 'Hạn giải quyết'),
       EMAIL_ADDRESS: (m = '') => (m ? `Địa chỉ email ${m.toLowerCase()}` : 'Địa chỉ email'),
       FILE_CSV: (m = '') => (m ? `File csv ${m.toLowerCase()}` : 'File csv'),
-      FILE: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
+      FILE: (m = '') => (m ? `Tập tin ${m.toLowerCase()}` : 'Tập tin'),
       FIRST_NAME: (m = '') => (m ? `Tên ${m.toLowerCase()}` : 'Tên'),
       HANDLER: (m = '') =>
         m ? `Cán bộ được phân công xử lý ${m.toLowerCase()}` : 'Cán bộ được phân công',
@@ -146,7 +146,7 @@ export default {
       SIGNER_INFO_POSITION: (m = '') =>
         m ? `Chức vụ cán bộ ký ${m.toLowerCase()}` : 'Chức vụ cán bộ ký',
       SIZE: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
-      STATUS: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
+      STATUS: (m = '') => (m ? `Trạng thái ${m.toLowerCase()}` : 'Trạng thái'),
       SUB_ORGAN: 'Tổ chức cấp dưới',
       SUBJECT: (m = '') => (m ? `Trích yếu ${m.toLowerCase()}` : 'Trích yếu'),
       TIME: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
@@ -177,6 +177,7 @@ export default {
       SELECT_LANGUAGE: '- Chọn ngôn ngữ văn bản đến -',
       SELECT_PRIORITY: '- Chọn độ khẩn văn bản đến -',
       SELECT_SECURITY: '- Chọn độ mật văn bản đến -',
+      SELECT_ORGANIZATION: '- Chọn cơ quan ban hành -',
     },
   },
   Language: {

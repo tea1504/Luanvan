@@ -75,6 +75,10 @@ const Constants = {
       ID: "/:id",
       CREATE_MULTI: "/csv",
     },
+    OfficialDispatch: {
+      ROOT: "/official-dispatch",
+      PROCESS: "/process",
+    },
     IncomingOfficialDispatch: {
       ROOT: "/incoming-official-dispatch",
       SLASH: "/",

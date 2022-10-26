@@ -11,6 +11,7 @@ const officerStatusRouter = require("./officerStatus.router");
 const rightRouter = require("./right.router");
 const organizationRouter = require("./organization.router");
 const IODRouter = require("./incomingOfficialDispatch.router");
+const ODRouter = require("./officialDispatch.router");
 const route = express.Router();
 const authMiddleware = require("./../middlewares/auth.middleware");
 const adminMiddleware = require("./../middlewares/admin.middleware");
@@ -75,6 +76,11 @@ route.use(
   Constants.ApiPath.IncomingOfficialDispatch.ROOT,
   authMiddleware,
   IODRouter
+);
+route.use(
+  Constants.ApiPath.OfficialDispatch.ROOT,
+  authMiddleware,
+  ODRouter
 );
 
 module.exports = route;

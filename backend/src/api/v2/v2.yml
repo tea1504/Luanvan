@@ -3,7 +3,7 @@ info:
   title: E-Office API's Document
   version: "1.0.0"
 servers:
-  - url: http://10.10.32.127:5000/v2
+  - url: http://10.10.35.21:5000/v2
   - url: http://localhost:5000/v2
 components:
   securitySchemes:
@@ -515,6 +515,8 @@ tags:
     description: Trạng thái cán bộ
   - name: Official Dispatch Travel
     description: Công văn đi
+  - name: Official Dispatch
+    description: Công văn
   - name: Organization
     description: Tổ chức
   - name: Priority
@@ -2675,6 +2677,33 @@ paths:
             type: string
           required: true
           description: id
+      responses:
+        200:
+          description: OK
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+  /official-dispatch/process:
+    post:
+      tags:
+        - Official Dispatch
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema: 
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
       responses:
         200:
           description: OK

@@ -204,7 +204,7 @@ class ApiProcessor {
    */
   async fetch(request) {
     this.onBeforeCallback(request)
-
+    if (request.config) ApiProcessor.updateCommonConfig(request.config)
     // create config for each request
     const axiosConfig = await this.createAxiosConfig(request)
     if (__DEV__) {

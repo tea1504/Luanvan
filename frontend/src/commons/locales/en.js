@@ -146,7 +146,7 @@ export default {
       SIGNER_INFO_POSITION: (m = '') =>
         m ? `Chức vụ cán bộ ký ${m.toLowerCase()}` : 'Chức vụ cán bộ ký',
       SIZE: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
-      STATUS: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
+      STATUS: (m = '') => (m ? `Trạng thái ${m.toLowerCase()}` : 'Trạng thái'),
       SUB_ORGAN: 'Tổ chức cấp dưới',
       SUBJECT: (m = '') => (m ? `Trích yếu ${m.toLowerCase()}` : 'Trích yếu'),
       TIME: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
@@ -177,6 +177,7 @@ export default {
       SELECT_LANGUAGE: '- Chọn ngôn ngữ văn bản đến -',
       SELECT_PRIORITY: '- Chọn độ khẩn văn bản đến -',
       SELECT_SECURITY: '- Chọn độ mật văn bản đến -',
+      SELECT_ORGANIZATION: '- Chọn cơ quan ban hành -',
     },
   },
   Language: {

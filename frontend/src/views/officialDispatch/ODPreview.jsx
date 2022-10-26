@@ -2,12 +2,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import DocViewer, { DocViewerRenderers } from 'react-doc-viewer'
 
-function ODPreview({ link }) {
+function ODPreview({ data }) {
   return (
-    // <object data={link} type="application/pdf" className="w-100 h-100">
-    //   <embed src={link} type="application/pdf" />
-    // </object>
-    <DocViewer pluginRenderers={DocViewerRenderers} documents={[{ uri: link }]} />
+    <object data={data} type="application/pdf" className="w-100 h-100">
+      <embed src={data} type="application/pdf" />
+    </object>
+    // <DocViewer pluginRenderers={DocViewerRenderers} documents={[{ uri: data }]} />
   )
 }
 

@@ -14,8 +14,12 @@ import {
   CFormSelect,
   CFormText,
   CImage,
+  CModal,
+  CModalBody,
+  CModalHeader,
   CRow,
   CSpinner,
+  CWidgetStatsF,
 } from '@coreui/react'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -43,6 +47,19 @@ import OfficerService from 'src/services/officer.service'
 import ckEditorConfig from 'src/configs/ckEditor.config'
 import { CKEditor } from '@ckeditor/ckeditor5-react'
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
+import {
+  FaEye,
+  FaFile,
+  FaFileCsv,
+  FaFileDownload,
+  FaFileExcel,
+  FaFileWord,
+  FaImage,
+  FaRegFilePdf,
+  FaTrash,
+  FaVectorSquare,
+} from 'react-icons/fa'
+import IODProcess from './IODProcess'
 
 const service = new IODService()
 const organizationService = new OrganizationService()
@@ -61,6 +78,8 @@ export default function IODCreateOrUpdate() {
   let loggedUser = useSelector((state) => state.user.user)
   if (Helpers.isObjectEmpty(loggedUser))
     loggedUser = JSON.parse(localStorage.getItem(Constants.StorageKeys.USER_INFO))
+  let token = useSelector((state) => state.user.token)
+  if (Helpers.isNullOrEmpty(token)) token = localStorage.getItem(Constants.StorageKeys.ACCESS_TOKEN)
   let loading = useSelector((state) => state.config.loading)
   const navigate = useNavigate()
   const language = useSelector((state) => state.config.language)
@@ -88,7 +107,7 @@ export default function IODCreateOrUpdate() {
     importer: null,
     handler: [],
     file: [],
-    fileTemp: null,
+    fileTemp: [],
     traceHeaderList: [],
   })
   const updateState = (newState) => {
@@ -134,13 +153,15 @@ export default function IODCreateOrUpdate() {
   const [priority, setPriority] = useState([])
   const [security, setSecurity] = useState([])
   const [officer, setOfficer] = useState([])
+  const [link, setLink] = useState('')
+  const [visible, setVisible] = useState(false)
 
   const getState = async (id = '') => {
     if (store.length > 0) {
       const s = store.find((el) => el._id === id)
       if (!s) {
         await getStateFromServer(id)
-      } else
+      } else {
         updateState({
           ...s,
           type: s.type._id,
@@ -154,7 +175,12 @@ export default function IODCreateOrUpdate() {
           arrivalDate: new Date(s.arrivalDate).getTime(),
           dueDate: new Date(s.dueDate).getTime(),
           handler: s.handler.map((el) => el._id),
+          fileTemp: s.file.map((el) => ({
+            ...el,
+            path: `${process.env.REACT_APP_BASE_URL}/${el.path}?token=${token}#toolbar=0`,
+          })),
         })
+      }
     } else {
       await getStateFromServer(id)
     }
@@ -177,6 +203,10 @@ export default function IODCreateOrUpdate() {
         arrivalDate: new Date(result.data.data.arrivalDate).getTime(),
         dueDate: new Date(result.data.data.dueDate).getTime(),
         handler: result.data.data.handler.map((el) => el._id),
+        fileTemp: result.data.data.file.map((el) => ({
+          ...el,
+          path: `${process.env.REACT_APP_BASE_URL}/${el.path}?token=${token}#toolbar=0`,
+        })),
       })
       dispatch(setLoading(false))
     } catch (error) {
@@ -202,6 +232,12 @@ export default function IODCreateOrUpdate() {
           break
       }
     }
+  }
+
+  const update = async (dataFormServer) => {
+    console.log(dataFormServer)
+    updateState(dataFormServer)
+    setVisible(false)
   }
 
   const getOrganization = async () => {
@@ -594,7 +630,10 @@ export default function IODCreateOrUpdate() {
     if (id) {
       const list = id.split('.')
       await getState(list[list.length - 1])
-    } else
+    } else {
+      state.fileTemp.map((el) => {
+        URL.revokeObjectURL(el.path)
+      })
       updateState({
         code: 0,
         issuedDate: 0,
@@ -615,9 +654,10 @@ export default function IODCreateOrUpdate() {
         importer: null,
         handler: [],
         file: [],
-        fileTemp: null,
+        fileTemp: [],
         traceHeaderList: [],
       })
+    }
   }
 
   const handleKeypress = (e) => {
@@ -627,8 +667,110 @@ export default function IODCreateOrUpdate() {
   }
 
   const handleInputFileOnChange = (e) => {
-    const file = Array.from(e.target.files)[0]
-    updateState({ file: file, fileTemp: URL.createObjectURL(file) })
+    const file = Array.from(e.target.files)
+    console.log(file)
+    updateState({
+      file: file,
+      fileTemp: file.map((el, ind) => {
+        return {
+          name: el.name,
+          size: el.size,
+          path: URL.createObjectURL(el) + '#toolbar=0',
+          _id: ind,
+        }
+      }),
+    })
+  }
+
+  const renderFile = () => {
+    const extension = (name) => {
+      const result = {}
+      switch (Helpers.getFileExtension(name)) {
+        case 'pdf':
+          result.icon = <FaRegFilePdf size="2rem" />
+          result.color = 'danger'
+          break
+        case 'doc':
+        case 'docx':
+          result.icon = <FaFileWord size="2rem" />
+          result.color = 'info'
+          break
+        case 'xls':
+        case 'xlsx':
+          result.icon = <FaFileExcel size="2rem" />
+          result.color = 'success'
+          break
+        case 'csv':
+          result.icon = <FaFileCsv size="2rem" />
+          result.color = 'success'
+          break
+        case 'apng':
+        case 'avif':
+        case 'gif':
+        case 'jpg':
+        case 'png':
+        case 'webp':
+          result.icon = <FaImage size="2rem" />
+          result.color = 'warning'
+          break
+        case 'svg':
+          result.icon = <FaVectorSquare size="2rem" />
+          result.color = 'warning'
+          break
+        default:
+          result.icon = <FaFile size="2rem" />
+          result.color = 'dark'
+          break
+      }
+      return result
+    }
+    return (
+      <CRow className="px-0 mx-0" xs={{ cols: 1, gutter: 4 }} md={{ cols: 2 }} lg={{ cols: 4 }}>
+        {state.fileTemp.map((el, ind) => (
+          <CCol xs key={ind}>
+            <CWidgetStatsF
+              icon={extension(el.name).icon}
+              color={extension(el.name).color}
+              padding={false}
+              title={Helpers.formatBytes(el.size)}
+              value={el.name}
+              footer={
+                <CRow xs={{ cols: 2 }}>
+                  <CCol>
+                    <CButton
+                      variant="ghost"
+                      color="secondary"
+                      className="w-100 m-0 p-0"
+                      onClick={() => {
+                        setLink(
+                          `${process.env.REACT_APP_BASE_URL}/${el.path}?token=${token}#toolbar=0`,
+                        )
+                      }}
+                    >
+                      <FaEye /> {Strings.Common.PREVIEW}
+                    </CButton>
+                  </CCol>
+                  <CCol>
+                    <CButton
+                      variant="ghost"
+                      color="secondary"
+                      className="w-100 m-0 p-0"
+                      onClick={() => {
+                        setLink(
+                          `${process.env.REACT_APP_BASE_URL}/${el.path}?token=${token}#toolbar=0`,
+                        )
+                      }}
+                    >
+                      <FaTrash /> {Strings.Common.DELETE}
+                    </CButton>
+                  </CCol>
+                </CRow>
+              }
+            />
+          </CCol>
+        ))}
+      </CRow>
+    )
   }
 
   useEffect(() => {
@@ -687,7 +829,7 @@ export default function IODCreateOrUpdate() {
                     placeholder={Strings.Form.FieldName.ISSUED_DATE(
                       Strings.IncomingOfficialDispatch.NAME,
                     )}
-                    value={Helpers.formatDateForInput(state.issuedDate ?? '')}
+                    value={Helpers.formatDateForInput(state.issuedDate)}
                     onChange={(e) =>
                       updateState({ issuedDate: new Date(e.target.value).getTime() })
                     }
@@ -757,7 +899,7 @@ export default function IODCreateOrUpdate() {
                       Helpers.propName(Strings, Strings.Form.FieldName.ARRIVAL_DATE),
                     )}
                     placeholder={Strings.Form.FieldName.ARRIVAL_DATE}
-                    value={Helpers.formatDateForInput(state.arrivalDate ?? '')}
+                    value={Helpers.formatDateForInput(state.arrivalDate)}
                     onChange={(e) =>
                       updateState({ arrivalDate: new Date(e.target.value).getTime() })
                     }
@@ -1020,7 +1162,7 @@ export default function IODCreateOrUpdate() {
                     placeholder={Strings.Form.FieldName.DUE_DATE(
                       Strings.IncomingOfficialDispatch.NAME,
                     )}
-                    value={Helpers.formatDateForInput(state.dueDate ?? '')}
+                    value={Helpers.formatDateForInput(state.dueDate)}
                     onChange={(e) => updateState({ dueDate: new Date(e.target.value).getTime() })}
                     onKeyPress={handleKeypress}
                   />
@@ -1099,6 +1241,76 @@ export default function IODCreateOrUpdate() {
                       Strings.Form.Validation[error.security](Strings.Security.NAME)}
                   </CFormFeedback>
                 </CCol>
+                {/* ORGANIZATION_IOD */}
+                <CCol xs={12}>
+                  <CFormLabel
+                    htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Organization.CODE)}
+                  >
+                    {Strings.Form.FieldName.ORGANIZATION_IOD}{' '}
+                    <Required mes={Strings.Form.Validation.REQUIRED()} />
+                  </CFormLabel>
+                  <Select
+                    id={Helpers.makeID(Strings.Officer.CODE, Strings.Organization.CODE)}
+                    value={
+                      organ.filter((el) => el.value === state.organ).length > 0
+                        ? organ.filter((el) => el.value === state.organ)[0]
+                        : null
+                    }
+                    options={organ}
+                    placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_ORGANIZATION}
+                    onChange={(selectedItem) => {
+                      if (selectedItem) updateState({ organ: selectedItem.value })
+                      else updateState({ organ: null })
+                    }}
+                    styles={{
+                      control: (provided, state) => ({
+                        ...provided,
+                        borderColor: error.organ
+                          ? Constants.Styles.ERROR_COLOR
+                          : Constants.Styles.BORDER_COLOR,
+                      }),
+                    }}
+                    isClearable={Helpers.isNullOrEmpty(id)}
+                  />
+                  <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
+                    {error.organ && Strings.Form.Validation[error.organ](Strings.Organization.NAME)}
+                  </CFormFeedback>
+                </CCol>
+                {/* FILE */}
+                <CCol xs={12}>
+                  <CFormLabel
+                    htmlFor={Helpers.makeID(
+                      Strings.IncomingOfficialDispatch.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.FILE),
+                    )}
+                  >
+                    {Strings.Form.FieldName.FILE()}{' '}
+                    <Required mes={Strings.Form.Validation.REQUIRED()} />
+                  </CFormLabel>
+                  <CFormInput
+                    invalid={!Helpers.isNullOrEmpty(error.dueDate)}
+                    type="file"
+                    multiple
+                    id={Helpers.makeID(
+                      Strings.IncomingOfficialDispatch.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.FILE),
+                    )}
+                    onChange={handleInputFileOnChange}
+                    onKeyPress={handleKeypress}
+                  />
+                  <CFormFeedback invalid>
+                    {error.dueDate &&
+                      Strings.Form.Validation[error.dueDate](
+                        Strings.Form.FieldName.DUE_DATE(Strings.IncomingOfficialDispatch.NAME),
+                      )}
+                  </CFormFeedback>
+                </CCol>
+                <CCol xs={12}>{renderFile()}</CCol>
+                <CCol xs={12}>
+                  {state.fileTemp.length > 0 && (
+                    <CButton onClick={() => setVisible(true)}>Tự động nhập liệu</CButton>
+                  )}
+                </CCol>
               </CForm>
             </CCardBody>
             <CCardFooter>
@@ -1136,6 +1348,20 @@ export default function IODCreateOrUpdate() {
           </CCard>
         </CCol>
       </CRow>
+      <CModal
+        alignment="center"
+        size="xl"
+        visible={visible}
+        onClose={() => {
+          setVisible(false)
+        }}
+        fullscreen={Helpers.isNullOrEmpty(id)}
+      >
+        <CModalHeader></CModalHeader>
+        <CModalBody>
+          <IODProcess data={state.file} dataTemp={state.fileTemp} updateData={update} />
+        </CModalBody>
+      </CModal>
     </CContainer>
   )
 }
