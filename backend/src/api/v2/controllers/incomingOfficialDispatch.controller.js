@@ -74,7 +74,7 @@ var incomingOfficialDispatchController = {
    */
   postOne: async (req, res, next) => {
     try {
-      const file = req.files;
+      const files = req.files;
       var {
         code,
         issuedDate,
@@ -86,8 +86,6 @@ var incomingOfficialDispatchController = {
         signerInfoName,
         signerInfoPosition,
         dueDate,
-        arrivalNumber,
-        arrivalDate,
         priority,
         security,
         organ,
@@ -125,7 +123,6 @@ var incomingOfficialDispatchController = {
           status: Constants.ApiCode.BAD_REQUEST,
           message: Constants.String.Message.ERR_400(Constants.String.IOD.TYPE),
         });
-      if (!approver) approver = null;
       if (!handler) handler = [];
       const result = await service.postOne(
         req.userID,
@@ -140,15 +137,13 @@ var incomingOfficialDispatchController = {
           signerInfoName,
           signerInfoPosition,
           dueDate,
-          arrivalNumber,
-          arrivalDate,
           priority,
           security,
           organ,
           approver,
           handler,
         },
-        file
+        files
       );
       return res.status(result.status).json(result);
     } catch (error) {

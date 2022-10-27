@@ -30,6 +30,7 @@ const Constants = {
       ID: "/:id",
       CREATE_MULTI: "/csv",
       ORGAN_ID: "/organ/:id",
+      USER_ID: "/user",
     },
     Type: {
       ROOT: "/types",

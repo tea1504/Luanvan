@@ -93,7 +93,7 @@ export default {
       __V: 'Phiên bản',
       _ID: 'ID',
       APPROVE_OD: 'Duyệt công văn',
-      APPROVER: (m = '') => (m ? `Cán bộ duyệt ${m.toLowerCase()}` : 'Cán bộ duyệt'),
+      APPROVER: (m = '') => (m ? `Cán bộ duyệt ${m.toLowerCase()}` : 'Chọn cán bộ duyệt văn bản'),
       ARRIVAL_DATE: 'Ngày đến',
       ARRIVAL_NUMBER: 'Số đến',
       CHECK_BOX_CSV: 'File có tiêu đề',
@@ -115,7 +115,7 @@ export default {
       DUE_DATE: (m = '') => (m ? `Hạn giải quyết ${m.toLowerCase()}` : 'Hạn giải quyết'),
       EMAIL_ADDRESS: (m = '') => (m ? `Địa chỉ email ${m.toLowerCase()}` : 'Địa chỉ email'),
       FILE_CSV: (m = '') => (m ? `File csv ${m.toLowerCase()}` : 'File csv'),
-      FILE: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
+      FILE: (m = '') => (m ? `Tập tin ${m.toLowerCase()}` : 'Tập tin'),
       FIRST_NAME: (m = '') => (m ? `Tên ${m.toLowerCase()}` : 'Tên'),
       HANDLER: (m = '') =>
         m ? `Cán bộ được phân công xử lý ${m.toLowerCase()}` : 'Cán bộ được phân công',
@@ -176,6 +176,7 @@ export default {
       SELECT_TYPE: '- Chọn loại văn bản đến -',
       SELECT_LANGUAGE: '- Chọn ngôn ngữ văn bản đến -',
       SELECT_PRIORITY: '- Chọn độ khẩn văn bản đến -',
+      SELECT_APPROVER: '- Chọn cán bộ duyệt -',
       SELECT_SECURITY: '- Chọn độ mật văn bản đến -',
       SELECT_ORGANIZATION: '- Chọn cơ quan ban hành -',
       ARRIVAL_NUMBER: 'Số đến được điền tự động',
@@ -267,6 +268,7 @@ export default {
   },
   Priority: {
     NAME: 'Độ khẩn',
+    CODE: 'PRIORITY',
     Common: {
       DESCRIPTION:
         'Mỗi cột dữ liệu phải cách nhau bởi dấu <code>,</code>.<br /> Ví dụ:<br /> <code>Độ khẩn 1, Cần xử lý ngay, #123456</code> <br/> <code>Độ khẩn 2, Xử lý trong ngày,</code> <br/> <code>Không khẩn,,</code>',

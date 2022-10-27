@@ -212,6 +212,39 @@ var officerService = {
     }
   },
   /**
+   * @param {string} id
+   * @param {number} limit
+   * @param {number} pageNumber
+   * @param {string} filter
+   * @returns {import("./../interfaces").ResponseResult}
+   */
+  getManyByUser: async (id, limit = 10, pageNumber = 1, filter = "") => {
+    try {
+      const user = await model.findById(id);
+      return officerService.getManyByOrganId(
+        user.organ._id.toString(),
+        limit,
+        pageNumber,
+        filter
+      );
+    } catch (error) {
+      switch (error.name) {
+        case "CastError":
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.ERR_406,
+            data: { error: error.message },
+          };
+        default:
+          return {
+            status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
+            message: Constants.String.Message.ERR_500,
+            data: { error: error.message },
+          };
+      }
+    }
+  },
+  /**
    * @param {import("./../interfaces").OfficerModel} data
    * @returns {import("./../interfaces").ResponseResult}
    */
@@ -254,7 +287,7 @@ var officerService = {
         const status = await officerStatusModel.findOne({ name: "NEW" });
         data.status = status._id;
       } else {
-        const status = await officerStatusModel.findById(data.organ);
+        const status = await officerStatusModel.findById(data.status);
         if (!status)
           return {
             status: Constants.ApiCode.NOT_FOUND,
@@ -505,7 +538,6 @@ var officerService = {
             Constants.String.Officer.PHONE_NUMBER
           ),
         };
-      console.log(file);
       if (file)
         data.file = {
           name: file.originalname,

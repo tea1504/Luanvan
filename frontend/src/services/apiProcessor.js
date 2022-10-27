@@ -207,6 +207,8 @@ class ApiProcessor {
     if (request.config) ApiProcessor.updateCommonConfig(request.config)
     // create config for each request
     const axiosConfig = await this.createAxiosConfig(request)
+    console.log(request)
+    console.log(axiosConfig)
     if (__DEV__) {
       const { method, path, requestId } = request
       console.log(
@@ -253,7 +255,8 @@ class ApiProcessor {
     }
     // data (IMPORTANT: not set data if method is GET)
     if (axiosConfig.method !== Method.GET) {
-      axiosConfig.data = { ...axiosConfig.data, ...request.data }
+      // axiosConfig.data = { ...axiosConfig.data, ...request.data }
+      axiosConfig.data = request.data
       // authentication
       if (request.secure !== false) {
         // Add logic for authentication

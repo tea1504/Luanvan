@@ -20,6 +20,12 @@ class OfficerService extends BaseService {
     })
     return result
   }
+  async getManyByUser(limit = 10, pageNumber = 1, filter = '') {
+    const result = await this.api.get({
+      path: Constants.ApiPath.GET_OFFICERS_BY_USER(limit, pageNumber, filter),
+    })
+    return result
+  }
   async createOne(type) {
     const result = await this.api.postFormData({
       path: Constants.ApiPath.CREATE_OFFICER,

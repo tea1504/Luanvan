@@ -102,13 +102,10 @@ export default function IODCreateOrUpdate() {
     signerInfoName: '',
     signerInfoPosition: '',
     dueDate: 0,
-    arrivalNumber: 0,
-    arrivalDate: 0,
     priority: null,
     security: null,
     organ: null,
     approver: null,
-    importer: null,
     handler: [],
     file: [],
     fileTemp: [],
@@ -132,13 +129,10 @@ export default function IODCreateOrUpdate() {
     signerInfoName: null,
     signerInfoPosition: null,
     dueDate: null,
-    arrivalNumber: null,
-    arrivalDate: null,
     priority: null,
     security: null,
     organ: null,
     approver: null,
-    importer: null,
     handler: null,
     file: null,
     traceHeaderList: null,
@@ -162,6 +156,7 @@ export default function IODCreateOrUpdate() {
     process: false,
     init: Helpers.isNullOrEmpty(id),
   })
+
   const updateVisible = (newState) => {
     setVisible((prevState) => ({
       ...prevState,
@@ -382,11 +377,15 @@ export default function IODCreateOrUpdate() {
     }
   }
 
-  const getNewArrivalNumber = async () => {
+  const getOfficer = async () => {
     try {
       dispatch(setLoading(true))
-      const result = await service.getNewArrivalNumber()
-      updateState({ arrivalNumber: result.data.data })
+      setOfficer([])
+      const result = await officerService.getManyByUser(10000, 1)
+      result.data.data.data.map((el) => {
+        var item = { value: el._id, label: `${el.lastName} ${el.firstName} (${el.position})` }
+        setOfficer((prevState) => [...prevState, item])
+      })
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
@@ -491,13 +490,10 @@ export default function IODCreateOrUpdate() {
       signerInfoName: null,
       signerInfoPosition: null,
       dueDate: null,
-      arrivalNumber: null,
-      arrivalDate: null,
       priority: null,
       security: null,
       organ: null,
       approver: null,
-      importer: null,
       handler: null,
       file: null,
       traceHeaderList: null,
@@ -523,13 +519,10 @@ export default function IODCreateOrUpdate() {
             signerInfoName: '',
             signerInfoPosition: '',
             dueDate: 0,
-            arrivalNumber: 0,
-            arrivalDate: 0,
             priority: null,
             security: null,
             organ: null,
             approver: null,
-            importer: null,
             handler: [],
             file: [],
             fileTemp: [],
@@ -570,13 +563,10 @@ export default function IODCreateOrUpdate() {
         signerInfoName: '',
         signerInfoPosition: '',
         dueDate: 0,
-        arrivalNumber: 0,
-        arrivalDate: 0,
         priority: null,
         security: null,
         organ: null,
         approver: null,
-        importer: null,
         handler: [],
         file: [],
         fileTemp: [],
@@ -593,7 +583,6 @@ export default function IODCreateOrUpdate() {
 
   const handleInputFileOnChange = (e) => {
     const file = Array.from(e.target.files)
-    console.log(file)
     updateState({
       file: file,
       fileTemp: file.map((el, ind) => {
@@ -708,6 +697,7 @@ export default function IODCreateOrUpdate() {
       getLanguage()
       getPriority()
       getSecurity()
+      getOfficer()
     } else {
       if (!loggedUser.right.createCategories) navigate(Screens.E403)
       getOrganization()
@@ -716,7 +706,7 @@ export default function IODCreateOrUpdate() {
       getLanguage()
       getPriority()
       getSecurity()
-      getNewArrivalNumber()
+      getOfficer()
     }
     return () => {
       URL.revokeObjectURL(state.fileTemp)
@@ -849,70 +839,6 @@ export default function IODCreateOrUpdate() {
                       }}
                     ></div>
                   </CFormText>
-                </CCol>
-                {/* ARRIVAL_DATE */}
-                <CCol xs={12} md={6}>
-                  <CFormLabel
-                    htmlFor={Helpers.makeID(
-                      Strings.IncomingOfficialDispatch.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.ARRIVAL_DATE),
-                    )}
-                  >
-                    {Strings.Form.FieldName.ARRIVAL_DATE}{' '}
-                    <Required mes={Strings.Form.Validation.REQUIRED()} />
-                  </CFormLabel>
-                  <CFormInput
-                    invalid={!Helpers.isNullOrEmpty(error.arrivalDate)}
-                    type="date"
-                    id={Helpers.makeID(
-                      Strings.IncomingOfficialDispatch.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.ARRIVAL_DATE),
-                    )}
-                    placeholder={Strings.Form.FieldName.ARRIVAL_DATE}
-                    value={Helpers.formatDateForInput(state.arrivalDate)}
-                    onChange={(e) =>
-                      updateState({ arrivalDate: new Date(e.target.value).getTime() })
-                    }
-                    onKeyPress={handleKeypress}
-                  />
-                  <CFormFeedback invalid>
-                    {error.arrivalDate &&
-                      Strings.Form.Validation[error.arrivalDate](
-                        Strings.Form.FieldName.ISSUED_DATE(Strings.IncomingOfficialDispatch.NAME),
-                      )}
-                  </CFormFeedback>
-                </CCol>
-                {/* ARRIVAL_NUMBER */}
-                <CCol xs={12} md={6}>
-                  <CFormLabel
-                    htmlFor={Helpers.makeID(
-                      Strings.IncomingOfficialDispatch.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.ARRIVAL_NUMBER),
-                    )}
-                  >
-                    {Strings.Form.FieldName.ARRIVAL_NUMBER}{' '}
-                    <Required mes={Strings.Form.Validation.REQUIRED()} />
-                  </CFormLabel>
-                  <CFormInput
-                    invalid={!Helpers.isNullOrEmpty(error.arrivalNumber)}
-                    type="number"
-                    min={1}
-                    id={Helpers.makeID(
-                      Strings.IncomingOfficialDispatch.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.ARRIVAL_NUMBER),
-                    )}
-                    placeholder={Strings.Form.FieldName.ARRIVAL_NUMBER}
-                    value={state.arrivalNumber}
-                    onChange={(e) => updateState({ arrivalNumber: parseInt(e.target.value) })}
-                    onKeyPress={handleKeypress}
-                  />
-                  <CFormFeedback invalid>
-                    {error.arrivalNumber &&
-                      Strings.Form.Validation[error.arrivalNumber](
-                        Strings.Form.FieldName.ARRIVAL_NUMBER,
-                      )}
-                  </CFormFeedback>
-                  <CFormText>{Strings.IncomingOfficialDispatch.Common.ARRIVAL_NUMBER}</CFormText>
                 </CCol>
                 {/* LANGUAGE */}
                 <CCol xs={12} md={6}>
@@ -1248,6 +1174,40 @@ export default function IODCreateOrUpdate() {
                       Tự động nhập liệu
                     </CButton>
                   )}
+                </CCol>
+                {/* PRIORITY */}
+                <CCol xs={12}>
+                  <CFormLabel htmlFor={Helpers.makeID(Strings.IncomingOfficialDispatch.CODE, Strings.Officer.CODE)}>
+                    {Strings.Form.FieldName.APPROVER()}{' '}
+                    <Required mes={Strings.Form.Validation.REQUIRED()} />
+                  </CFormLabel>
+                  <Select
+                    id={Helpers.makeID(Strings.IncomingOfficialDispatch.CODE, Strings.Officer.CODE)}
+                    value={
+                      officer.filter((el) => el.value === state.approver).length > 0
+                        ? officer.filter((el) => el.value === state.approver)[0]
+                        : null
+                    }
+                    options={officer}
+                    placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_APPROVER}
+                    onChange={(selectedItem) => {
+                      if (selectedItem) updateState({ approver: selectedItem.value })
+                      else updateState({ approver: null })
+                    }}
+                    styles={{
+                      control: (provided, state) => ({
+                        ...provided,
+                        borderColor: error.priority
+                          ? Constants.Styles.ERROR_COLOR
+                          : Constants.Styles.BORDER_COLOR,
+                      }),
+                    }}
+                    isClearable={Helpers.isNullOrEmpty(id)}
+                  />
+                  <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
+                    {error.priority &&
+                      Strings.Form.Validation[error.priority](Strings.Priority.NAME)}
+                  </CFormFeedback>
                 </CCol>
               </CForm>
             </CCardBody>

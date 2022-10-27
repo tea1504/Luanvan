@@ -1,5 +1,6 @@
 const Constants = require("../constants");
 const officerModel = require("../models/officer.model");
+const statusModel = require("../models/status.model");
 const incomingOfficialDispatchModel = require("./../models/incomingOfficialDispatch.model");
 const model = require("./../models/incomingOfficialDispatch.model");
 
@@ -197,9 +198,38 @@ var incomingOfficialDispatchService = {
       };
     }
   },
-  postOne: async (id, data, file) => {
+  postOne: async (id, data, files) => {
     try {
       data.importer = id;
+      if (!data.approver || data.approver === "null") delete data.approver;
+      data.arrivalDate = new Date().getTime();
+      const status = await statusModel.findOne({
+        name: "PENDING",
+        deleted: false,
+      });
+      if (!status)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Status._),
+        };
+      data.traceHeaderList = [];
+      data.traceHeaderList.push({
+        officer: id,
+        command: status.description,
+        date: new Date().getTime(),
+        header: status.name,
+        status: status._id.toString(),
+      });
+      data.file = [];
+      console.log(files);
+      files.map((el) => {
+        data.file.push({
+          name: el.originalname,
+          path: "uploads/" + data.security + "/" + el.filename,
+          typeFile: el.mimetype,
+          size: el.size,
+        });
+      });
       const result = await model.create(data);
       return {
         status: Constants.ApiCode.SUCCESS,

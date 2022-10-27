@@ -33,10 +33,19 @@ class IODService extends BaseService {
   //   return result
   // }
   async createOne(data) {
-    //FormData
+    var formData = new FormData()
+    for (const [key, value] of Object.entries(data)) {
+      if (key == 'handler' || key == 'file') {
+        Array.from(value).map((el) => {
+          formData.append(key, el)
+        })
+      } else {
+        formData.append(key, value)
+      }
+    }
     const result = await this.api.postFormData({
       path: Constants.ApiPath.CREATE_IOD,
-      data: { ...data, ...file },
+      data: formData,
     })
     return result
   }

@@ -105,6 +105,8 @@ const Constants = {
       `/officers?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
     GET_OFFICERS_BY_ORGAN_ID: (id = '', limit = 10, pageNumber = 1, filter = '') =>
       `/officers/organ/${id}?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+    GET_OFFICERS_BY_USER: (limit = 10, pageNumber = 1, filter = '') =>
+      `/officers/user?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
     GET_OFFICER: (id = '') => `/officers/` + id,
     CREATE_OFFICER: '/officers',
     CREATE_OFFICERS: '/officers/csv',
@@ -119,7 +121,7 @@ const Constants = {
       `/incoming-official-dispatch/organ/${id}?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
     GET_IOD: (id = '') => `/incoming-official-dispatch/` + id,
     GET_FILE_IOD: (id = '') => `/incoming-official-dispatch/file/` + id,
-    GET_NEW_ARRIVAL_NUMBER:"/incoming-official-dispatch/new-arrival-number/",
+    GET_NEW_ARRIVAL_NUMBER: '/incoming-official-dispatch/new-arrival-number/',
     CREATE_IOD: '/incoming-official-dispatch',
     CREATE_IODS: '/incoming-official-dispatch/csv',
     UPDATE_IOD: (id = '') => '/incoming-official-dispatch/' + id,

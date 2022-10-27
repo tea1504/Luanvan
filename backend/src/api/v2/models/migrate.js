@@ -588,10 +588,62 @@ async function start() {
   console.log("Migrate Status");
   {
     await _status.deleteMany();
-    await _status.create({
-      _id: "status000001",
-      name: "Status 1",
-    });
+    await _status.create([
+      {
+        _id: "status000001",
+        name: "PENDING",
+        description: "Chờ duyệt/cấp số",
+        color: Helpers.generateColor(),
+      },
+      {
+        _id: "status000002",
+        name: "APPROVED",
+        description: "Đã duyệt/cấp số",
+        color: Helpers.generateColor(),
+      },
+      {
+        _id: "status000003",
+        name: "PROGRESSING",
+        description: "Chờ xử lý",
+        color: Helpers.generateColor(),
+      },
+      {
+        _id: "status000004",
+        name: "PROGRESSED",
+        description: "Đã xử lý",
+        color: Helpers.generateColor(),
+      },
+      {
+        _id: "status000005",
+        name: "REFUSE",
+        description: "Từ chối",
+        color: Helpers.generateColor(),
+      },
+      {
+        _id: "status000006",
+        name: "LATE",
+        description: "Trễ hạn xử lý",
+        color: Helpers.generateColor(),
+      },
+      {
+        _id: "status000007",
+        name: "IMPLEMENT",
+        description: "Đã triển khai",
+        color: Helpers.generateColor(),
+      },
+      {
+        _id: "status000008",
+        name: "REPORTED",
+        description: "Đã báo cáo",
+        color: Helpers.generateColor(),
+      },
+      {
+        _id: "status000009",
+        name: "RELEASE",
+        description: "Đã phát hành",
+        color: Helpers.generateColor(),
+      },
+    ]);
   }
 
   console.log("Migrate Incoming Official Dispatch");
@@ -630,7 +682,7 @@ async function start() {
             command: "người nào đó đã thêm",
             date: Date.now(),
             header: "Thêm mới",
-            status: "status000001",
+            status: "status000007",
           },
         ],
         file: [
@@ -692,7 +744,7 @@ async function start() {
             command: "người nào đó đã thêm",
             date: Date.now(),
             header: "Thêm mới",
-            status: "status000001",
+            status: "status000007",
           },
         ],
         file: [

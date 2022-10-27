@@ -61,6 +61,25 @@ const officerController = {
    * @param {import("express").Response} res
    * @param {import("express").RequestHandler} next
    */
+  getManyByUser: async (req, res, next) => {
+    try {
+      const { pageNumber, limit, filter } = req.query;
+      const result = await service.getManyByUser(
+        req.userID,
+        parseInt(limit),
+        parseInt(pageNumber),
+        filter
+      );
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
   postOne: async (req, res, next) => {
     try {
       const file = req.file;

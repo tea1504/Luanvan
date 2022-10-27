@@ -51,7 +51,9 @@ export default [
   },
   {
     name: Strings.Form.FieldName.SUBJECT(),
-    selector: (row) => Helpers.trimString(row.subject, 80),
+    cell: (row) => (
+      <div title={row.subject}>{Helpers.trimString(Helpers.htmlDecode(row.subject), 80)}</div>
+    ),
     sortable: true,
     maxWidth: '500px',
   },
@@ -71,7 +73,7 @@ export default [
           }}
           shape="rounded-pill"
         >
-          {traceHeaderListSorted.status.name}
+          {traceHeaderListSorted.status.description}
         </CBadge>
       )
     },

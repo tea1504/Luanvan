@@ -30,6 +30,11 @@ route.get(
   readCategories,
   controller.getManyByOrganId
 );
+route.get(
+  Constants.ApiPath.Officers.USER_ID,
+  readCategories,
+  controller.getManyByUser
+);
 route.get(Constants.ApiPath.Officers.ID, readCategories, controller.getOne);
 route.post(
   Constants.ApiPath.Officers.SLASH,

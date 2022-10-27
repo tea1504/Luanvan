@@ -113,10 +113,6 @@ const incomingOfficialDispatchSchema = new mongoose.Schema(
     },
     arrivalNumber: {
       type: Number,
-      required: [
-        true,
-        Constants.String.Message.REQUIRED(Constants.String.IOD.ARRIVAL_NUMBER),
-      ],
     },
     arrivalDate: {
       type: Date,
