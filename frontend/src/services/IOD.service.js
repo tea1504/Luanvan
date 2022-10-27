@@ -20,46 +20,52 @@ class IODService extends BaseService {
     })
     return result
   }
-  async getManyByOrganId(id, limit = 10, pageNumber = 1, filter = '') {
+  async getNewArrivalNumber(id) {
     const result = await this.api.get({
-      path: Constants.ApiPath.GET_OFFICERS_BY_ORGAN_ID(id, limit, pageNumber, filter),
+      path: Constants.ApiPath.GET_NEW_ARRIVAL_NUMBER,
     })
     return result
   }
-  async createOne(type) {
-    const result = await this.api.postFormData({
-      path: Constants.ApiPath.CREATE_OFFICER,
-      data: type,
-    })
-    return result
-  }
-  async createMany(data) {
-    const result = await this.api.postFormData({
-      path: Constants.ApiPath.CREATE_OFFICERS,
-      data: data,
-    })
-    return result
-  }
-  async updateOne(id, type) {
-    const result = await this.api.putFormData({
-      path: Constants.ApiPath.UPDATE_OFFICER(id),
-      data: type,
-    })
-    return result
-  }
-  async deleteOne(id) {
-    const result = await this.api.delete({
-      path: Constants.ApiPath.DELETE_OFFICER(id),
-    })
-    return result
-  }
-  async deleteMany(ids) {
-    const result = await this.api.delete({
-      path: Constants.ApiPath.DELETE_OFFICERS,
-      data: { ids },
-    })
-    return result
-  }
+  // async getManyByOrganId(id, limit = 10, pageNumber = 1, filter = '') {
+  //   const result = await this.api.get({
+  //     path: Constants.ApiPath.GET_OFFICERS_BY_ORGAN_ID(id, limit, pageNumber, filter),
+  //   })
+  //   return result
+  // }
+  // async createOne(type) {
+  //   const result = await this.api.postFormData({
+  //     path: Constants.ApiPath.CREATE_OFFICER,
+  //     data: type,
+  //   })
+  //   return result
+  // }
+  // async createMany(data) {
+  //   const result = await this.api.postFormData({
+  //     path: Constants.ApiPath.CREATE_OFFICERS,
+  //     data: data,
+  //   })
+  //   return result
+  // }
+  // async updateOne(id, type) {
+  //   const result = await this.api.putFormData({
+  //     path: Constants.ApiPath.UPDATE_OFFICER(id),
+  //     data: type,
+  //   })
+  //   return result
+  // }
+  // async deleteOne(id) {
+  //   const result = await this.api.delete({
+  //     path: Constants.ApiPath.DELETE_OFFICER(id),
+  //   })
+  //   return result
+  // }
+  // async deleteMany(ids) {
+  //   const result = await this.api.delete({
+  //     path: Constants.ApiPath.DELETE_OFFICERS,
+  //     data: { ids },
+  //   })
+  //   return result
+  // }
 }
 
 export default IODService

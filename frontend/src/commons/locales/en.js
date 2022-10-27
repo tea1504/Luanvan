@@ -178,6 +178,7 @@ export default {
       SELECT_PRIORITY: '- Chọn độ khẩn văn bản đến -',
       SELECT_SECURITY: '- Chọn độ mật văn bản đến -',
       SELECT_ORGANIZATION: '- Chọn cơ quan ban hành -',
+      ARRIVAL_NUMBER: 'Số đến được điền tự động',
     },
   },
   Language: {

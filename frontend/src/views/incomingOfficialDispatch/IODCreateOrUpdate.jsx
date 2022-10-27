@@ -60,6 +60,8 @@ import {
   FaVectorSquare,
 } from 'react-icons/fa'
 import IODProcess from './IODProcess'
+import { Resizable } from 're-resizable'
+import ODPreview from '../officialDispatch/ODPreview'
 
 const service = new IODService()
 const organizationService = new OrganizationService()
@@ -177,7 +179,7 @@ export default function IODCreateOrUpdate() {
           handler: s.handler.map((el) => el._id),
           fileTemp: s.file.map((el) => ({
             ...el,
-            path: `${process.env.REACT_APP_BASE_URL}/${el.path}?token=${token}#toolbar=0`,
+            path: `${el.path}`,
           })),
         })
       }
@@ -205,7 +207,7 @@ export default function IODCreateOrUpdate() {
         handler: result.data.data.handler.map((el) => el._id),
         fileTemp: result.data.data.file.map((el) => ({
           ...el,
-          path: `${process.env.REACT_APP_BASE_URL}/${el.path}?token=${token}#toolbar=0`,
+          path: `${el.path}`,
         })),
       })
       dispatch(setLoading(false))
@@ -235,7 +237,6 @@ export default function IODCreateOrUpdate() {
   }
 
   const update = async (dataFormServer) => {
-    console.log(dataFormServer)
     updateState(dataFormServer)
     setVisible(false)
   }
@@ -424,6 +425,37 @@ export default function IODCreateOrUpdate() {
         var item = { value: el._id, label: `${el.name}` }
         setSecurity((prevState) => [...prevState, item])
       })
+      dispatch(setLoading(false))
+    } catch (error) {
+      dispatch(setLoading(false))
+      switch (error.status) {
+        case 401:
+          MySwal.fire({
+            title: Strings.Message.COMMON_ERROR,
+            icon: 'error',
+            text: error.message,
+          }).then(() => {
+            localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
+            localStorage.clear(Constants.StorageKeys.USER_INFO)
+            navigate(Screens.LOGIN)
+          })
+          break
+        default:
+          MySwal.fire({
+            title: Strings.Message.COMMON_ERROR,
+            icon: 'error',
+            text: error.message,
+          })
+          break
+      }
+    }
+  }
+
+  const getNewArrivalNumber = async () => {
+    try {
+      dispatch(setLoading(true))
+      const result = await service.getNewArrivalNumber()
+      updateState({ arrivalNumber: result.data.data })
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
@@ -792,6 +824,7 @@ export default function IODCreateOrUpdate() {
       getLanguage()
       getPriority()
       getSecurity()
+      getNewArrivalNumber()
     }
     return () => {
       URL.revokeObjectURL(state.fileTemp)
@@ -799,14 +832,24 @@ export default function IODCreateOrUpdate() {
   }, [])
 
   return (
-    <CContainer>
+    <CContainer fluid>
       <CRow>
+        {link && (
+          <Resizable defaultSize={{ width: '50%' }} className="h-100 d-none d-md-inline">
+            <CCard style={{ height: '75vh' }}>
+              <ODPreview data={link} />
+            </CCard>
+          </Resizable>
+        )}
         <CCol>
-          <CCard className="mb-3 border-secondary border-top-5">
+          <CCard
+            className="mb-3 border-secondary border-top-5"
+            style={{ height: '75vh', paddingBottom: '10px' }}
+          >
             <CCardHeader className="text-center py-3" component="h3">
               {Strings.IncomingOfficialDispatch.NAME}
             </CCardHeader>
-            <CCardBody>
+            <CCardBody style={{ height: '60vh', overflow: 'auto' }}>
               <CForm noValidate className="row g-3">
                 {/* ISSUED_DATE */}
                 <CCol xs={12}>
@@ -942,6 +985,7 @@ export default function IODCreateOrUpdate() {
                         Strings.Form.FieldName.ARRIVAL_NUMBER,
                       )}
                   </CFormFeedback>
+                  <CFormText>{Strings.IncomingOfficialDispatch.Common.ARRIVAL_NUMBER}</CFormText>
                 </CCol>
                 {/* TYPE */}
                 <CCol xs={12}>

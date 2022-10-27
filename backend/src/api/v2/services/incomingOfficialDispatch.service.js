@@ -1,5 +1,6 @@
 const Constants = require("../constants");
 const officerModel = require("../models/officer.model");
+const incomingOfficialDispatchModel = require("./../models/incomingOfficialDispatch.model");
 const model = require("./../models/incomingOfficialDispatch.model");
 
 var incomingOfficialDispatchService = {
@@ -10,10 +11,15 @@ var incomingOfficialDispatchService = {
     filter = ""
   ) => {
     try {
-      const organID = await officerModel.findById(userID);
+      const user = await officerModel.findById(userID, { deleted: false });
+      if (!user)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Officer._),
+        };
       const result = {};
       const total = await model.countDocuments({
-        organ: organID.organ,
+        organ: user.organ,
         deleted: false,
       });
       let startIndex = (pageNumber - 1) * limit;
@@ -34,7 +40,7 @@ var incomingOfficialDispatchService = {
       result.rowsPerPage = limit;
       result.data = await model
         .find({
-          organ: organID.organ,
+          organ: user.organ,
           deleted: false,
         })
         .populate("type")
@@ -127,7 +133,6 @@ var incomingOfficialDispatchService = {
       for (var i = 0; i < item.file.length; i++) {
         if (item.file[i]._id.toString() === id) result = item.file[i];
       }
-      console.log(result);
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.GET_200(Constants.String.Language._),
@@ -148,6 +153,46 @@ var incomingOfficialDispatchService = {
             data: { error: error.message },
           };
       }
+    }
+  },
+  getNewArrivalNumber: async (userID) => {
+    try {
+      const date = new Date();
+      const user = await officerModel.findById(userID, { deleted: false });
+      if (!user)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Officer._),
+        };
+      const IOD = await incomingOfficialDispatchModel
+        .findOne({
+          organ: user.organ,
+          arrivalDate: {
+            $gte: new Date(date.getFullYear() + "-1-1"),
+            $lte: new Date(date.getFullYear() + "-12-31"),
+          },
+          deleted: false,
+        })
+        .sort({ arrivalNumber: -1 });
+      if (!IOD)
+        return {
+          status: Constants.ApiCode.SUCCESS,
+          message: Constants.String.Message.GET_200(
+            Constants.String.IOD.ARRIVAL_NUMBER
+          ),
+          data: 1,
+        };
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.GET_200(Constants.String.IOD.ARRIVAL_NUMBER),
+        data: IOD.arrivalNumber + 1,
+      };
+    } catch (error) {
+      return {
+        status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
+        message: Constants.String.Message.ERR_500,
+        data: { error: error.message },
+      };
     }
   },
 };

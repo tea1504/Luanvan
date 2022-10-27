@@ -31,7 +31,7 @@ function IODProcess({ data, dataTemp, updateData }) {
   const [toast, setToast] = useState()
 
   const exampleToast = (message) => (
-    <CToast delay={500}>
+    <CToast>
       <CToastHeader closeButton>
         <svg
           className="rounded me-2"
@@ -54,20 +54,21 @@ function IODProcess({ data, dataTemp, updateData }) {
   const handleClickButton = async () => {
     try {
       dispatch(setLoading(true))
-      const result = await service.api.postFormData({
-        path: Constants.ApiPath.POST_PROCESS_OD,
-        data: { file: data[state] },
-        config: {
-          onDownloadProgress: (progressEvent) => {
-            setToast(exampleToast(progressEvent.loaded))
+      const result = await service.api
+        .postFormData({
+          path: Constants.ApiPath.POST_PROCESS_OD,
+          data: { file: data[state] },
+          config: {
+            onDownloadProgress: (progressEvent) => {
+              setToast(exampleToast(progressEvent.loaded))
+            },
           },
-        },
-      })
-      console.log(JSON.parse(result.data.split('#')[1]))
+        })
       updateData(JSON.parse(result.data.split('#')[1]).data)
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
+      console.log(error)
       switch (error.status) {
         case 401:
           MySwal.fire({

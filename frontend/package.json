@@ -44,6 +44,7 @@
     "js-cookie": "^3.0.1",
     "js-file-download": "^0.4.12",
     "prop-types": "^15.8.1",
+    "re-resizable": "^6.9.9",
     "react": "^18.0.2",
     "react-app-polyfill": "^3.0.0",
     "react-calendar": "^3.8.0",

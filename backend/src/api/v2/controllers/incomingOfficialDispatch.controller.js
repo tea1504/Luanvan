@@ -49,8 +49,20 @@ var incomingOfficialDispatchController = {
       list = id.split(".");
       const result = await service.getFile(list[list.length - 1]);
       const file = path.join(__dirname, "../../../../public", result.data.path);
-      console.log(file);
       return res.status(result.status).download(file, result.data.name);
+    } catch (error) {
+      return next(error);
+    }
+  },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
+  getNewArrivalNumber: async (req, res, next) => {
+    try {
+      const result = await service.getNewArrivalNumber(req.userID);
+      return res.status(result.status).json(result);
     } catch (error) {
       return next(error);
     }

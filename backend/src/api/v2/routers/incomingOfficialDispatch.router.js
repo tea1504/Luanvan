@@ -5,6 +5,7 @@ const multer = require("multer");
 const path = require("path");
 const controller = require("./../controllers/incomingOfficialDispatch.controller")
 const readOD = require("../middlewares/readOD.middleware")
+const createOD = require("../middlewares/createOD.middleware")
 
 
 var storage = multer.diskStorage({
@@ -30,6 +31,11 @@ route.get(
   Constants.ApiPath.IncomingOfficialDispatch.FILE,
   readOD,
   controller.getFile
+);
+route.get(
+  Constants.ApiPath.IncomingOfficialDispatch.GET_ARRIVAL_NUMBER,
+  createOD,
+  controller.getNewArrivalNumber
 );
 route.get(
   Constants.ApiPath.IncomingOfficialDispatch.ID,

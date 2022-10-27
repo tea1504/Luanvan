@@ -553,7 +553,6 @@ const Helpers = {
     return luma < 140 ? '#ffffff' : '#000000'
   },
   getMaVanBan: (code, organ, type, date, c = 1) => {
-    console.log(c)
     const d = new Date(date ?? Date.now())
     switch (c) {
       case 1:

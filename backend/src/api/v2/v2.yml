@@ -2665,6 +2665,24 @@ paths:
           description: Dữ liệu không được chấp nhận
         500:
           description: Lỗi hệ thống
+  /incoming-official-dispatch/new-arrival-number:
+    get:
+      summary: Lấy bản ghi 1 loại văn bản theo id
+      tags:
+        - Incoming Official Dispatch
+      responses:
+        200:
+          description: OK
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
   /incoming-official-dispatch/{id}:
     get:
       summary: Lấy bản ghi 1 loại văn bản theo id

@@ -335,7 +335,6 @@ class ApiProcessor {
       console.log('  > response :', response)
       console.log('  > error    :', error)
     }
-
     // Error handler
     if (error) {
       // TODO: show token expired
@@ -358,6 +357,11 @@ class ApiProcessor {
           }
           return
         }
+      } else {
+        if (Helpers.isFunction(request.onError)) {
+          request.onError(error)
+        }
+        return
       }
     }
   }

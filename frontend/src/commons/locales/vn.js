@@ -115,7 +115,7 @@ export default {
       DUE_DATE: (m = '') => (m ? `Hạn giải quyết ${m.toLowerCase()}` : 'Hạn giải quyết'),
       EMAIL_ADDRESS: (m = '') => (m ? `Địa chỉ email ${m.toLowerCase()}` : 'Địa chỉ email'),
       FILE_CSV: (m = '') => (m ? `File csv ${m.toLowerCase()}` : 'File csv'),
-      FILE: (m = '') => (m ? `Tập tin ${m.toLowerCase()}` : 'Tập tin'),
+      FILE: (m = '') => (m ? `Chức vụ ${m.toLowerCase()}` : 'Chức vụ'),
       FIRST_NAME: (m = '') => (m ? `Tên ${m.toLowerCase()}` : 'Tên'),
       HANDLER: (m = '') =>
         m ? `Cán bộ được phân công xử lý ${m.toLowerCase()}` : 'Cán bộ được phân công',
@@ -178,6 +178,7 @@ export default {
       SELECT_PRIORITY: '- Chọn độ khẩn văn bản đến -',
       SELECT_SECURITY: '- Chọn độ mật văn bản đến -',
       SELECT_ORGANIZATION: '- Chọn cơ quan ban hành -',
+      ARRIVAL_NUMBER: 'Số đến được điền tự động',
     },
   },
   Language: {

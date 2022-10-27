@@ -119,12 +119,15 @@ const Constants = {
       `/incoming-official-dispatch/organ/${id}?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
     GET_IOD: (id = '') => `/incoming-official-dispatch/` + id,
     GET_FILE_IOD: (id = '') => `/incoming-official-dispatch/file/` + id,
-    POST_PROCESS_OD: `/official-dispatch/process/`,
+    GET_NEW_ARRIVAL_NUMBER:"/incoming-official-dispatch/new-arrival-number/",
     CREATE_IOD: '/incoming-official-dispatch',
     CREATE_IODS: '/incoming-official-dispatch/csv',
     UPDATE_IOD: (id = '') => '/incoming-official-dispatch/' + id,
     DELETE_IOD: (id = '') => '/incoming-official-dispatch/' + id,
     DELETE_IODS: '/incoming-official-dispatch',
+
+    // official-dispatch
+    POST_PROCESS_OD: `/official-dispatch/process/`,
 
     // Officer Status
     GET_OFFICER_STATUSES: (limit = 10, pageNumber = 1, filter = '') =>

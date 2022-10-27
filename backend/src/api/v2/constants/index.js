@@ -82,9 +82,10 @@ const Constants = {
     IncomingOfficialDispatch: {
       ROOT: "/incoming-official-dispatch",
       SLASH: "/",
-      ID: "/:id",
       CREATE_MULTI: "/csv",
+      GET_ARRIVAL_NUMBER: "/new-arrival-number",
       FILE: "/file/:id",
+      ID: "/:id",
     },
     OfficerStatus: {
       ROOT: "/officer-statuses",
