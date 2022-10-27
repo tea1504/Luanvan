@@ -184,7 +184,9 @@ var incomingOfficialDispatchService = {
         };
       return {
         status: Constants.ApiCode.SUCCESS,
-        message: Constants.String.Message.GET_200(Constants.String.IOD.ARRIVAL_NUMBER),
+        message: Constants.String.Message.GET_200(
+          Constants.String.IOD.ARRIVAL_NUMBER
+        ),
         data: IOD.arrivalNumber + 1,
       };
     } catch (error) {
@@ -193,6 +195,38 @@ var incomingOfficialDispatchService = {
         message: Constants.String.Message.ERR_500,
         data: { error: error.message },
       };
+    }
+  },
+  postOne: async (id, data, file) => {
+    try {
+      data.importer = id;
+      const result = await model.create(data);
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.POST_200(Constants.String.IOD._),
+        data: result,
+      };
+    } catch (error) {
+      switch (error.name) {
+        case "ValidationError":
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.ERR_406,
+            data: { error: error.errors },
+          };
+        case "MongoServerError":
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.ERR_406,
+            data: { error: error.message },
+          };
+        default:
+          return {
+            status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
+            message: Constants.String.Message.ERR_500,
+            data: { error: error.message },
+          };
+      }
     }
   },
 };

@@ -179,6 +179,7 @@ export default {
       SELECT_SECURITY: '- Chọn độ mật văn bản đến -',
       SELECT_ORGANIZATION: '- Chọn cơ quan ban hành -',
       ARRIVAL_NUMBER: 'Số đến được điền tự động',
+      UPLOAD_FILE: 'Đính kèm file',
     },
   },
   Language: {

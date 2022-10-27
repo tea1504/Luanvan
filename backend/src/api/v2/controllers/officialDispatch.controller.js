@@ -16,9 +16,9 @@ var officialDispatch = {
       const file = req.file;
       const result = await service.processOD(file);
       fs.unlinkSync(file.path);
-      for (var i = 0; i < 9; i++) {
-        await sleep(10000);
-        res.write(i + "");
+      for (var i = 1; i <= 100; i++) {
+        res.write(`|${i}/100`);
+        await sleep(100);
       }
       res.write("#");
       return res.end(JSON.stringify(result));

@@ -613,11 +613,11 @@ paths:
             schema:
               type: object
               properties:
-                password: 
+                password:
                   type: string
-                confirmPassword: 
+                confirmPassword:
                   type: string
-                oldPassword: 
+                oldPassword:
                   type: string
       responses:
         200:
@@ -729,7 +729,7 @@ paths:
         required: true
         content:
           multipart/form-data:
-            schema: 
+            schema:
               type: object
               properties:
                 text:
@@ -936,7 +936,7 @@ paths:
         required: true
         content:
           multipart/form-data:
-            schema: 
+            schema:
               type: object
               properties:
                 text:
@@ -1141,7 +1141,7 @@ paths:
         required: true
         content:
           multipart/form-data:
-            schema: 
+            schema:
               type: object
               properties:
                 text:
@@ -1346,7 +1346,7 @@ paths:
         required: true
         content:
           multipart/form-data:
-            schema: 
+            schema:
               type: object
               properties:
                 text:
@@ -1551,7 +1551,7 @@ paths:
         required: true
         content:
           multipart/form-data:
-            schema: 
+            schema:
               type: object
               properties:
                 text:
@@ -1758,7 +1758,7 @@ paths:
         required: true
         content:
           multipart/form-data:
-            schema: 
+            schema:
               type: object
               properties:
                 text:
@@ -2136,7 +2136,7 @@ paths:
         required: true
         content:
           multipart/form-data:
-            schema: 
+            schema:
               type: object
               properties:
                 text:
@@ -2337,7 +2337,7 @@ paths:
             schema:
               type: object
               properties:
-                code: 
+                code:
                   type: string
                   default: 111111
                 position:
@@ -2355,13 +2355,13 @@ paths:
                 phoneNumber:
                   type: string
                   default: "0912883745"
-                organ: 
+                organ:
                   type: string
                   default: 6f7267616e30303030303031
-                right: 
+                right:
                   type: string
                   default: "726967687430303030303030"
-                status: 
+                status:
                   type: string
                   default: 6f6666696365725374613030
                 avatar:
@@ -2422,7 +2422,7 @@ paths:
         required: true
         content:
           multipart/form-data:
-            schema: 
+            schema:
               type: object
               properties:
                 text:
@@ -2552,13 +2552,13 @@ paths:
                 phoneNumber:
                   type: string
                   default: "0912883745"
-                organ: 
+                organ:
                   type: string
                   default: 6f7267616e30303030303031
-                right: 
+                right:
                   type: string
                   default: "726967687430303030303030"
-                status: 
+                status:
                   type: string
                   default: 6f6666696365725374613031
                 avatar:
@@ -2640,6 +2640,93 @@ paths:
           description: Không tìm thấy liên kết
         500:
           description: Lỗi hệ thống
+    post:
+      summary: Thêm nhiều bản ghi
+      tags:
+        - Incoming Official Dispatch
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: number
+                  default: 10
+                issuedDate:
+                  type: number
+                  default: 1666840126000
+                subject:
+                  type: string
+                  default: "123456"
+                type: 
+                  type: string
+                  default: "747970653030303030303031"
+                language: 
+                  type: string
+                  default: "6c616e677561676530303031"
+                pageAmount:
+                  type: number
+                  default: 10
+                description:
+                  type: string
+                  default: "123456"
+                signerInfoName:
+                  type: string
+                  default: "123456"
+                signerInfoPosition:
+                  type: string
+                  default: "123456"
+                dueDate:
+                  type: number
+                  default: 1666840126000
+                arrivalNumber:
+                  type: number
+                  default: 5
+                arrivalDate:
+                  type: number
+                  default: 1666840126000
+                priority:
+                  type: string
+                  default: "7072696f7269747930303030"
+                security:
+                  type: string
+                  default: "736563757269747930303030"
+                organ:
+                  type: string
+                  default: "6f7267616e30303030303031"
+                approver:
+                  type: string
+                  default: "6f6666696365723030303031"
+                importer:
+                  type: string
+                  default: "6f6666696365723030303031"
+                handler:
+                  type: array
+                  items:
+                    type: string
+                    default: "6f6666696365723030303031"
+                file:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        200:
+          description: Thêm mới thành công
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
   /incoming-official-dispatch/file/{id}:
     get:
       summary: Lấy bản ghi 1 loại văn bản theo id
@@ -2716,7 +2803,7 @@ paths:
         required: true
         content:
           multipart/form-data:
-            schema: 
+            schema:
               type: object
               properties:
                 file:

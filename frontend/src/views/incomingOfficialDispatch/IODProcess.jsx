@@ -68,7 +68,6 @@ function IODProcess({ data, dataTemp, updateData }) {
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
-      console.log(error)
       switch (error.status) {
         case 401:
           MySwal.fire({

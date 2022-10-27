@@ -77,10 +77,6 @@ route.use(
   authMiddleware,
   IODRouter
 );
-route.use(
-  Constants.ApiPath.OfficialDispatch.ROOT,
-  authMiddleware,
-  ODRouter
-);
+route.use(Constants.ApiPath.OfficialDispatch.ROOT, authMiddleware, ODRouter);
 
 module.exports = route;

@@ -3,14 +3,18 @@ const Constants = require("../constants");
 const route = express.Router();
 const multer = require("multer");
 const path = require("path");
-const controller = require("./../controllers/incomingOfficialDispatch.controller")
-const readOD = require("../middlewares/readOD.middleware")
-const createOD = require("../middlewares/createOD.middleware")
-
+const controller = require("./../controllers/incomingOfficialDispatch.controller");
+const readOD = require("../middlewares/readOD.middleware");
+const createOD = require("../middlewares/createOD.middleware");
+var fs = require("fs");
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join("public/uploads/"));
+    if (req.body.security == "undefined") req.body.security = "";
+    if (!fs.existsSync("public/uploads/" + req.body.security)) {
+      fs.mkdirSync("public/uploads/" + req.body.security);
+    }
+    cb(null, path.join("public/uploads/", req.body.security));
   },
   filename: function (req, file, cb) {
     cb(
@@ -41,6 +45,12 @@ route.get(
   Constants.ApiPath.IncomingOfficialDispatch.ID,
   readOD,
   controller.getOne
+);
+route.post(
+  Constants.ApiPath.IncomingOfficialDispatch.SLASH,
+  createOD,
+  upload.array("file"),
+  controller.postOne
 );
 
 module.exports = route;

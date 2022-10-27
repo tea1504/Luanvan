@@ -67,6 +67,94 @@ var incomingOfficialDispatchController = {
       return next(error);
     }
   },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
+  postOne: async (req, res, next) => {
+    try {
+      const file = req.files;
+      var {
+        code,
+        issuedDate,
+        subject,
+        type,
+        language,
+        pageAmount,
+        description,
+        signerInfoName,
+        signerInfoPosition,
+        dueDate,
+        arrivalNumber,
+        arrivalDate,
+        priority,
+        security,
+        organ,
+        approver,
+        handler,
+      } = req.body;
+      if (!language)
+        return res.status(Constants.ApiCode.BAD_REQUEST).json({
+          status: Constants.ApiCode.BAD_REQUEST,
+          message: Constants.String.Message.ERR_400(
+            Constants.String.IOD.LANGUAGE
+          ),
+        });
+      if (!organ)
+        return res.status(Constants.ApiCode.BAD_REQUEST).json({
+          status: Constants.ApiCode.BAD_REQUEST,
+          message: Constants.String.Message.ERR_400(Constants.String.IOD.ORGAN),
+        });
+      if (!priority)
+        return res.status(Constants.ApiCode.BAD_REQUEST).json({
+          status: Constants.ApiCode.BAD_REQUEST,
+          message: Constants.String.Message.ERR_400(
+            Constants.String.IOD.PRIORITY
+          ),
+        });
+      if (!security)
+        return res.status(Constants.ApiCode.BAD_REQUEST).json({
+          status: Constants.ApiCode.BAD_REQUEST,
+          message: Constants.String.Message.ERR_400(
+            Constants.String.IOD.SECURITY
+          ),
+        });
+      if (!type)
+        return res.status(Constants.ApiCode.BAD_REQUEST).json({
+          status: Constants.ApiCode.BAD_REQUEST,
+          message: Constants.String.Message.ERR_400(Constants.String.IOD.TYPE),
+        });
+      if (!approver) approver = null;
+      if (!handler) handler = [];
+      const result = await service.postOne(
+        req.userID,
+        {
+          code,
+          issuedDate,
+          subject,
+          type,
+          language,
+          pageAmount,
+          description,
+          signerInfoName,
+          signerInfoPosition,
+          dueDate,
+          arrivalNumber,
+          arrivalDate,
+          priority,
+          security,
+          organ,
+          approver,
+          handler,
+        },
+        file
+      );
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  },
 };
 
 module.exports = incomingOfficialDispatchController;

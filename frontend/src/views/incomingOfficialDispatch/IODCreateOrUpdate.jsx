@@ -55,11 +55,13 @@ import {
   FaFileExcel,
   FaFileWord,
   FaImage,
+  FaPaperclip,
   FaRegFilePdf,
   FaTrash,
   FaVectorSquare,
 } from 'react-icons/fa'
 import IODProcess from './IODProcess'
+import IODUploadFile from './IODUploadFile'
 import { Resizable } from 're-resizable'
 import ODPreview from '../officialDispatch/ODPreview'
 
@@ -156,7 +158,16 @@ export default function IODCreateOrUpdate() {
   const [security, setSecurity] = useState([])
   const [officer, setOfficer] = useState([])
   const [link, setLink] = useState('')
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useState({
+    process: false,
+    init: Helpers.isNullOrEmpty(id),
+  })
+  const updateVisible = (newState) => {
+    setVisible((prevState) => ({
+      ...prevState,
+      ...newState,
+    }))
+  }
 
   const getState = async (id = '') => {
     if (store.length > 0) {
@@ -179,7 +190,9 @@ export default function IODCreateOrUpdate() {
           handler: s.handler.map((el) => el._id),
           fileTemp: s.file.map((el) => ({
             ...el,
-            path: `${el.path}`,
+            path: el.path.includes('blob')
+              ? `${el.path}?token=${token}#toolbar=0`
+              : `${process.env.REACT_APP_BASE_URL}/${el.path}?token=${token}#toolbar=0`,
           })),
         })
       }
@@ -207,7 +220,7 @@ export default function IODCreateOrUpdate() {
         handler: result.data.data.handler.map((el) => el._id),
         fileTemp: result.data.data.file.map((el) => ({
           ...el,
-          path: `${el.path}`,
+          path: `${process.env.REACT_APP_BASE_URL}/${el.path}?token=${token}#toolbar=0`,
         })),
       })
       dispatch(setLoading(false))
@@ -238,7 +251,39 @@ export default function IODCreateOrUpdate() {
 
   const update = async (dataFormServer) => {
     updateState(dataFormServer)
-    setVisible(false)
+    setVisible({ init: false, process: false })
+  }
+
+  const showError = (error) => {
+    console.log(error.status === 406 ? Object.values(error.data.error) : error)
+    switch (error.status) {
+      case 401:
+        MySwal.fire({
+          title: Strings.Message.COMMON_ERROR,
+          icon: 'error',
+          text: error.message,
+        }).then(() => {
+          localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
+          localStorage.clear(Constants.StorageKeys.USER_INFO)
+          navigate(Screens.LOGIN)
+        })
+        break
+      case 406:
+        const message = Object.values(error.data.error).map((el) => el.message)
+        MySwal.fire({
+          title: Strings.Message.COMMON_ERROR,
+          icon: 'error',
+          html: message.join('<br/>'),
+        })
+        break
+      default:
+        MySwal.fire({
+          title: Strings.Message.COMMON_ERROR,
+          icon: 'error',
+          text: error.message,
+        })
+        break
+    }
   }
 
   const getOrganization = async () => {
@@ -253,26 +298,7 @@ export default function IODCreateOrUpdate() {
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
-      switch (error.status) {
-        case 401:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          }).then(() => {
-            localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
-            localStorage.clear(Constants.StorageKeys.USER_INFO)
-            navigate(Screens.LOGIN)
-          })
-          break
-        default:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          })
-          break
-      }
+      showError(error)
     }
   }
 
@@ -288,26 +314,7 @@ export default function IODCreateOrUpdate() {
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
-      switch (error.status) {
-        case 401:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          }).then(() => {
-            localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
-            localStorage.clear(Constants.StorageKeys.USER_INFO)
-            navigate(Screens.LOGIN)
-          })
-          break
-        default:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          })
-          break
-      }
+      showError(error)
     }
   }
 
@@ -323,26 +330,7 @@ export default function IODCreateOrUpdate() {
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
-      switch (error.status) {
-        case 401:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          }).then(() => {
-            localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
-            localStorage.clear(Constants.StorageKeys.USER_INFO)
-            navigate(Screens.LOGIN)
-          })
-          break
-        default:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          })
-          break
-      }
+      showError(error)
     }
   }
 
@@ -358,26 +346,7 @@ export default function IODCreateOrUpdate() {
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
-      switch (error.status) {
-        case 401:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          }).then(() => {
-            localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
-            localStorage.clear(Constants.StorageKeys.USER_INFO)
-            navigate(Screens.LOGIN)
-          })
-          break
-        default:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          })
-          break
-      }
+      showError(error)
     }
   }
 
@@ -393,26 +362,7 @@ export default function IODCreateOrUpdate() {
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
-      switch (error.status) {
-        case 401:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          }).then(() => {
-            localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
-            localStorage.clear(Constants.StorageKeys.USER_INFO)
-            navigate(Screens.LOGIN)
-          })
-          break
-        default:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          })
-          break
-      }
+      showError(error)
     }
   }
 
@@ -428,26 +378,7 @@ export default function IODCreateOrUpdate() {
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
-      switch (error.status) {
-        case 401:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          }).then(() => {
-            localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
-            localStorage.clear(Constants.StorageKeys.USER_INFO)
-            navigate(Screens.LOGIN)
-          })
-          break
-        default:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          })
-          break
-      }
+      showError(error)
     }
   }
 
@@ -459,26 +390,7 @@ export default function IODCreateOrUpdate() {
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
-      switch (error.status) {
-        case 401:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          }).then(() => {
-            localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
-            localStorage.clear(Constants.StorageKeys.USER_INFO)
-            navigate(Screens.LOGIN)
-          })
-          break
-        default:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          })
-          break
-      }
+      showError(error)
     }
   }
 
@@ -590,7 +502,7 @@ export default function IODCreateOrUpdate() {
       file: null,
       traceHeaderList: null,
     })
-    if (validate()) {
+    if (validate() || true) {
       try {
         dispatch(setLoading(true))
         if (!id) {
@@ -598,7 +510,7 @@ export default function IODCreateOrUpdate() {
           MySwal.fire({
             title: Strings.Common.SUCCESS,
             icon: 'success',
-            text: Strings.IOD.Common.ALERT_PASSWORD(result.data.data.password),
+            text: Strings.Message.Create.SUCCESS,
           })
           updateState({
             code: 0,
@@ -620,7 +532,7 @@ export default function IODCreateOrUpdate() {
             importer: null,
             handler: [],
             file: [],
-            fileTemp: null,
+            fileTemp: [],
             traceHeaderList: [],
           })
         } else {
@@ -634,26 +546,7 @@ export default function IODCreateOrUpdate() {
         dispatch(setLoading(false))
       } catch (error) {
         dispatch(setLoading(false))
-        switch (error.status) {
-          case 401:
-            MySwal.fire({
-              title: Strings.Message.COMMON_ERROR,
-              icon: 'error',
-              text: error.message,
-            }).then(() => {
-              localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
-              localStorage.clear(Constants.StorageKeys.USER_INFO)
-              navigate(Screens.LOGIN)
-            })
-            break
-          default:
-            MySwal.fire({
-              title: Strings.Message.COMMON_ERROR,
-              icon: 'error',
-              text: error.message,
-            })
-            break
-        }
+        showError(error)
       }
     }
   }
@@ -714,50 +607,51 @@ export default function IODCreateOrUpdate() {
     })
   }
 
-  const renderFile = () => {
-    const extension = (name) => {
-      const result = {}
-      switch (Helpers.getFileExtension(name)) {
-        case 'pdf':
-          result.icon = <FaRegFilePdf size="2rem" />
-          result.color = 'danger'
-          break
-        case 'doc':
-        case 'docx':
-          result.icon = <FaFileWord size="2rem" />
-          result.color = 'info'
-          break
-        case 'xls':
-        case 'xlsx':
-          result.icon = <FaFileExcel size="2rem" />
-          result.color = 'success'
-          break
-        case 'csv':
-          result.icon = <FaFileCsv size="2rem" />
-          result.color = 'success'
-          break
-        case 'apng':
-        case 'avif':
-        case 'gif':
-        case 'jpg':
-        case 'png':
-        case 'webp':
-          result.icon = <FaImage size="2rem" />
-          result.color = 'warning'
-          break
-        case 'svg':
-          result.icon = <FaVectorSquare size="2rem" />
-          result.color = 'warning'
-          break
-        default:
-          result.icon = <FaFile size="2rem" />
-          result.color = 'dark'
-          break
-      }
-      return result
+  const extension = (name) => {
+    const result = {}
+    switch (Helpers.getFileExtension(name)) {
+      case 'pdf':
+        result.icon = <FaRegFilePdf size="2rem" />
+        result.color = 'danger'
+        break
+      case 'doc':
+      case 'docx':
+        result.icon = <FaFileWord size="2rem" />
+        result.color = 'info'
+        break
+      case 'xls':
+      case 'xlsx':
+        result.icon = <FaFileExcel size="2rem" />
+        result.color = 'success'
+        break
+      case 'csv':
+        result.icon = <FaFileCsv size="2rem" />
+        result.color = 'success'
+        break
+      case 'apng':
+      case 'avif':
+      case 'gif':
+      case 'jpg':
+      case 'png':
+      case 'webp':
+        result.icon = <FaImage size="2rem" />
+        result.color = 'warning'
+        break
+      case 'svg':
+        result.icon = <FaVectorSquare size="2rem" />
+        result.color = 'warning'
+        break
+      default:
+        result.icon = <FaFile size="2rem" />
+        result.color = 'dark'
+        break
     }
+    return result
+  }
+
+  const renderFile = () => {
     return (
-      <CRow className="px-0 mx-0" xs={{ cols: 1, gutter: 4 }} md={{ cols: 2 }} lg={{ cols: 4 }}>
+      <CRow className="px-0 mx-0" xs={{ cols: 1, gutter: 4 }} md={{ cols: 2 }}>
         {state.fileTemp.map((el, ind) => (
           <CCol xs key={ind}>
             <CWidgetStatsF
@@ -774,9 +668,7 @@ export default function IODCreateOrUpdate() {
                       color="secondary"
                       className="w-100 m-0 p-0"
                       onClick={() => {
-                        setLink(
-                          `${process.env.REACT_APP_BASE_URL}/${el.path}?token=${token}#toolbar=0`,
-                        )
+                        setLink(el.path)
                       }}
                     >
                       <FaEye /> {Strings.Common.PREVIEW}
@@ -851,8 +743,43 @@ export default function IODCreateOrUpdate() {
             </CCardHeader>
             <CCardBody style={{ height: '60vh', overflow: 'auto' }}>
               <CForm noValidate className="row g-3">
-                {/* ISSUED_DATE */}
+                {/* ORGANIZATION_IOD */}
                 <CCol xs={12}>
+                  <CFormLabel
+                    htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Organization.CODE)}
+                  >
+                    {Strings.Form.FieldName.ORGANIZATION_IOD}{' '}
+                    <Required mes={Strings.Form.Validation.REQUIRED()} />
+                  </CFormLabel>
+                  <Select
+                    id={Helpers.makeID(Strings.Officer.CODE, Strings.Organization.CODE)}
+                    value={
+                      organ.filter((el) => el.value === state.organ).length > 0
+                        ? organ.filter((el) => el.value === state.organ)[0]
+                        : null
+                    }
+                    options={organ}
+                    placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_ORGANIZATION}
+                    onChange={(selectedItem) => {
+                      if (selectedItem) updateState({ organ: selectedItem.value })
+                      else updateState({ organ: null })
+                    }}
+                    styles={{
+                      control: (provided, state) => ({
+                        ...provided,
+                        borderColor: error.organ
+                          ? Constants.Styles.ERROR_COLOR
+                          : Constants.Styles.BORDER_COLOR,
+                      }),
+                    }}
+                    isClearable={Helpers.isNullOrEmpty(id)}
+                  />
+                  <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
+                    {error.organ && Strings.Form.Validation[error.organ](Strings.Organization.NAME)}
+                  </CFormFeedback>
+                </CCol>
+                {/* ISSUED_DATE */}
+                <CCol xs={12} md={6}>
                   <CFormLabel
                     htmlFor={Helpers.makeID(
                       Strings.IncomingOfficialDispatch.CODE,
@@ -886,7 +813,7 @@ export default function IODCreateOrUpdate() {
                   </CFormFeedback>
                 </CCol>
                 {/* CODE */}
-                <CCol xs={12}>
+                <CCol xs={12} md={6}>
                   <CFormLabel
                     htmlFor={Helpers.makeID(
                       Strings.IncomingOfficialDispatch.CODE,
@@ -924,7 +851,7 @@ export default function IODCreateOrUpdate() {
                   </CFormText>
                 </CCol>
                 {/* ARRIVAL_DATE */}
-                <CCol xs={12}>
+                <CCol xs={12} md={6}>
                   <CFormLabel
                     htmlFor={Helpers.makeID(
                       Strings.IncomingOfficialDispatch.CODE,
@@ -956,7 +883,7 @@ export default function IODCreateOrUpdate() {
                   </CFormFeedback>
                 </CCol>
                 {/* ARRIVAL_NUMBER */}
-                <CCol xs={12}>
+                <CCol xs={12} md={6}>
                   <CFormLabel
                     htmlFor={Helpers.makeID(
                       Strings.IncomingOfficialDispatch.CODE,
@@ -987,41 +914,8 @@ export default function IODCreateOrUpdate() {
                   </CFormFeedback>
                   <CFormText>{Strings.IncomingOfficialDispatch.Common.ARRIVAL_NUMBER}</CFormText>
                 </CCol>
-                {/* TYPE */}
-                <CCol xs={12}>
-                  <CFormLabel htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Type.CODE)}>
-                    {Strings.Form.FieldName.TYPE(Strings.IncomingOfficialDispatch.NAME)}{' '}
-                    <Required mes={Strings.Form.Validation.REQUIRED()} />
-                  </CFormLabel>
-                  <Select
-                    id={Helpers.makeID(Strings.Officer.CODE, Strings.Type.CODE)}
-                    value={
-                      type.filter((el) => el.value === state.type).length > 0
-                        ? type.filter((el) => el.value === state.type)[0]
-                        : null
-                    }
-                    options={type}
-                    placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_TYPE}
-                    onChange={(selectedItem) => {
-                      if (selectedItem) updateState({ type: selectedItem.value })
-                      else updateState({ type: null })
-                    }}
-                    styles={{
-                      control: (provided, state) => ({
-                        ...provided,
-                        borderColor: error.type
-                          ? Constants.Styles.ERROR_COLOR
-                          : Constants.Styles.BORDER_COLOR,
-                      }),
-                    }}
-                    isClearable={Helpers.isNullOrEmpty(id)}
-                  />
-                  <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
-                    {error.type && Strings.Form.Validation[error.type](Strings.Type.NAME)}
-                  </CFormFeedback>
-                </CCol>
                 {/* LANGUAGE */}
-                <CCol xs={12}>
+                <CCol xs={12} md={6}>
                   <CFormLabel htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Language.CODE)}>
                     {Strings.Form.FieldName.LANGUAGE(Strings.IncomingOfficialDispatch.NAME)}{' '}
                     <Required mes={Strings.Form.Validation.REQUIRED()} />
@@ -1053,6 +947,107 @@ export default function IODCreateOrUpdate() {
                     {error.lang && Strings.Form.Validation[error.lang](Strings.Language.NAME)}
                   </CFormFeedback>
                 </CCol>
+                {/* TYPE */}
+                <CCol xs={12} md={6}>
+                  <CFormLabel htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Type.CODE)}>
+                    {Strings.Form.FieldName.TYPE(Strings.IncomingOfficialDispatch.NAME)}{' '}
+                    <Required mes={Strings.Form.Validation.REQUIRED()} />
+                  </CFormLabel>
+                  <Select
+                    id={Helpers.makeID(Strings.Officer.CODE, Strings.Type.CODE)}
+                    value={
+                      type.filter((el) => el.value === state.type).length > 0
+                        ? type.filter((el) => el.value === state.type)[0]
+                        : null
+                    }
+                    options={type}
+                    placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_TYPE}
+                    onChange={(selectedItem) => {
+                      if (selectedItem) updateState({ type: selectedItem.value })
+                      else updateState({ type: null })
+                    }}
+                    styles={{
+                      control: (provided, state) => ({
+                        ...provided,
+                        borderColor: error.type
+                          ? Constants.Styles.ERROR_COLOR
+                          : Constants.Styles.BORDER_COLOR,
+                      }),
+                    }}
+                    isClearable={Helpers.isNullOrEmpty(id)}
+                  />
+                  <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
+                    {error.type && Strings.Form.Validation[error.type](Strings.Type.NAME)}
+                  </CFormFeedback>
+                </CCol>
+                {/* PRIORITY */}
+                <CCol xs={12} md={6}>
+                  <CFormLabel htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Priority.CODE)}>
+                    {Strings.Form.FieldName.PRIORITY(Strings.IncomingOfficialDispatch.NAME)}{' '}
+                    <Required mes={Strings.Form.Validation.REQUIRED()} />
+                  </CFormLabel>
+                  <Select
+                    id={Helpers.makeID(Strings.Officer.CODE, Strings.Priority.CODE)}
+                    value={
+                      priority.filter((el) => el.value === state.priority).length > 0
+                        ? priority.filter((el) => el.value === state.priority)[0]
+                        : null
+                    }
+                    options={priority}
+                    placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_PRIORITY}
+                    onChange={(selectedItem) => {
+                      if (selectedItem) updateState({ priority: selectedItem.value })
+                      else updateState({ priority: null })
+                    }}
+                    styles={{
+                      control: (provided, state) => ({
+                        ...provided,
+                        borderColor: error.priority
+                          ? Constants.Styles.ERROR_COLOR
+                          : Constants.Styles.BORDER_COLOR,
+                      }),
+                    }}
+                    isClearable={Helpers.isNullOrEmpty(id)}
+                  />
+                  <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
+                    {error.priority &&
+                      Strings.Form.Validation[error.priority](Strings.Priority.NAME)}
+                  </CFormFeedback>
+                </CCol>
+                {/* SECURITY */}
+                <CCol xs={12} md={6}>
+                  <CFormLabel htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Security.CODE)}>
+                    {Strings.Form.FieldName.SECURITY(Strings.IncomingOfficialDispatch.NAME)}{' '}
+                    <Required mes={Strings.Form.Validation.REQUIRED()} />
+                  </CFormLabel>
+                  <Select
+                    id={Helpers.makeID(Strings.Officer.CODE, Strings.Security.CODE)}
+                    value={
+                      security.filter((el) => el.value === state.security).length > 0
+                        ? security.filter((el) => el.value === state.security)[0]
+                        : null
+                    }
+                    options={security}
+                    placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_SECURITY}
+                    onChange={(selectedItem) => {
+                      if (selectedItem) updateState({ security: selectedItem.value })
+                      else updateState({ security: null })
+                    }}
+                    styles={{
+                      control: (provided, state) => ({
+                        ...provided,
+                        borderColor: error.security
+                          ? Constants.Styles.ERROR_COLOR
+                          : Constants.Styles.BORDER_COLOR,
+                      }),
+                    }}
+                    isClearable={Helpers.isNullOrEmpty(id)}
+                  />
+                  <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
+                    {error.security &&
+                      Strings.Form.Validation[error.security](Strings.Security.NAME)}
+                  </CFormFeedback>
+                </CCol>
                 {/* SUBJECT */}
                 <CCol xs={12}>
                   <CFormLabel
@@ -1080,6 +1075,76 @@ export default function IODCreateOrUpdate() {
                   <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
                     {error.description &&
                       Strings.Form.Validation[error.description](Strings.Language.NAME)}
+                  </CFormFeedback>
+                </CCol>
+                {/* SIGNER_INFO_NAME */}
+                <CCol xs={12} md={6}>
+                  <CFormLabel
+                    htmlFor={Helpers.makeID(
+                      Strings.IncomingOfficialDispatch.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.SIGNER_INFO_NAME),
+                    )}
+                  >
+                    {Strings.Form.FieldName.SIGNER_INFO_NAME(Strings.IncomingOfficialDispatch.NAME)}{' '}
+                    <Required mes={Strings.Form.Validation.REQUIRED()} />
+                  </CFormLabel>
+                  <CFormInput
+                    invalid={!Helpers.isNullOrEmpty(error.signerInfoName)}
+                    type="text"
+                    id={Helpers.makeID(
+                      Strings.IncomingOfficialDispatch.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.SIGNER_INFO_NAME),
+                    )}
+                    placeholder={Strings.Form.FieldName.SIGNER_INFO_NAME(
+                      Strings.IncomingOfficialDispatch.NAME,
+                    )}
+                    value={state.signerInfoName}
+                    onChange={(e) => updateState({ signerInfoName: e.target.value })}
+                    onKeyPress={handleKeypress}
+                  />
+                  <CFormFeedback invalid>
+                    {error.signerInfoName &&
+                      Strings.Form.Validation[error.signerInfoName](
+                        Strings.Form.FieldName.SIGNER_INFO_NAME(
+                          Strings.IncomingOfficialDispatch.NAME,
+                        ),
+                      )}
+                  </CFormFeedback>
+                </CCol>
+                {/* SIGNER_INFO_POSITION */}
+                <CCol xs={12} md={6}>
+                  <CFormLabel
+                    htmlFor={Helpers.makeID(
+                      Strings.IncomingOfficialDispatch.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.SIGNER_INFO_POSITION),
+                    )}
+                  >
+                    {Strings.Form.FieldName.SIGNER_INFO_POSITION(
+                      Strings.IncomingOfficialDispatch.NAME,
+                    )}{' '}
+                    <Required mes={Strings.Form.Validation.REQUIRED()} />
+                  </CFormLabel>
+                  <CFormInput
+                    invalid={!Helpers.isNullOrEmpty(error.signerInfoPosition)}
+                    type="text"
+                    id={Helpers.makeID(
+                      Strings.IncomingOfficialDispatch.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.SIGNER_INFO_POSITION),
+                    )}
+                    placeholder={Strings.Form.FieldName.SIGNER_INFO_POSITION(
+                      Strings.IncomingOfficialDispatch.NAME,
+                    )}
+                    value={state.signerInfoPosition}
+                    onChange={(e) => updateState({ signerInfoPosition: e.target.value })}
+                    onKeyPress={handleKeypress}
+                  />
+                  <CFormFeedback invalid>
+                    {error.signerInfoPosition &&
+                      Strings.Form.Validation[error.signerInfoPosition](
+                        Strings.Form.FieldName.SIGNER_INFO_POSITION(
+                          Strings.IncomingOfficialDispatch.NAME,
+                        ),
+                      )}
                   </CFormFeedback>
                 </CCol>
                 {/* PAGE_AMOUNT */}
@@ -1115,76 +1180,6 @@ export default function IODCreateOrUpdate() {
                       )}
                   </CFormFeedback>
                 </CCol>
-                {/* SIGNER_INFO_NAME */}
-                <CCol xs={12}>
-                  <CFormLabel
-                    htmlFor={Helpers.makeID(
-                      Strings.IncomingOfficialDispatch.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.SIGNER_INFO_NAME),
-                    )}
-                  >
-                    {Strings.Form.FieldName.SIGNER_INFO_NAME(Strings.IncomingOfficialDispatch.NAME)}{' '}
-                    <Required mes={Strings.Form.Validation.REQUIRED()} />
-                  </CFormLabel>
-                  <CFormInput
-                    invalid={!Helpers.isNullOrEmpty(error.signerInfoName)}
-                    type="text"
-                    id={Helpers.makeID(
-                      Strings.IncomingOfficialDispatch.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.SIGNER_INFO_NAME),
-                    )}
-                    placeholder={Strings.Form.FieldName.SIGNER_INFO_NAME(
-                      Strings.IncomingOfficialDispatch.NAME,
-                    )}
-                    value={state.signerInfoName}
-                    onChange={(e) => updateState({ signerInfoName: e.target.value })}
-                    onKeyPress={handleKeypress}
-                  />
-                  <CFormFeedback invalid>
-                    {error.signerInfoName &&
-                      Strings.Form.Validation[error.signerInfoName](
-                        Strings.Form.FieldName.SIGNER_INFO_NAME(
-                          Strings.IncomingOfficialDispatch.NAME,
-                        ),
-                      )}
-                  </CFormFeedback>
-                </CCol>
-                {/* SIGNER_INFO_POSITION */}
-                <CCol xs={12}>
-                  <CFormLabel
-                    htmlFor={Helpers.makeID(
-                      Strings.IncomingOfficialDispatch.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.SIGNER_INFO_POSITION),
-                    )}
-                  >
-                    {Strings.Form.FieldName.SIGNER_INFO_POSITION(
-                      Strings.IncomingOfficialDispatch.NAME,
-                    )}{' '}
-                    <Required mes={Strings.Form.Validation.REQUIRED()} />
-                  </CFormLabel>
-                  <CFormInput
-                    invalid={!Helpers.isNullOrEmpty(error.signerInfoPosition)}
-                    type="text"
-                    id={Helpers.makeID(
-                      Strings.IncomingOfficialDispatch.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.SIGNER_INFO_POSITION),
-                    )}
-                    placeholder={Strings.Form.FieldName.SIGNER_INFO_POSITION(
-                      Strings.IncomingOfficialDispatch.NAME,
-                    )}
-                    value={state.signerInfoPosition}
-                    onChange={(e) => updateState({ signerInfoPosition: e.target.value })}
-                    onKeyPress={handleKeypress}
-                  />
-                  <CFormFeedback invalid>
-                    {error.signerInfoPosition &&
-                      Strings.Form.Validation[error.signerInfoPosition](
-                        Strings.Form.FieldName.SIGNER_INFO_POSITION(
-                          Strings.IncomingOfficialDispatch.NAME,
-                        ),
-                      )}
-                  </CFormFeedback>
-                </CCol>
                 {/* DUE_DATE */}
                 <CCol xs={12}>
                   <CFormLabel
@@ -1215,109 +1210,6 @@ export default function IODCreateOrUpdate() {
                       Strings.Form.Validation[error.dueDate](
                         Strings.Form.FieldName.DUE_DATE(Strings.IncomingOfficialDispatch.NAME),
                       )}
-                  </CFormFeedback>
-                </CCol>
-                {/* PRIORITY */}
-                <CCol xs={12}>
-                  <CFormLabel htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Priority.CODE)}>
-                    {Strings.Form.FieldName.PRIORITY(Strings.IncomingOfficialDispatch.NAME)}{' '}
-                    <Required mes={Strings.Form.Validation.REQUIRED()} />
-                  </CFormLabel>
-                  <Select
-                    id={Helpers.makeID(Strings.Officer.CODE, Strings.Priority.CODE)}
-                    value={
-                      priority.filter((el) => el.value === state.priority).length > 0
-                        ? priority.filter((el) => el.value === state.priority)[0]
-                        : null
-                    }
-                    options={priority}
-                    placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_PRIORITY}
-                    onChange={(selectedItem) => {
-                      if (selectedItem) updateState({ priority: selectedItem.value })
-                      else updateState({ priority: null })
-                    }}
-                    styles={{
-                      control: (provided, state) => ({
-                        ...provided,
-                        borderColor: error.priority
-                          ? Constants.Styles.ERROR_COLOR
-                          : Constants.Styles.BORDER_COLOR,
-                      }),
-                    }}
-                    isClearable={Helpers.isNullOrEmpty(id)}
-                  />
-                  <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
-                    {error.priority &&
-                      Strings.Form.Validation[error.priority](Strings.Priority.NAME)}
-                  </CFormFeedback>
-                </CCol>
-                {/* SECURITY */}
-                <CCol xs={12}>
-                  <CFormLabel htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Security.CODE)}>
-                    {Strings.Form.FieldName.SECURITY(Strings.IncomingOfficialDispatch.NAME)}{' '}
-                    <Required mes={Strings.Form.Validation.REQUIRED()} />
-                  </CFormLabel>
-                  <Select
-                    id={Helpers.makeID(Strings.Officer.CODE, Strings.Security.CODE)}
-                    value={
-                      security.filter((el) => el.value === state.security).length > 0
-                        ? security.filter((el) => el.value === state.security)[0]
-                        : null
-                    }
-                    options={security}
-                    placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_SECURITY}
-                    onChange={(selectedItem) => {
-                      if (selectedItem) updateState({ security: selectedItem.value })
-                      else updateState({ security: null })
-                    }}
-                    styles={{
-                      control: (provided, state) => ({
-                        ...provided,
-                        borderColor: error.security
-                          ? Constants.Styles.ERROR_COLOR
-                          : Constants.Styles.BORDER_COLOR,
-                      }),
-                    }}
-                    isClearable={Helpers.isNullOrEmpty(id)}
-                  />
-                  <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
-                    {error.security &&
-                      Strings.Form.Validation[error.security](Strings.Security.NAME)}
-                  </CFormFeedback>
-                </CCol>
-                {/* ORGANIZATION_IOD */}
-                <CCol xs={12}>
-                  <CFormLabel
-                    htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Organization.CODE)}
-                  >
-                    {Strings.Form.FieldName.ORGANIZATION_IOD}{' '}
-                    <Required mes={Strings.Form.Validation.REQUIRED()} />
-                  </CFormLabel>
-                  <Select
-                    id={Helpers.makeID(Strings.Officer.CODE, Strings.Organization.CODE)}
-                    value={
-                      organ.filter((el) => el.value === state.organ).length > 0
-                        ? organ.filter((el) => el.value === state.organ)[0]
-                        : null
-                    }
-                    options={organ}
-                    placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_ORGANIZATION}
-                    onChange={(selectedItem) => {
-                      if (selectedItem) updateState({ organ: selectedItem.value })
-                      else updateState({ organ: null })
-                    }}
-                    styles={{
-                      control: (provided, state) => ({
-                        ...provided,
-                        borderColor: error.organ
-                          ? Constants.Styles.ERROR_COLOR
-                          : Constants.Styles.BORDER_COLOR,
-                      }),
-                    }}
-                    isClearable={Helpers.isNullOrEmpty(id)}
-                  />
-                  <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
-                    {error.organ && Strings.Form.Validation[error.organ](Strings.Organization.NAME)}
                   </CFormFeedback>
                 </CCol>
                 {/* FILE */}
@@ -1352,19 +1244,21 @@ export default function IODCreateOrUpdate() {
                 <CCol xs={12}>{renderFile()}</CCol>
                 <CCol xs={12}>
                   {state.fileTemp.length > 0 && (
-                    <CButton onClick={() => setVisible(true)}>Tự động nhập liệu</CButton>
+                    <CButton onClick={() => setVisible({ process: true })}>
+                      Tự động nhập liệu
+                    </CButton>
                   )}
                 </CCol>
               </CForm>
             </CCardBody>
             <CCardFooter>
               <CRow>
-                <CCol md={6} className="mt-1">
+                <CCol md={4} className="mt-1">
                   <CButton className="w-100" disabled={loading} onClick={handleSubmitForm}>
                     {loading && <CSpinner size="sm" />} {Strings.Common.SUBMIT}
                   </CButton>
                 </CCol>
-                <CCol md={6} className="mt-1">
+                <CCol md={4} className="mt-1">
                   <CButton
                     className="w-100"
                     disabled={loading}
@@ -1374,8 +1268,6 @@ export default function IODCreateOrUpdate() {
                     {Strings.Common.RESET}
                   </CButton>
                 </CCol>
-              </CRow>
-              <CRow>
                 <CCol className="mt-1">
                   <CButton
                     className="w-100"
@@ -1395,15 +1287,33 @@ export default function IODCreateOrUpdate() {
       <CModal
         alignment="center"
         size="xl"
-        visible={visible}
+        visible={visible.process}
         onClose={() => {
-          setVisible(false)
+          updateVisible({ process: false })
         }}
-        fullscreen={Helpers.isNullOrEmpty(id)}
       >
         <CModalHeader></CModalHeader>
         <CModalBody>
           <IODProcess data={state.file} dataTemp={state.fileTemp} updateData={update} />
+        </CModalBody>
+      </CModal>
+      <CModal
+        alignment="center"
+        size="xl"
+        visible={visible.init}
+        onClose={() => {
+          updateVisible({ init: false })
+        }}
+        fullscreen
+      >
+        <CModalHeader></CModalHeader>
+        <CModalBody>
+          <IODUploadFile
+            state={state}
+            extension={extension}
+            handleInputFileOnChange={handleInputFileOnChange}
+            updateData={update}
+          />
         </CModalBody>
       </CModal>
     </CContainer>

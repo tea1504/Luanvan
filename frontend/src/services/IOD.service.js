@@ -32,13 +32,14 @@ class IODService extends BaseService {
   //   })
   //   return result
   // }
-  // async createOne(type) {
-  //   const result = await this.api.postFormData({
-  //     path: Constants.ApiPath.CREATE_OFFICER,
-  //     data: type,
-  //   })
-  //   return result
-  // }
+  async createOne(data) {
+    //FormData
+    const result = await this.api.postFormData({
+      path: Constants.ApiPath.CREATE_IOD,
+      data: { ...data, ...file },
+    })
+    return result
+  }
   // async createMany(data) {
   //   const result = await this.api.postFormData({
   //     path: Constants.ApiPath.CREATE_OFFICERS,
