@@ -11,9 +11,7 @@ import {
   CFormFeedback,
   CFormInput,
   CFormLabel,
-  CFormSelect,
   CFormText,
-  CImage,
   CModal,
   CModalBody,
   CModalHeader,
@@ -38,7 +36,6 @@ import OrganizationService from 'src/services/organization.service'
 import StatusService from 'src/services/status.service'
 import RightService from 'src/services/right.service'
 import Select from 'react-select'
-import Resources from 'src/commons/resources'
 import TypeService from 'src/services/type.service'
 import LanguageService from 'src/services/language.service'
 import PriorityService from 'src/services/priority.service'
@@ -51,16 +48,15 @@ import {
   FaEye,
   FaFile,
   FaFileCsv,
-  FaFileDownload,
   FaFileExcel,
   FaFileWord,
   FaImage,
-  FaPaperclip,
+  FaMinusSquare,
   FaRegFilePdf,
   FaTrash,
   FaVectorSquare,
 } from 'react-icons/fa'
-import IODProcess from './IODProcess'
+import IODProgress from './IODProgress'
 import IODUploadFile from './IODUploadFile'
 import { Resizable } from 're-resizable'
 import ODPreview from '../officialDispatch/ODPreview'
@@ -73,7 +69,6 @@ const languageService = new LanguageService()
 const priorityService = new PriorityService()
 const securityService = new SecurityService()
 const officerService = new OfficerService()
-const rightService = new RightService()
 const MySwal = withReactContent(Swal)
 
 export default function IODCreateOrUpdate() {
@@ -110,6 +105,7 @@ export default function IODCreateOrUpdate() {
     file: [],
     fileTemp: [],
     traceHeaderList: [],
+    sendEmail: true,
   })
   const updateState = (newState) => {
     setState((prevState) => ({
@@ -250,7 +246,6 @@ export default function IODCreateOrUpdate() {
   }
 
   const showError = (error) => {
-    console.log(error.status === 406 ? Object.values(error.data.error) : error)
     switch (error.status) {
       case 401:
         MySwal.fire({
@@ -395,84 +390,63 @@ export default function IODCreateOrUpdate() {
 
   const validate = () => {
     var flag = true
-    if (Helpers.isNullOrEmpty(state.position)) {
-      updateError({
-        position: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED),
-      })
-      flag = false
-    } else if (state.position.length > 100) {
-      updateError({
-        position: Helpers.propName(Strings, Strings.Form.Validation.MAX_LENGTH),
-      })
-      flag = false
-    }
-    if (Helpers.isNullOrEmpty(state.firstName)) {
-      updateError({
-        firstName: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED),
-      })
-      flag = false
-    } else if (state.firstName.length > 10) {
-      updateError({
-        firstName: Helpers.propName(Strings, Strings.Form.Validation.MAX_LENGTH),
-      })
-      flag = false
-    }
-    if (Helpers.isNullOrEmpty(state.code)) {
-      updateError({
-        code: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED),
-      })
-      flag = false
-    } else if (state.code.length > 10) {
-      updateError({
-        code: Helpers.propName(Strings, Strings.Form.Validation.MAX_LENGTH),
-      })
-      flag = false
-    }
-    if (Helpers.isNullOrEmpty(state.lastName)) {
-      updateError({
-        lastName: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED),
-      })
-      flag = false
-    } else if (state.lastName.length > 40) {
-      updateError({
-        lastName: Helpers.propName(Strings, Strings.Form.Validation.MAX_LENGTH),
-      })
-      flag = false
-    }
-    if (Helpers.isNullOrEmpty(state.emailAddress)) {
-      flag = false
-      updateError({ emailAddress: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
-    } else if (state.emailAddress.length > 200) {
-      flag = false
-      updateError({ emailAddress: Helpers.propName(Strings, Strings.Form.Validation.MAX_LENGTH) })
-    } else if (!state.emailAddress.match(Constants.RegExp.EMAIL_ADDRESS)) {
-      flag = false
-      updateError({ emailAddress: Helpers.propName(Strings, Strings.Form.Validation.MATCH) })
-    }
-    if (Helpers.isNullOrEmpty(state.phoneNumber)) {
-      flag = false
-      updateError({ phoneNumber: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
-    } else if (state.phoneNumber.length > 10) {
-      flag = false
-      updateError({ phoneNumber: Helpers.propName(Strings, Strings.Form.Validation.MAX_LENGTH) })
-    } else if (state.phoneNumber.length < 10) {
-      flag = false
-      updateError({ phoneNumber: Helpers.propName(Strings, Strings.Form.Validation.MIN_LENGTH) })
-    } else if (!state.phoneNumber.match(Constants.RegExp.PHONE_NUMBER)) {
-      flag = false
-      updateError({ phoneNumber: Helpers.propName(Strings, Strings.Form.Validation.MATCH) })
-    }
     if (Helpers.isNullOrEmpty(state.organ)) {
-      updateError({
-        organ: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED),
-      })
       flag = false
+      updateError({ organ: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
     }
-    if (Helpers.isNullOrEmpty(state.right)) {
-      updateError({
-        right: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED),
-      })
+    if (state.code == 0) {
       flag = false
+      updateError({ code: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
+    }
+    if (Helpers.isNullOrEmpty(state.language)) {
+      flag = false
+      updateError({ language: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
+    }
+    if (Helpers.isNullOrEmpty(state.type)) {
+      flag = false
+      updateError({ type: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
+    }
+    if (Helpers.isNullOrEmpty(state.priority)) {
+      flag = false
+      updateError({ priority: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
+    }
+    if (Helpers.isNullOrEmpty(state.security)) {
+      flag = false
+      updateError({ security: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
+    }
+    if (Helpers.isNullOrEmpty(state.subject)) {
+      flag = false
+      updateError({ subject: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
+    }
+    if (Helpers.isNullOrEmpty(state.signerInfoName)) {
+      flag = false
+      updateError({ signerInfoName: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
+    } else if (state.signerInfoName.length > 500) {
+      flag = false
+      updateError({ signerInfoName: Helpers.propName(Strings, Strings.Form.Validation.MAX_LENGTH) })
+    }
+    if (Helpers.isNullOrEmpty(state.signerInfoPosition)) {
+      flag = false
+      updateError({
+        signerInfoPosition: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED),
+      })
+    } else if (state.signerInfoPosition.length > 500) {
+      flag = false
+      updateError({
+        signerInfoPosition: Helpers.propName(Strings, Strings.Form.Validation.MAX_LENGTH),
+      })
+    }
+    if (state.pageAmount == 0) {
+      flag = false
+      updateError({ pageAmount: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
+    }
+    if (Helpers.isNullOrEmpty(state.approver)) {
+      flag = false
+      updateError({ approver: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
+    }
+    if (Helpers.isNullOrEmpty(state.file) || state.file.length === 0) {
+      flag = false
+      updateError({ file: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
     }
     return flag
   }
@@ -498,7 +472,7 @@ export default function IODCreateOrUpdate() {
       file: null,
       traceHeaderList: null,
     })
-    if (validate() || true) {
+    if (validate()) {
       try {
         dispatch(setLoading(true))
         if (!id) {
@@ -542,9 +516,11 @@ export default function IODCreateOrUpdate() {
         showError(error)
       }
     }
+    setLink('')
   }
 
   const handelOnClickResetButton = async () => {
+    setLink('')
     if (id) {
       const list = id.split('.')
       await getState(list[list.length - 1])
@@ -584,15 +560,36 @@ export default function IODCreateOrUpdate() {
   const handleInputFileOnChange = (e) => {
     const file = Array.from(e.target.files)
     updateState({
-      file: file,
-      fileTemp: file.map((el, ind) => {
-        return {
-          name: el.name,
-          size: el.size,
-          path: URL.createObjectURL(el) + '#toolbar=0',
-          _id: ind,
-        }
-      }),
+      file: [...state.file, ...file],
+      fileTemp: [
+        ...state.fileTemp,
+        ...file.map((el, ind) => {
+          return {
+            name: el.name,
+            size: el.size,
+            path: URL.createObjectURL(el) + '#toolbar=0',
+            _id: ind,
+          }
+        }),
+      ],
+    })
+    e.target.value = ''
+  }
+
+  const handleDeleteFile = (file) => {
+    console.log(file)
+    updateState({
+      fileTemp: state.file
+        .filter((el, ind) => ind != file._id)
+        .map((el, ind) => {
+          return {
+            name: el.name,
+            size: el.size,
+            path: URL.createObjectURL(el) + '#toolbar=0',
+            _id: ind,
+          }
+        }),
+      file: state.file.filter((el, ind) => ind != file._id),
     })
   }
 
@@ -657,10 +654,19 @@ export default function IODCreateOrUpdate() {
                       color="secondary"
                       className="w-100 m-0 p-0"
                       onClick={() => {
-                        setLink(el.path)
+                        if (link === el.path) setLink('')
+                        else setLink(el.path)
                       }}
                     >
-                      <FaEye /> {Strings.Common.PREVIEW}
+                      {link !== el.path ? (
+                        <>
+                          <FaEye /> {Strings.Common.PREVIEW}
+                        </>
+                      ) : (
+                        <>
+                          <FaMinusSquare /> {Strings.Common.CLOSE}
+                        </>
+                      )}
                     </CButton>
                   </CCol>
                   <CCol>
@@ -668,11 +674,7 @@ export default function IODCreateOrUpdate() {
                       variant="ghost"
                       color="secondary"
                       className="w-100 m-0 p-0"
-                      onClick={() => {
-                        setLink(
-                          `${process.env.REACT_APP_BASE_URL}/${el.path}?token=${token}#toolbar=0`,
-                        )
-                      }}
+                      onClick={() => handleDeleteFile(el)}
                     >
                       <FaTrash /> {Strings.Common.DELETE}
                     </CButton>
@@ -755,7 +757,7 @@ export default function IODCreateOrUpdate() {
                       else updateState({ organ: null })
                     }}
                     styles={{
-                      control: (provided, state) => ({
+                      control: (provided) => ({
                         ...provided,
                         borderColor: error.organ
                           ? Constants.Styles.ERROR_COLOR
@@ -860,9 +862,9 @@ export default function IODCreateOrUpdate() {
                       else updateState({ language: null })
                     }}
                     styles={{
-                      control: (provided, state) => ({
+                      control: (provided) => ({
                         ...provided,
-                        borderColor: error.lang
+                        borderColor: error.language
                           ? Constants.Styles.ERROR_COLOR
                           : Constants.Styles.BORDER_COLOR,
                       }),
@@ -870,7 +872,8 @@ export default function IODCreateOrUpdate() {
                     isClearable={Helpers.isNullOrEmpty(id)}
                   />
                   <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
-                    {error.lang && Strings.Form.Validation[error.lang](Strings.Language.NAME)}
+                    {error.language &&
+                      Strings.Form.Validation[error.language](Strings.Language.NAME)}
                   </CFormFeedback>
                 </CCol>
                 {/* TYPE */}
@@ -893,7 +896,7 @@ export default function IODCreateOrUpdate() {
                       else updateState({ type: null })
                     }}
                     styles={{
-                      control: (provided, state) => ({
+                      control: (provided) => ({
                         ...provided,
                         borderColor: error.type
                           ? Constants.Styles.ERROR_COLOR
@@ -926,7 +929,7 @@ export default function IODCreateOrUpdate() {
                       else updateState({ priority: null })
                     }}
                     styles={{
-                      control: (provided, state) => ({
+                      control: (provided) => ({
                         ...provided,
                         borderColor: error.priority
                           ? Constants.Styles.ERROR_COLOR
@@ -960,7 +963,7 @@ export default function IODCreateOrUpdate() {
                       else updateState({ security: null })
                     }}
                     styles={{
-                      control: (provided, state) => ({
+                      control: (provided) => ({
                         ...provided,
                         borderColor: error.security
                           ? Constants.Styles.ERROR_COLOR
@@ -999,8 +1002,10 @@ export default function IODCreateOrUpdate() {
                     }}
                   />
                   <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
-                    {error.description &&
-                      Strings.Form.Validation[error.description](Strings.Language.NAME)}
+                    {error.subject &&
+                      Strings.Form.Validation[error.subject](
+                        Strings.Form.FieldName.SUBJECT(Strings.IncomingOfficialDispatch.NAME),
+                      )}
                   </CFormFeedback>
                 </CCol>
                 {/* SIGNER_INFO_NAME */}
@@ -1150,7 +1155,7 @@ export default function IODCreateOrUpdate() {
                     <Required mes={Strings.Form.Validation.REQUIRED()} />
                   </CFormLabel>
                   <CFormInput
-                    invalid={!Helpers.isNullOrEmpty(error.dueDate)}
+                    invalid={!Helpers.isNullOrEmpty(error.file)}
                     type="file"
                     multiple
                     id={Helpers.makeID(
@@ -1161,9 +1166,9 @@ export default function IODCreateOrUpdate() {
                     onKeyPress={handleKeypress}
                   />
                   <CFormFeedback invalid>
-                    {error.dueDate &&
-                      Strings.Form.Validation[error.dueDate](
-                        Strings.Form.FieldName.DUE_DATE(Strings.IncomingOfficialDispatch.NAME),
+                    {error.file &&
+                      Strings.Form.Validation[error.file](
+                        Strings.Form.FieldName.FILE(Strings.IncomingOfficialDispatch.NAME),
                       )}
                   </CFormFeedback>
                 </CCol>
@@ -1175,38 +1180,60 @@ export default function IODCreateOrUpdate() {
                     </CButton>
                   )}
                 </CCol>
-                {/* PRIORITY */}
+                {/* APPROVER */}
                 <CCol xs={12}>
-                  <CFormLabel htmlFor={Helpers.makeID(Strings.IncomingOfficialDispatch.CODE, Strings.Officer.CODE)}>
+                  <CFormLabel
+                    htmlFor={Helpers.makeID(
+                      Strings.IncomingOfficialDispatch.CODE,
+                      Strings.Officer.CODE,
+                    )}
+                  >
                     {Strings.Form.FieldName.APPROVER()}{' '}
                     <Required mes={Strings.Form.Validation.REQUIRED()} />
                   </CFormLabel>
-                  <Select
-                    id={Helpers.makeID(Strings.IncomingOfficialDispatch.CODE, Strings.Officer.CODE)}
-                    value={
-                      officer.filter((el) => el.value === state.approver).length > 0
-                        ? officer.filter((el) => el.value === state.approver)[0]
-                        : null
-                    }
-                    options={officer}
-                    placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_APPROVER}
-                    onChange={(selectedItem) => {
-                      if (selectedItem) updateState({ approver: selectedItem.value })
-                      else updateState({ approver: null })
-                    }}
-                    styles={{
-                      control: (provided, state) => ({
-                        ...provided,
-                        borderColor: error.priority
-                          ? Constants.Styles.ERROR_COLOR
-                          : Constants.Styles.BORDER_COLOR,
-                      }),
-                    }}
-                    isClearable={Helpers.isNullOrEmpty(id)}
-                  />
+                  <CRow>
+                    <CCol sx={12} md={8}>
+                      <Select
+                        id={Helpers.makeID(
+                          Strings.IncomingOfficialDispatch.CODE,
+                          Strings.Officer.CODE,
+                        )}
+                        value={
+                          officer.filter((el) => el.value === state.approver).length > 0
+                            ? officer.filter((el) => el.value === state.approver)[0]
+                            : null
+                        }
+                        options={officer}
+                        placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_APPROVER}
+                        onChange={(selectedItem) => {
+                          if (selectedItem) updateState({ approver: selectedItem.value })
+                          else updateState({ approver: null })
+                        }}
+                        styles={{
+                          control: (provided) => ({
+                            ...provided,
+                            borderColor: error.approver
+                              ? Constants.Styles.ERROR_COLOR
+                              : Constants.Styles.BORDER_COLOR,
+                          }),
+                        }}
+                        isClearable={Helpers.isNullOrEmpty(id)}
+                      />
+                    </CCol>
+                    <CCol xs={12} md={4}>
+                      <CFormCheck
+                        id="EMAIL"
+                        label={Strings.IncomingOfficialDispatch.Common.SEND_EMAIL_APPROVAL}
+                        checked={state.sendEmail}
+                        onChange={() => updateState({ sendEmail: !state.sendEmail })}
+                      />
+                    </CCol>
+                  </CRow>
                   <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
-                    {error.priority &&
-                      Strings.Form.Validation[error.priority](Strings.Priority.NAME)}
+                    {error.approver &&
+                      Strings.Form.Validation[error.approver](
+                        Strings.Form.FieldName.APPROVER(Strings.IncomingOfficialDispatch.NAME),
+                      )}
                   </CFormFeedback>
                 </CCol>
               </CForm>
@@ -1254,7 +1281,7 @@ export default function IODCreateOrUpdate() {
       >
         <CModalHeader></CModalHeader>
         <CModalBody>
-          <IODProcess data={state.file} dataTemp={state.fileTemp} updateData={update} />
+          <IODProgress data={state.file} dataTemp={state.fileTemp} updateData={update} />
         </CModalBody>
       </CModal>
       <CModal
@@ -1273,6 +1300,7 @@ export default function IODCreateOrUpdate() {
             extension={extension}
             handleInputFileOnChange={handleInputFileOnChange}
             updateData={update}
+            handleDeleteFile={handleDeleteFile}
           />
         </CModalBody>
       </CModal>

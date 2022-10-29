@@ -3,6 +3,14 @@ const officerModel = require("../models/officer.model");
 const statusModel = require("../models/status.model");
 const incomingOfficialDispatchModel = require("./../models/incomingOfficialDispatch.model");
 const model = require("./../models/incomingOfficialDispatch.model");
+var nodemailer = require("nodemailer");
+var transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.MAIL_USER,
+    pass: process.env.MAIL_PASS,
+  },
+});
 
 var incomingOfficialDispatchService = {
   getManyByUserOrgan: async (
@@ -201,7 +209,7 @@ var incomingOfficialDispatchService = {
   postOne: async (id, data, files) => {
     try {
       data.importer = id;
-      if (!data.approver || data.approver === "null") delete data.approver;
+      // if (!data.approver || data.approver === "null") delete data.approver;
       data.arrivalDate = new Date().getTime();
       const status = await statusModel.findOne({
         name: "PENDING",
@@ -221,7 +229,6 @@ var incomingOfficialDispatchService = {
         status: status._id.toString(),
       });
       data.file = [];
-      console.log(files);
       files.map((el) => {
         data.file.push({
           name: el.originalname,
@@ -230,6 +237,29 @@ var incomingOfficialDispatchService = {
           size: el.size,
         });
       });
+      const approver = await officerModel.findById(data.approver, {
+        deleted: false,
+      });
+      if (data.sendEmail === "true") {
+        var mailOptions = {
+          from: process.env.MAIL_USER,
+          to: approver.emailAddress,
+          subject: "email_title",
+          html: `<img src="https://imggroup.com.vn/Content/images/logo-img.png" height="100"/>
+          <br/>
+          <span style="width: 100%; font-family: Tahoma,Geneva, sans-serif;">
+              Bạn có 1 văn bản cần duyệt
+          </span>
+`,
+        };
+        transporter.sendMail(mailOptions, function (error, info) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log("Email sent: " + info.response);
+          }
+        });
+      }
       const result = await model.create(data);
       return {
         status: Constants.ApiCode.SUCCESS,

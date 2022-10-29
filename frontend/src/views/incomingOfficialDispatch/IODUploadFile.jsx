@@ -10,7 +10,7 @@ import {
   CRow,
   CWidgetStatsF,
 } from '@coreui/react'
-import { FaPaperclip } from 'react-icons/fa'
+import { FaPaperclip, FaTrash } from 'react-icons/fa'
 import Strings from 'src/constants/strings'
 import Helpers from 'src/commons/helpers'
 import { useState } from 'react'
@@ -26,7 +26,7 @@ import Screens from 'src/constants/screens'
 const service = new BaseService()
 const MySwal = withReactContent(Swal)
 
-function IODUploadFile({ state, extension, handleInputFileOnChange, updateData }) {
+function IODUploadFile({ state, extension, handleInputFileOnChange, updateData,handleDeleteFile }) {
   let loading = useSelector((state) => state.config.loading)
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -46,13 +46,22 @@ function IODUploadFile({ state, extension, handleInputFileOnChange, updateData }
               title={Helpers.formatBytes(el.size)}
               value={el.name}
               footer={
-                <div
-                  className="text-center"
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => setProcess(el)}
-                >
-                  alo
-                </div>
+                <CRow>
+                  <CCol
+                    className="text-center" style={{ cursor: 'pointer' }}
+                    onClick={() => setProcess(el)}> alo
+                  </CCol>
+                  <CCol>
+                    <CButton
+                      variant="ghost"
+                      color="secondary"
+                      className="w-100 m-0 p-0"
+                      onClick={() => handleDeleteFile(el)}
+                    >
+                      <FaTrash /> {Strings.Common.DELETE}
+                    </CButton>
+                  </CCol>
+                </CRow>
               }
             />
           </CCol>
@@ -80,7 +89,6 @@ function IODUploadFile({ state, extension, handleInputFileOnChange, updateData }
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
-      console.log(error)
       switch (error.status) {
         case 401:
           MySwal.fire({
@@ -156,6 +164,7 @@ IODUploadFile.prototype = {
   extension: PropTypes.func.isRequired,
   handleInputFileOnChange: PropTypes.func.isRequired,
   updateData: PropTypes.func.isRequired,
+  handleDeleteFile: PropTypes.func.isRequired,
 }
 
 export default IODUploadFile

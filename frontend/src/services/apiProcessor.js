@@ -207,8 +207,6 @@ class ApiProcessor {
     if (request.config) ApiProcessor.updateCommonConfig(request.config)
     // create config for each request
     const axiosConfig = await this.createAxiosConfig(request)
-    console.log(request)
-    console.log(axiosConfig)
     if (__DEV__) {
       const { method, path, requestId } = request
       console.log(

@@ -155,7 +155,6 @@ export default function OrganizationDetail() {
   }
 
   const handlePageChange = (page) => {
-    console.log(organ)
     updateOrgan({ page: page })
     getOrgan(organ.rowsPerPage, page)
   }

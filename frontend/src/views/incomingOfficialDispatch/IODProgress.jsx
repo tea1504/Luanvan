@@ -18,7 +18,7 @@ import Screens from 'src/constants/screens'
 const service = new BaseService()
 const MySwal = withReactContent(Swal)
 
-function IODProcess({ data, dataTemp, updateData }) {
+function IODProgress({ data, dataTemp, updateData }) {
   const val = data.map((el, ind) => {
     return { value: ind, label: el.name }
   })
@@ -116,10 +116,10 @@ function IODProcess({ data, dataTemp, updateData }) {
   )
 }
 
-IODProcess.prototype = {
+IODProgress.prototype = {
   data: PropTypes.array.isRequired,
   dataTemp: PropTypes.array.isRequired,
   updateData: PropTypes.func.isRequired,
 }
 
-export default IODProcess
+export default IODProgress

@@ -91,6 +91,7 @@ var incomingOfficialDispatchController = {
         organ,
         approver,
         handler,
+        sendEmail,
       } = req.body;
       if (!language)
         return res.status(Constants.ApiCode.BAD_REQUEST).json({
@@ -142,6 +143,7 @@ var incomingOfficialDispatchController = {
           organ,
           approver,
           handler,
+          sendEmail,
         },
         files
       );

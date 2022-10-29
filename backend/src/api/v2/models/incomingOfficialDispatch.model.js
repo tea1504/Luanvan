@@ -251,7 +251,7 @@ const incomingOfficialDispatchSchema = new mongoose.Schema(
           type: String,
           required: false,
           maxLength: [
-            10,
+            100,
             Constants.String.Message.MAX_LENGTH(Constants.String.IOD.FILE.TYPE),
           ],
         },

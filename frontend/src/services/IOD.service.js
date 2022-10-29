@@ -34,6 +34,7 @@ class IODService extends BaseService {
   // }
   async createOne(data) {
     var formData = new FormData()
+    Object.keys(data).forEach((el) => data[el] === null  && delete data[el]);
     for (const [key, value] of Object.entries(data)) {
       if (key == 'handler' || key == 'file') {
         Array.from(value).map((el) => {
