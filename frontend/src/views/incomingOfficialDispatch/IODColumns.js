@@ -55,30 +55,28 @@ export default [
       <div title={row.subject}>{Helpers.trimString(Helpers.htmlDecode(row.subject), 80)}</div>
     ),
     sortable: true,
-    maxWidth: '500px',
+  },
+  {
+    name: Strings.Form.FieldName.ORGANIZATION_IOD,
+    selector: (row) => row.organ.name,
+    sortable: true,
   },
   {
     name: Strings.Form.FieldName.STATUS(),
     cell: (row) => {
-      const traceHeaderListSorted = [...row.traceHeaderList].sort((a, b) => {
-        var d1 = new Date(a.date),
-          d2 = new Date(b.date)
-        return d2 - d1
-      })[0]
       return (
         <CBadge
           style={{
-            background: traceHeaderListSorted.status.color,
-            color: Helpers.getTextColorByBackgroundColor(traceHeaderListSorted.status.color),
+            background: row.status.color,
+            color: Helpers.getTextColorByBackgroundColor(row.status.color),
           }}
           shape="rounded-pill"
         >
-          {traceHeaderListSorted.status.description}
+          {Helpers.htmlDecode(row.status.description)}
         </CBadge>
       )
     },
     sortable: true,
-    maxWidth: '500px',
   },
   {
     name: Strings.Common.ACTION,

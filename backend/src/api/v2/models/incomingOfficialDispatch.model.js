@@ -159,6 +159,16 @@ const incomingOfficialDispatchSchema = new mongoose.Schema(
       ],
     },
     handler: [{ type: mongoose.ObjectId, ref: officerModel, required: false }],
+    status: {
+      type: mongoose.ObjectId,
+      ref: statusModel,
+      required: [
+        true,
+        Constants.String.Message.REQUIRED(
+          Constants.String.IOD.TRACE_HEADER_LIST.STATUS
+        ),
+      ],
+    },
     traceHeaderList: [
       {
         officer: {

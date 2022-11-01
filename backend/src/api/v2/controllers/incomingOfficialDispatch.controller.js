@@ -16,7 +16,8 @@ var incomingOfficialDispatchController = {
         req.userID,
         parseInt(limit),
         parseInt(pageNumber),
-        filter
+        filter,
+        req.query
       );
       return res.status(result.status).json(result);
     } catch (error) {

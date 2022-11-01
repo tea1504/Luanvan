@@ -30,7 +30,7 @@ const Constants = {
 
     // Type
     GET_TYPES: (limit = 10, pageNumber = 1, filter = '') =>
-      `/types?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+      `/types?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
     GET_TYPE: (id) => `/types/` + id,
     CREATE_TYPE: '/types',
     CREATE_TYPES: '/types/csv',
@@ -40,7 +40,7 @@ const Constants = {
 
     // Language
     GET_LANGUAGES: (limit = 10, pageNumber = 1, filter = '') =>
-      `/languages?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+      `/languages?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
     GET_LANGUAGE: (id) => `/languages/` + id,
     CREATE_LANGUAGE: '/languages',
     CREATE_LANGUAGES: '/languages/csv',
@@ -50,7 +50,7 @@ const Constants = {
 
     // Security
     GET_SECURITIES: (limit = 10, pageNumber = 1, filter = '') =>
-      `/securities?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+      `/securities?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
     GET_SECURITY: (id) => `/securities/` + id,
     CREATE_SECURITY: '/securities',
     CREATE_SECURITIES: '/securities/csv',
@@ -60,7 +60,7 @@ const Constants = {
 
     // Status
     GET_STATUSES: (limit = 10, pageNumber = 1, filter = '') =>
-      `/statuses?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+      `/statuses?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
     GET_STATUS: (id) => `/statuses/` + id,
     CREATE_STATUS: '/statuses',
     CREATE_STATUSES: '/statuses/csv',
@@ -70,7 +70,7 @@ const Constants = {
 
     // Priority
     GET_PRIORITIES: (limit = 10, pageNumber = 1, filter = '') =>
-      `/priorities?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+      `/priorities?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
     GET_PRIORITY: (id) => `/priorities/` + id,
     CREATE_PRIORITY: '/priorities',
     CREATE_PRIORITIES: '/priorities/csv',
@@ -80,7 +80,7 @@ const Constants = {
 
     // Right
     GET_RIGHTS: (limit = 10, pageNumber = 1, filter = '') =>
-      `/rights?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+      `/rights?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
     GET_RIGHT: (id) => `/rights/` + id,
     GET_MAX_CODE: `/rights/max-code`,
     CREATE_RIGHT: '/rights',
@@ -90,9 +90,9 @@ const Constants = {
 
     // Organization
     GET_ORGANIZATIONS: (limit = 5, pageNumber = 1, filter = '') =>
-      `/organizations?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+      `/organizations?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
     GET_ORGANIZATIONS_BY_ORGAN_ID: (id = '', limit = 10, pageNumber = 1, filter = '') =>
-      `/organizations/organ/${id}?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+      `/organizations/organ/${id}?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
     GET_ORGANIZATION: (id = '') => `/organizations/` + id,
     CREATE_ORGANIZATION: '/organizations',
     CREATE_ORGANIZATIONS: '/organizations/csv',
@@ -102,11 +102,11 @@ const Constants = {
 
     // Organization
     GET_OFFICERS: (limit = 5, pageNumber = 1, filter = '') =>
-      `/officers?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+      `/officers?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
     GET_OFFICERS_BY_ORGAN_ID: (id = '', limit = 10, pageNumber = 1, filter = '') =>
-      `/officers/organ/${id}?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+      `/officers/organ/${id}?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
     GET_OFFICERS_BY_USER: (limit = 10, pageNumber = 1, filter = '') =>
-      `/officers/user?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+      `/officers/user?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
     GET_OFFICER: (id = '') => `/officers/` + id,
     CREATE_OFFICER: '/officers',
     CREATE_OFFICERS: '/officers/csv',
@@ -115,10 +115,10 @@ const Constants = {
     DELETE_OFFICERS: '/officers',
 
     // Incoming Official Dispatch
-    GET_IODS: (limit = 5, pageNumber = 1, filter = '') =>
-      `/incoming-official-dispatch?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+    GET_IODS: (limit = 5, pageNumber = 1, filter = '', params = '') =>
+      `/incoming-official-dispatch?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}&${params}`,
     GET_IODS_BY_ORGAN_ID: (id = '', limit = 10, pageNumber = 1, filter = '') =>
-      `/incoming-official-dispatch/organ/${id}?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+      `/incoming-official-dispatch/organ/${id}?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
     GET_IOD: (id = '') => `/incoming-official-dispatch/` + id,
     GET_FILE_IOD: (id = '') => `/incoming-official-dispatch/file/` + id,
     GET_NEW_ARRIVAL_NUMBER: '/incoming-official-dispatch/new-arrival-number/',
@@ -133,7 +133,7 @@ const Constants = {
 
     // Officer Status
     GET_OFFICER_STATUSES: (limit = 10, pageNumber = 1, filter = '') =>
-      `/officer-statuses?limit=${limit}&&pageNumber=${pageNumber}&&filter=${filter}`,
+      `/officer-statuses?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
     GET_OFFICER_STATUS: (id) => `/rights/` + id,
     CREATE_OFFICER_STATUS: '/officer-statuses',
     UPDATE_OFFICER_STATUS: (id) => '/officer-statuses/' + id,

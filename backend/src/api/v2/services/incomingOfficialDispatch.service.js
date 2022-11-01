@@ -17,7 +17,8 @@ var incomingOfficialDispatchService = {
     userID,
     limit = 10,
     pageNumber = 1,
-    filter = ""
+    filter = "",
+    params = {}
   ) => {
     try {
       const user = await officerModel.findById(userID, { deleted: false });
@@ -26,10 +27,31 @@ var incomingOfficialDispatchService = {
           status: Constants.ApiCode.NOT_FOUND,
           message: Constants.String.Message.ERR_404(Constants.String.Officer._),
         };
+      delete params.limit;
+      delete params.pageNumber;
+      delete params.filter;
+      Object.keys(params).forEach(
+        (el) => params[el] === "" && delete params[el]
+      );
+      var between = {};
+      if (params.arrivalNumberStart)
+        between.arrivalNumber = {
+          $gte: parseInt(params.arrivalNumberStart),
+          $lte: parseInt(params.arrivalNumberEnd),
+        };
+      if (params.issuedStartDate)
+        between.issuedDate = {
+          $gte: parseInt(params.issuedStartDate),
+          $lte: parseInt(params.issuedEndDate),
+        };
+      console.log(params, between);
+      if (params.arrivalNumber < 1) params.arrivalNumber = null;
       const result = {};
       const total = await model.countDocuments({
         organ: user.organ,
         deleted: false,
+        ...params,
+        ...between,
       });
       let startIndex = (pageNumber - 1) * limit;
       let endIndex = pageNumber * limit;
@@ -51,6 +73,8 @@ var incomingOfficialDispatchService = {
         .find({
           organ: user.organ,
           deleted: false,
+          ...params,
+          ...between,
         })
         .populate("type")
         .populate("language")
@@ -60,6 +84,7 @@ var incomingOfficialDispatchService = {
         .populate("approver")
         .populate("importer")
         .populate("handler")
+        .populate("status")
         .populate("traceHeaderList.officer")
         .populate("traceHeaderList.status")
         .skip(startIndex)
@@ -90,6 +115,7 @@ var incomingOfficialDispatchService = {
         .populate("approver")
         .populate("importer")
         .populate("handler")
+        .populate("status")
         .populate("traceHeaderList.officer")
         .populate("traceHeaderList.status");
       if (!item)
@@ -121,18 +147,7 @@ var incomingOfficialDispatchService = {
   },
   getFile: async (id) => {
     try {
-      const item = await model
-        .findOne({ "file._id": id, deleted: false })
-        .populate("type")
-        .populate("language")
-        .populate("priority")
-        .populate("security")
-        .populate("organ")
-        .populate("approver")
-        .populate("importer")
-        .populate("handler")
-        .populate("traceHeaderList.officer")
-        .populate("traceHeaderList.status");
+      const item = await model.findOne({ "file._id": id, deleted: false });
       if (!item)
         return {
           status: Constants.ApiCode.NOT_FOUND,
@@ -220,6 +235,7 @@ var incomingOfficialDispatchService = {
           status: Constants.ApiCode.NOT_FOUND,
           message: Constants.String.Message.ERR_404(Constants.String.Status._),
         };
+      data.status = status._id.toString();
       data.traceHeaderList = [];
       data.traceHeaderList.push({
         officer: id,

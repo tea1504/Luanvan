@@ -2,9 +2,9 @@ import Constants from 'src/constants'
 import BaseService from './base.service'
 
 class IODService extends BaseService {
-  async getMany(limit = 10, pageNumber = 1, filter = '') {
+  async getMany(limit = 10, pageNumber = 1, filter = '', params = '') {
     const result = await this.api.get({
-      path: Constants.ApiPath.GET_IODS(limit, pageNumber, filter),
+      path: Constants.ApiPath.GET_IODS(limit, pageNumber, filter, params),
     })
     return result
   }
@@ -34,7 +34,7 @@ class IODService extends BaseService {
   // }
   async createOne(data) {
     var formData = new FormData()
-    Object.keys(data).forEach((el) => data[el] === null  && delete data[el]);
+    Object.keys(data).forEach((el) => data[el] === null && delete data[el])
     for (const [key, value] of Object.entries(data)) {
       if (key == 'handler' || key == 'file') {
         Array.from(value).map((el) => {

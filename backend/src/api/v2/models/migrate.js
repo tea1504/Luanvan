@@ -669,6 +669,7 @@ async function start() {
         approver: "officer00001",
         importer: "officer00001",
         handler: ["officer00001", "officer00001"],
+        status: "status000007",
         traceHeaderList: [
           {
             officer: "officer00001",
@@ -731,6 +732,7 @@ async function start() {
         approver: "officer00001",
         importer: "officer00001",
         handler: ["officer00001", "officer00001"],
+        status: "status000007",
         traceHeaderList: [
           {
             officer: "officer00001",
@@ -782,6 +784,21 @@ async function start() {
         organ: "organ0000001",
         approver: "officer00001",
         importer: "officer00001",
+        status: "status000007",
+        file: [
+          {
+            name: "123",
+            path: "123",
+            type: "1234",
+            size: 123456,
+          },
+          {
+            name: "123",
+            path: "123",
+            type: "1234",
+            size: 123456,
+          },
+        ],
       },
       {
         _id: "ODT000000002",
@@ -800,6 +817,21 @@ async function start() {
         organ: "organ0000002",
         approver: "officer00001",
         importer: "officer00001",
+        status: "status000007",
+        file: [
+          {
+            name: "123",
+            path: "123",
+            type: "1234",
+            size: 123456,
+          },
+          {
+            name: "123",
+            path: "123",
+            type: "1234",
+            size: 123456,
+          },
+        ],
       },
     ]);
   }

@@ -2,6 +2,7 @@ require("dotenv").config();
 var mongoose = require("mongoose");
 var databaseConfig = require("../../../config/database.config");
 const Constants = require("../constants");
+const statusModel = require("./status.model");
 
 mongoose.connect(databaseConfig.v2.path);
 
@@ -141,6 +142,16 @@ const officialDispatchTravelSchema = new mongoose.Schema(
       required: [
         true,
         Constants.String.Message.REQUIRED(Constants.String.ODT.IMPORTER),
+      ],
+    },
+    status: {
+      type: mongoose.ObjectId,
+      ref: statusModel,
+      required: [
+        true,
+        Constants.String.Message.REQUIRED(
+          Constants.String.IOD.TRACE_HEADER_LIST.STATUS
+        ),
       ],
     },
     file: [

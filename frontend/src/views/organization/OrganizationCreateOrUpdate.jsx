@@ -1,5 +1,3 @@
-import { CKEditor } from '@ckeditor/ckeditor5-react'
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
 import {
   CButton,
   CCard,
@@ -20,7 +18,6 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import Helpers from 'src/commons/helpers'
-import ckEditorConfig from 'src/configs/ckEditor.config'
 import Constants from 'src/constants'
 import Screens from 'src/constants/screens'
 import Strings from 'src/constants/strings'
@@ -30,6 +27,7 @@ import withReactContent from 'sweetalert2-react-content'
 import { useDispatch } from 'react-redux'
 import { setLoading } from 'src/store/slice/config.slice'
 import Required from 'src/components/Required'
+import Select from 'react-select'
 
 const service = new OrganizationService()
 const MySwal = withReactContent(Swal)
@@ -432,21 +430,33 @@ export default function OrganizationCreateOrUpdate() {
                   >
                     {Strings.Form.FieldName.ORGANIZATION}
                   </CFormLabel>
-                  <CFormSelect
+                  <Select
                     id={Helpers.makeID(
                       Strings.Organization.CODE,
                       Helpers.propName(Strings, Strings.Form.FieldName.ORGANIZATION),
                     )}
-                    invalid={!Helpers.isNullOrEmpty(error.organ)}
+                    value={
+                      organ.filter((el) => el.value === state.organ).length > 0
+                        ? organ.filter((el) => el.value === state.organ)[0]
+                        : null
+                    }
                     options={organ}
-                    value={state.organ}
-                    onChange={(e) => {
-                      console.log(e.target.value)
-                      if (e.target.value === '-1') updateState({ organ: null })
-                      else updateState({ organ: e.target.value })
+                    placeholder={Strings.Organization.Common.SELECT}
+                    onChange={(selectedItem) => {
+                      if (selectedItem) updateState({ organ: selectedItem.value })
+                      else updateState({ organ: null })
                     }}
+                    styles={{
+                      control: (provided) => ({
+                        ...provided,
+                        borderColor: error.organ
+                          ? Constants.Styles.ERROR_COLOR
+                          : Constants.Styles.BORDER_COLOR,
+                      }),
+                    }}
+                    isClearable
                   />
-                  <CFormFeedback invalid>
+                  <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
                     {error.organ && Strings.Form.Validation[error.organ](Strings.Organization.NAME)}
                   </CFormFeedback>
                 </CCol>

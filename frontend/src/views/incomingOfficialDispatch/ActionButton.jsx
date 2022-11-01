@@ -113,7 +113,19 @@ const ActionButton = ({ data }) => {
             color="info"
             className="m-1"
             onClick={() =>
-              navigate(Screens.IOD_DETAIL(`${Helpers.toSlug(`${data.arrivalNumber}`)}.${data._id}`))
+              navigate(
+                Screens.IOD_DETAIL(
+                  `${Helpers.toSlug(
+                    Helpers.getMaVanBan(
+                      data.code,
+                      data.organ.code,
+                      data.type.notation,
+                      data.issuedDate,
+                      localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
+                    ),
+                  )}.${data._id}`,
+                ),
+              )
             }
           >
             <FaInfoCircle style={{ color: 'whitesmoke' }} />
@@ -126,7 +138,19 @@ const ActionButton = ({ data }) => {
             color="warning"
             className="m-1"
             onClick={() =>
-              navigate(Screens.IOD_UPDATE(`${Helpers.toSlug(`${data.arrivalNumber}`)}.${data._id}`))
+              navigate(
+                Screens.IOD_UPDATE(
+                  `${Helpers.toSlug(
+                    Helpers.getMaVanBan(
+                      data.code,
+                      data.organ.code,
+                      data.type.notation,
+                      data.issuedDate,
+                      localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
+                    ),
+                  )}.${data._id}`,
+                ),
+              )
             }
           >
             <FaPenSquare style={{ color: 'whitesmoke' }} />
