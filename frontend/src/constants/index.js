@@ -125,6 +125,7 @@ const Constants = {
     CREATE_IOD: '/incoming-official-dispatch',
     CREATE_IODS: '/incoming-official-dispatch/csv',
     UPDATE_IOD: (id = '') => '/incoming-official-dispatch/' + id,
+    APPROVE_IOD: (id = '') => '/incoming-official-dispatch/approval/' + id,
     DELETE_IOD: (id = '') => '/incoming-official-dispatch/' + id,
     DELETE_IODS: '/incoming-official-dispatch',
 

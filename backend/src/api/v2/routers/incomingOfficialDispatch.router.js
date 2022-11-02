@@ -6,6 +6,7 @@ const path = require("path");
 const controller = require("./../controllers/incomingOfficialDispatch.controller");
 const readOD = require("../middlewares/readOD.middleware");
 const createOD = require("../middlewares/createOD.middleware");
+const approveOD = require("../middlewares/approveOD.middleware");
 var fs = require("fs");
 
 var storage = multer.diskStorage({
@@ -51,6 +52,11 @@ route.post(
   createOD,
   upload.array("file"),
   controller.postOne
+);
+route.put(
+  Constants.ApiPath.IncomingOfficialDispatch.APPROVAL,
+  approveOD,
+  controller.approval
 );
 
 module.exports = route;

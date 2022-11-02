@@ -63,7 +63,6 @@ route.use(
 route.use(
   Constants.ApiPath.Organization.ROOT,
   authMiddleware,
-  adminMiddleware,
   organizationRouter
 );
 route.use(

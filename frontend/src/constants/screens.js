@@ -71,6 +71,7 @@ const Screens = {
   IOD_DETAIL: (id = ':id') => '/cong-van-den/chi-tiet/' + id,
   IOD_CREATE: '/cong-van-den/tao-moi',
   IOD_UPDATE: (id = ':id') => '/cong-van-den/cap-nhat/' + id,
+  IOD_APPROVE: (id = ':id') => '/cong-van-den/phe-duyet/' + id,
 
   // user
   OFFICER_INFO: '/officer',

@@ -255,6 +255,7 @@ var typeService = {
             Constants.String.Type.NOTATION
           ),
         };
+      await typeModel.findByIdAndUpdate({ _id: id }, type);
       const result = await typeModel.findOne({ _id: id });
       return {
         status: Constants.ApiCode.SUCCESS,

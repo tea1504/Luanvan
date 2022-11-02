@@ -44,7 +44,6 @@ var incomingOfficialDispatchService = {
           $gte: parseInt(params.issuedStartDate),
           $lte: parseInt(params.issuedEndDate),
         };
-      console.log(params, between);
       if (params.arrivalNumber < 1) params.arrivalNumber = null;
       const result = {};
       const total = await model.countDocuments({
@@ -224,7 +223,6 @@ var incomingOfficialDispatchService = {
   postOne: async (id, data, files) => {
     try {
       data.importer = id;
-      // if (!data.approver || data.approver === "null") delete data.approver;
       data.arrivalDate = new Date().getTime();
       const status = await statusModel.findOne({
         name: "PENDING",
@@ -290,6 +288,101 @@ var incomingOfficialDispatchService = {
             message: Constants.String.Message.ERR_406,
             data: { error: error.errors },
           };
+        case "MongoServerError":
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.ERR_406,
+            data: { error: error.message },
+          };
+        default:
+          return {
+            status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
+            message: Constants.String.Message.ERR_500,
+            data: { error: error.message },
+          };
+      }
+    }
+  },
+  approval: async (
+    id = "",
+    userID = "",
+    data = { handler: [], sendEmail: true, description: "", arrivalNumber: 0 }
+  ) => {
+    try {
+      const item = await model.findOne({
+        _id: id,
+        deleted: false,
+      });
+      if (!item)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.IOD._),
+        };
+      const user = await officerModel.findById(userID, { deleted: false });
+      if (!user)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Officer._),
+        };
+      const APPROVED = await statusModel.findOne({
+        name: "APPROVED",
+        deleted: false,
+      });
+      const PROGRESSING = await statusModel.findOne({
+        name: "PROGRESSING",
+        deleted: false,
+      });
+      item.traceHeaderList.push({
+        date: new Date(),
+        status: APPROVED._id.toString(),
+        officer: user._id.toString(),
+        command: `${user.lastName} ${user.firstName} đã duyệt văn bản`,
+        header: APPROVED.name,
+      });
+      if (data.handler.length === 0) {
+        if (!APPROVED)
+          return {
+            status: Constants.ApiCode.NOT_FOUND,
+            message: Constants.String.Message.ERR_404(
+              Constants.String.Status._
+            ),
+          };
+        item.handler = data.handler;
+        item.status = APPROVED._id.toString();
+      } else {
+        if (!PROGRESSING)
+          return {
+            status: Constants.ApiCode.NOT_FOUND,
+            message: Constants.String.Message.ERR_404(
+              Constants.String.Status._
+            ),
+          };
+        item.status = PROGRESSING._id.toString();
+        item.traceHeaderList.push({
+          date: new Date(),
+          status: PROGRESSING._id.toString(),
+          officer: user._id.toString(),
+          command: `${user.lastName} ${user.firstName} đã phân công xử lý`,
+          header: PROGRESSING.name,
+        });
+      }
+      item.arrivalNumber = data.arrivalNumber;
+      item.description = data.description;
+      item.save();
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.PUT_200(Constants.String.Language._),
+        data: item,
+      };
+    } catch (error) {
+      switch (error.name) {
+        case "ValidationError":
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.ERR_406,
+            data: { error: error.errors },
+          };
+        case "CastError":
         case "MongoServerError":
           return {
             status: Constants.ApiCode.NOT_ACCEPTABLE,

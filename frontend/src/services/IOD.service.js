@@ -57,13 +57,13 @@ class IODService extends BaseService {
   //   })
   //   return result
   // }
-  // async updateOne(id, type) {
-  //   const result = await this.api.putFormData({
-  //     path: Constants.ApiPath.UPDATE_OFFICER(id),
-  //     data: type,
-  //   })
-  //   return result
-  // }
+  async approval(id, data) {
+    const result = await this.api.put({
+      path: Constants.ApiPath.APPROVE_IOD(id),
+      data: data,
+    })
+    return result
+  }
   // async deleteOne(id) {
   //   const result = await this.api.delete({
   //     path: Constants.ApiPath.DELETE_OFFICER(id),

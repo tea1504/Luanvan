@@ -69,6 +69,7 @@ export default function IODDetail() {
     language: {},
     pageAmount: 0,
     description: '',
+    status: {},
     signerInfoName: '',
     signerInfoPosition: '',
     dueDate: '',
@@ -136,48 +137,6 @@ export default function IODDetail() {
           break
       }
     }
-  }
-
-  const renderTraceHeaderList = () => {
-    const traceHeaderListSorted = [...state.traceHeaderList].sort((a, b) => {
-      var d1 = new Date(a.date),
-        d2 = new Date(b.date)
-      return d2 - d1
-    })[0]
-    if (loggedUser?.right?.readCategories)
-      return (
-        <CTooltip content={Strings.Common.MORE} placement="right">
-          <CBadge
-            style={{
-              background: traceHeaderListSorted.status.color,
-              color: Helpers.getTextColorByBackgroundColor(traceHeaderListSorted.status.color),
-              cursor: 'pointer',
-            }}
-            onClick={() =>
-              navigate(
-                Screens.STATUS_DETAIL(
-                  `${Helpers.toSlug(traceHeaderListSorted.status.name)}.${
-                    traceHeaderListSorted.status._id
-                  }`,
-                ),
-              )
-            }
-          >
-            {traceHeaderListSorted.status.name}
-          </CBadge>
-        </CTooltip>
-      )
-    else
-      return (
-        <CBadge
-          style={{
-            background: traceHeaderListSorted.status.color,
-            color: Helpers.getTextColorByBackgroundColor(traceHeaderListSorted.status.color),
-          }}
-        >
-          {traceHeaderListSorted.status.name}
-        </CBadge>
-      )
   }
 
   const renderFile = () => {
@@ -329,7 +288,11 @@ export default function IODDetail() {
                   <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
                     {Strings.Form.FieldName.ARRIVAL_NUMBER}
                   </CTableHeaderCell>
-                  <CTableDataCell>{state.arrivalNumber}</CTableDataCell>
+                  <CTableDataCell>
+                    {state.arrivalNumber === 0
+                      ? Strings.IncomingOfficialDispatch.Common.NOT_ARRIVAL_NUMBER
+                      : state.arrivalNumber}
+                  </CTableDataCell>
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
@@ -405,7 +368,7 @@ export default function IODDetail() {
                   <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
                     {Strings.Form.FieldName.SUBJECT(Strings.IncomingOfficialDispatch.NAME)}
                   </CTableHeaderCell>
-                  <CTableDataCell colSpan={3}>{state.subject}</CTableDataCell>
+                  <CTableDataCell colSpan={3}>{Helpers.htmlDecode(state.subject)}</CTableDataCell>
                 </CTableRow>
                 <CTableRow>
                   <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
@@ -565,7 +528,14 @@ export default function IODDetail() {
                     {Strings.Form.FieldName.STATUS(Strings.IncomingOfficialDispatch.NAME)}
                   </CTableHeaderCell>
                   <CTableDataCell colSpan={3}>
-                    {state.traceHeaderList.length !== 0 && renderTraceHeaderList()}
+                    <CBadge
+                      style={{
+                        background: state.status.color,
+                        color: Helpers.getTextColorByBackgroundColor(state.status.color),
+                      }}
+                    >
+                      {Helpers.htmlDecode(state.status.description)}
+                    </CBadge>
                   </CTableDataCell>
                 </CTableRow>
                 <CTableRow>

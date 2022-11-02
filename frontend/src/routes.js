@@ -41,6 +41,7 @@ const IODCreateOrUpdate = React.lazy(() =>
   import('./views/incomingOfficialDispatch/IODCreateOrUpdate'),
 )
 const IODDetail = React.lazy(() => import('./views/incomingOfficialDispatch/IODDetail'))
+const IODApproval = React.lazy(() => import('./views/incomingOfficialDispatch/IODApproval'))
 const User = React.lazy(() => import('./views/user/User'))
 const UserChangePassword = React.lazy(() => import('./views/user/UserChangePassword'))
 
@@ -342,6 +343,13 @@ const routes = [
     element: IODCreateOrUpdate,
     role: [0, 1],
     right: Strings.Common.UPDATE_OD,
+  },
+  {
+    path: Screens.IOD_APPROVE(),
+    name: { vi: vn.Common.APPROVE, en: en.Common.APPROVE },
+    element: IODApproval,
+    role: [0, 1],
+    right: Strings.Common.APPROVE_OD,
   },
 ]
 

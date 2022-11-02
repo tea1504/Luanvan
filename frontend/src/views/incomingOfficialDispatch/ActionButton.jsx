@@ -12,7 +12,7 @@ import { setData, setTotal } from 'src/store/slice/IOD.slide'
 import Constants from 'src/constants'
 import Helpers from 'src/commons/helpers'
 import IODService from 'src/services/IOD.service'
-import { FaInfoCircle, FaPenSquare, FaTrash } from 'react-icons/fa'
+import { FaInfoCircle, FaPenSquare, FaTasks, FaTrash } from 'react-icons/fa'
 
 const service = new IODService()
 const MySwal = withReactContent(Swal)
@@ -110,6 +110,7 @@ const ActionButton = ({ data }) => {
       {loggedUser.right[Strings.Common.READ_OD] && (
         <CTooltip content={Strings.Common.DETAIL}>
           <CButton
+            size="sm"
             color="info"
             className="m-1"
             onClick={() =>
@@ -135,6 +136,7 @@ const ActionButton = ({ data }) => {
       {loggedUser.right[Strings.Common.UPDATE_OD] && (
         <CTooltip content={Strings.Common.EDIT}>
           <CButton
+            size="sm"
             color="warning"
             className="m-1"
             onClick={() =>
@@ -157,10 +159,37 @@ const ActionButton = ({ data }) => {
           </CButton>
         </CTooltip>
       )}
-      {loggedUser.right[Strings.Common.DELETE_OD] && (
-        <CTooltip content={Strings.Common.DELETE}>
-          <CButton color="danger" className="m-1" onClick={handleDeleteButton}>
-            <FaTrash style={{ color: 'whitesmoke' }} />
+      {loggedUser.right[Strings.Common.DELETE_OD] &&
+        ['PENDING', 'REFUSE', 'LATE'].includes(data.status.name) && (
+          <CTooltip content={Strings.Common.DELETE}>
+            <CButton size="sm" color="danger" className="m-1" onClick={handleDeleteButton}>
+              <FaTrash style={{ color: 'whitesmoke' }} />
+            </CButton>
+          </CTooltip>
+        )}
+      {loggedUser.right[Strings.Common.APPROVE_OD] && ['PENDING'].includes(data.status.name) && (
+        <CTooltip content={Strings.Common.APPROVE}>
+          <CButton
+            size="sm"
+            color="success"
+            className="m-1"
+            onClick={() =>
+              navigate(
+                Screens.IOD_APPROVE(
+                  `${Helpers.toSlug(
+                    Helpers.getMaVanBan(
+                      data.code,
+                      data.organ.code,
+                      data.type.notation,
+                      data.issuedDate,
+                      localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
+                    ),
+                  )}.${data._id}`,
+                ),
+              )
+            }
+          >
+            <FaTasks style={{ color: 'whitesmoke' }} />
           </CButton>
         </CTooltip>
       )}

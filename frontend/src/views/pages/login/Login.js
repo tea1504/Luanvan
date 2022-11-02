@@ -72,6 +72,29 @@ const Login = () => {
     return flag
   }
 
+  const showError = (error) => {
+    switch (error.status) {
+      case 401:
+        MySwal.fire({
+          title: Strings.Message.COMMON_ERROR,
+          icon: 'error',
+          text: error.message,
+        }).then(() => {
+          localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
+          localStorage.clear(Constants.StorageKeys.USER_INFO)
+          navigate(Screens.LOGIN)
+        })
+        break
+      default:
+        MySwal.fire({
+          title: Strings.Message.COMMON_ERROR,
+          icon: 'error',
+          text: error.message,
+        })
+        break
+    }
+  }
+
   const handleClickLoginButton = async (e) => {
     try {
       e.preventDefault()
@@ -93,11 +116,11 @@ const Login = () => {
           else navigate(Screens.USER_CHANGE_PASSWORD, { replace: true })
         }
       }
+      dispatch(setLoading(false))
     } catch (error) {
-      console.log(error)
-      updateErr({ form: true, code: false, password: true, message: error.message })
+      dispatch(setLoading(false))
+      showError(error)
     }
-    dispatch(setLoading(false))
   }
 
   const getToken = async () => {
@@ -107,26 +130,7 @@ const Login = () => {
       localStorage.setItem(Constants.StorageKeys.ACCESS_TOKEN, token)
       dispatch(setToken(token))
     } catch (error) {
-      switch (error.status) {
-        case 401:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          }).then(() => {
-            localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
-            localStorage.clear(Constants.StorageKeys.USER_INFO)
-            navigate(Screens.LOGIN)
-          })
-          break
-        default:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          })
-          break
-      }
+      showError(error)
     }
   }
 

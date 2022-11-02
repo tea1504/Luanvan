@@ -153,6 +153,28 @@ var incomingOfficialDispatchController = {
       return next(error);
     }
   },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
+  approval: async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const list = id.split(".");
+      var { handler, sendEmail, arrivalNumber, description } = req.body;
+      if (!handler) handler = [];
+      const result = await service.approval(list[list.length - 1], req.userID, {
+        handler,
+        description,
+        sendEmail,
+        arrivalNumber,
+      });
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  },
 };
 
 module.exports = incomingOfficialDispatchController;

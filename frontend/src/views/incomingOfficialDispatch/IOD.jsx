@@ -85,7 +85,7 @@ export default function IOD() {
   })
   const updateFindParams = (newState) =>
     setFindParams((prevState) => ({ ...prevState, ...newState }))
-  const [visible, setVisible] = useState(true)
+  const [visible, setVisible] = useState(false)
 
   const printRef = useRef()
 
@@ -619,6 +619,9 @@ export default function IOD() {
                     onSelectedRowsChange={handleRowSelected}
                     clearSelectedRows={toggleCleared}
                     progressPending={loading}
+                    selectableRowDisabled={(row) =>
+                      !['PENDING', 'REFUSE', 'LATE'].includes(row.status.name)
+                    }
                   />
                 </CCol>
               </CRow>

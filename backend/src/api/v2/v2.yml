@@ -3,7 +3,7 @@ info:
   title: E-Office API's Document
   version: "1.0.0"
 servers:
-  - url: http://10.10.35.21:5000/v2
+  - url: http://192.168.72.113:5000/v2
   - url: http://localhost:5000/v2
 components:
   securitySchemes:

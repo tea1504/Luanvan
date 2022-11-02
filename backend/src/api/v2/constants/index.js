@@ -85,6 +85,7 @@ const Constants = {
       SLASH: "/",
       CREATE_MULTI: "/csv",
       GET_ARRIVAL_NUMBER: "/new-arrival-number",
+      APPROVAL: "/approval/:id",
       FILE: "/file/:id",
       ID: "/:id",
     },

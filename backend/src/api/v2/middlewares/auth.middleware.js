@@ -13,7 +13,7 @@ const verifyToken = async (req, res, next) => {
   if (!token) {
     res
       .status(403)
-      .send({ status: 403, message: Constants.String.Message.ERR_403 });
+      .send({ status: 403, message: Constants.String.Message.ERR_403});
   }
   try {
     const decoded = jwt.verify(token, process.env.PRIVATEKEY);
