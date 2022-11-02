@@ -37,12 +37,14 @@ const Constants = {
       SLASH: "/",
       ID: "/:id",
       CREATE_MULTI: "/csv",
+      LIST: "/list",
     },
     Status: {
       ROOT: "/statuses",
       SLASH: "/",
       ID: "/:id",
       CREATE_MULTI: "/csv",
+      LIST: "/list",
     },
     Security: {
       ROOT: "/securities",
@@ -69,6 +71,7 @@ const Constants = {
       ID: "/:id",
       CREATE_MULTI: "/csv",
       ORGAN_ID: "/organ/:id",
+      LIST: "/list",
     },
     OfficialDispatchTravel: {
       ROOT: "/official-dispatch-travel",

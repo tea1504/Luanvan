@@ -2,6 +2,12 @@ import Constants from 'src/constants'
 import BaseService from './base.service'
 
 class TypeService extends BaseService {
+  async getList() {
+    const result = await this.api.get({
+      path: Constants.ApiPath.GET_LIST_TYPE,
+    })
+    return result
+  }
   async getMany(limit = 10, pageNumber = 1, filter = '') {
     const result = await this.api.get({
       path: Constants.ApiPath.GET_TYPES(limit, pageNumber, filter),

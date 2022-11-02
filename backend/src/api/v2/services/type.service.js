@@ -1,9 +1,33 @@
 require("dotenv").config();
 const Constants = require("../constants");
-const typeModel = require("./../models/type.model");
+const model = require("./../models/type.model");
 const { parse } = require("csv-parse/sync");
 
 var typeService = {
+  /**
+   * @returns {import("./../interfaces").ResponseResult}
+   */
+  getList: async () => {
+    try {
+      const result = await model.find(
+        {
+          deleted: false,
+        },
+        "name notation"
+      );
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.GET_200(Constants.String.Type._),
+        data: result,
+      };
+    } catch (error) {
+      return {
+        status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
+        message: Constants.String.Message.ERR_500,
+        data: { error: error.message },
+      };
+    }
+  },
   /**
    * @param {number} size
    * @param {number} page
@@ -13,7 +37,7 @@ var typeService = {
   getTypes: async (limit = 10, pageNumber = 1, filter = "") => {
     try {
       const result = {};
-      const totalTypes = await typeModel.countDocuments({
+      const totalTypes = await model.countDocuments({
         deleted: false,
         $or: [
           { name: { $regex: filter } },
@@ -37,7 +61,7 @@ var typeService = {
         };
       }
       result.rowsPerPage = limit;
-      result.data = await typeModel
+      result.data = await model
         .find({
           deleted: false,
           $or: [
@@ -68,7 +92,7 @@ var typeService = {
    */
   post: async (type) => {
     try {
-      const typeName = await typeModel.findOne({
+      const typeName = await model.findOne({
         name: type.name,
         deleted: false,
       });
@@ -77,7 +101,7 @@ var typeService = {
           status: Constants.ApiCode.NOT_ACCEPTABLE,
           message: Constants.String.Message.UNIQUE(Constants.String.Type.NAME),
         };
-      const typeNotation = await typeModel.findOne({
+      const typeNotation = await model.findOne({
         notation: type.notation,
         deleted: false,
       });
@@ -88,7 +112,7 @@ var typeService = {
             Constants.String.Type.NOTATION
           ),
         };
-      const newType = await typeModel.create(type);
+      const newType = await model.create(type);
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.POST_200(Constants.String.Type._),
@@ -131,7 +155,7 @@ var typeService = {
         var type = { name: records[i][0], notation: records[i][1] };
         if (records[i][2] !== "") type.description = records[i][2];
         if (records[i][3] !== "") type.color = records[i][3];
-        const typeName = await typeModel.findOne({
+        const typeName = await model.findOne({
           name: type.name,
           deleted: false,
         });
@@ -143,7 +167,7 @@ var typeService = {
             ),
             data: list,
           };
-        const typeNotation = await typeModel.findOne({
+        const typeNotation = await model.findOne({
           notation: type.notation,
           deleted: false,
         });
@@ -155,7 +179,7 @@ var typeService = {
             ),
             data: list,
           };
-        const newType = await typeModel.create(type);
+        const newType = await model.create(type);
         list.push(newType);
       }
       return {
@@ -192,7 +216,7 @@ var typeService = {
    */
   getType: async (id) => {
     try {
-      const type = await typeModel.findOne({ _id: id, deleted: false });
+      const type = await model.findOne({ _id: id, deleted: false });
       if (!type)
         return {
           status: Constants.ApiCode.NOT_FOUND,
@@ -227,13 +251,13 @@ var typeService = {
    */
   putType: async (id, type) => {
     try {
-      const findType = await typeModel.findOne({ _id: id, deleted: false });
+      const findType = await model.findOne({ _id: id, deleted: false });
       if (!findType)
         return {
           status: Constants.ApiCode.NOT_FOUND,
           message: "không tìm thấy loại văn bản",
         };
-      const typeName = await typeModel.findOne({
+      const typeName = await model.findOne({
         _id: { $ne: id },
         name: type.name,
         deleted: false,
@@ -243,7 +267,7 @@ var typeService = {
           status: Constants.ApiCode.NOT_ACCEPTABLE,
           message: Constants.String.Message.UNIQUE(Constants.String.Type.NAME),
         };
-      const typeNotation = await typeModel.findOne({
+      const typeNotation = await model.findOne({
         _id: { $ne: id },
         notation: type.notation,
         deleted: false,
@@ -255,8 +279,8 @@ var typeService = {
             Constants.String.Type.NOTATION
           ),
         };
-      await typeModel.findByIdAndUpdate({ _id: id }, type);
-      const result = await typeModel.findOne({ _id: id });
+      await model.findByIdAndUpdate({ _id: id }, type);
+      const result = await model.findOne({ _id: id });
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.PUT_200(Constants.String.Type._),
@@ -292,7 +316,7 @@ var typeService = {
    */
   deleteType: async (id) => {
     try {
-      const deletedType = await typeModel.findOneAndUpdate(
+      const deletedType = await model.findOneAndUpdate(
         { _id: id, deleted: false },
         { deleted: true }
       );
@@ -329,7 +353,7 @@ var typeService = {
    */
   deleteTypes: async (ids) => {
     try {
-      const deletedTypes = await typeModel.updateMany(
+      const deletedTypes = await model.updateMany(
         { _id: { $in: ids }, deleted: false },
         { deleted: true }
       );

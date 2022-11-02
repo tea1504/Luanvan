@@ -4,6 +4,8 @@ const statusModel = require("../models/status.model");
 const incomingOfficialDispatchModel = require("./../models/incomingOfficialDispatch.model");
 const model = require("./../models/incomingOfficialDispatch.model");
 var nodemailer = require("nodemailer");
+const securityModel = require("../models/security.model");
+const { default: mongoose } = require("mongoose");
 var transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -14,7 +16,7 @@ var transporter = nodemailer.createTransport({
 
 var incomingOfficialDispatchService = {
   getManyByUserOrgan: async (
-    userID,
+    userID = "",
     limit = 10,
     pageNumber = 1,
     filter = "",
@@ -45,12 +47,19 @@ var incomingOfficialDispatchService = {
           $lte: parseInt(params.issuedEndDate),
         };
       if (params.arrivalNumber < 1) params.arrivalNumber = null;
+      const khongMat = await securityModel.findOne({ name: "Không" });
       const result = {};
       const total = await model.countDocuments({
         organ: user.organ,
         deleted: false,
         ...params,
         ...between,
+        // $or: [
+        //   { security: khongMat._id.toString() },
+        //   { importer: userID },
+        //   { handler: userID },
+        //   { approver: userID },
+        // ],
       });
       let startIndex = (pageNumber - 1) * limit;
       let endIndex = pageNumber * limit;
@@ -74,6 +83,12 @@ var incomingOfficialDispatchService = {
           deleted: false,
           ...params,
           ...between,
+          $or: [
+            { security: khongMat._id.toString() },
+            { importer: userID },
+            { handler: { $all: [mongoose.Types.ObjectId(userID)] } },
+            { approver: userID },
+          ],
         })
         .populate("type")
         .populate("language")
@@ -347,7 +362,6 @@ var incomingOfficialDispatchService = {
               Constants.String.Status._
             ),
           };
-        item.handler = data.handler;
         item.status = APPROVED._id.toString();
       } else {
         if (!PROGRESSING)
@@ -357,6 +371,7 @@ var incomingOfficialDispatchService = {
               Constants.String.Status._
             ),
           };
+        item.handler = data.handler;
         item.status = PROGRESSING._id.toString();
         item.traceHeaderList.push({
           date: new Date(),

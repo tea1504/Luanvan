@@ -6,6 +6,32 @@ const { parse } = require("csv-parse/sync");
 
 var organizationService = {
   /**
+   * @returns {import("./../interfaces").ResponseResult}
+   */
+  getList: async () => {
+    try {
+      const result = await model.find(
+        {
+          deleted: false,
+        },
+        "name code"
+      );
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.GET_200(
+          Constants.String.Organization._
+        ),
+        data: result,
+      };
+    } catch (error) {
+      return {
+        status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
+        message: Constants.String.Message.ERR_500,
+        data: { error: error.message },
+      };
+    }
+  },
+  /**
    * @param {number} limit
    * @param {number} pageNumber
    * @param {string} filter

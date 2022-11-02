@@ -1,13 +1,14 @@
 const express = require("express");
 const Constants = require("../constants");
 const route = express.Router();
-const statusController = require("./../controllers/status.controller");
+const controller = require("./../controllers/status.controller");
 const multer = require("multer");
 const path = require("path");
 const readCategories = require("../middlewares/readCategories.middleware");
 const createCategories = require("../middlewares/createCategories.middleware");
 const updateCategories = require("../middlewares/updateCategories.middleware");
 const deleteCategories = require("../middlewares/deleteCategories.middleware");
+const adminMiddleware = require("./../middlewares/admin.middleware");
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -24,40 +25,51 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage });
 
 route.get(
+  Constants.ApiPath.Status.LIST,
+  controller.getList
+);
+route.get(
   Constants.ApiPath.Status.SLASH,
+  adminMiddleware,
   readCategories,
-  statusController.getStatuses
+  controller.getStatuses
 );
 route.get(
   Constants.ApiPath.Status.ID,
+  adminMiddleware,
   readCategories,
-  statusController.getStatus
+  controller.getStatus
 );
 route.post(
   Constants.ApiPath.Status.SLASH,
+  adminMiddleware,
   createCategories,
-  statusController.postStatus
+  controller.postStatus
 );
 route.post(
   Constants.ApiPath.Status.CREATE_MULTI,
+  adminMiddleware,
   createCategories,
   upload.single("file"),
-  statusController.postStatuses
+  controller.postStatuses
 );
 route.put(
   Constants.ApiPath.Status.ID,
+  adminMiddleware,
   updateCategories,
-  statusController.putStatus
+  controller.putStatus
 );
 route.delete(
   Constants.ApiPath.Status.ID,
+  adminMiddleware,
   deleteCategories,
-  statusController.deleteStatus
+  controller.deleteStatus
 );
 route.delete(
   Constants.ApiPath.Status.SLASH,
+  adminMiddleware,
   deleteCategories,
-  statusController.deleteStatuses
+  controller.deleteStatuses
 );
 
 module.exports = route;

@@ -21,13 +21,11 @@ route.use(Constants.ApiPath.Officer.ROOT, authMiddleware, officerRouter);
 route.use(
   Constants.ApiPath.Type.ROOT,
   authMiddleware,
-  adminMiddleware,
   typeRouter
 );
 route.use(
   Constants.ApiPath.Status.ROOT,
   authMiddleware,
-  adminMiddleware,
   statusRouter
 );
 route.use(
@@ -51,7 +49,6 @@ route.use(
 route.use(
   Constants.ApiPath.OfficerStatus.ROOT,
   authMiddleware,
-  adminMiddleware,
   officerStatusRouter
 );
 route.use(

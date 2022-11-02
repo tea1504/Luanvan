@@ -8,6 +8,12 @@ class OrganizationService extends BaseService {
     })
     return result
   }
+  async getList() {
+    const result = await this.api.get({
+      path: Constants.ApiPath.GET_LIST_ORGANIZATIONS,
+    })
+    return result
+  }
   async getOne(id) {
     const result = await this.api.get({
       path: Constants.ApiPath.GET_ORGANIZATION(id),

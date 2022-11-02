@@ -15,18 +15,16 @@ var storage = multer.diskStorage({
     cb(null, path.join("public/uploads/"));
   },
   filename: function (req, file, cb) {
-    cb(
-      null,
-      file.fieldname + "_" + Date.now() + "." + file.originalname.split(".")[1]
-    );
+    var f = file.originalname.split(".");
+    cb(null, file.fieldname + "_" + Date.now() + "." + f[f.length - 1]);
   },
 });
 
 var upload = multer({ storage: storage });
 
 route.get(
-  Constants.ApiPath.Organization.SLASH,
-  organizationController.getMany
+  Constants.ApiPath.Organization.LIST,
+  organizationController.getList
 );
 route.get(
   Constants.ApiPath.Organization.SLASH,

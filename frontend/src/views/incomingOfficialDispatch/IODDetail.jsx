@@ -538,62 +538,70 @@ export default function IODDetail() {
                     </CBadge>
                   </CTableDataCell>
                 </CTableRow>
-                <CTableRow>
-                  <CTableHeaderCell
-                    colSpan={4}
-                    className="text-center bg-primary bg-gradient bg-opacity-25"
-                  >
-                    <h3>{Strings.Common.DATABASE_INFO}</h3>
-                  </CTableHeaderCell>
-                </CTableRow>
-                <CTableRow>
-                  <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Form.FieldName.APPROVER(Strings.IncomingOfficialDispatch.NAME)}
-                  </CTableHeaderCell>
-                  <CTableDataCell>
-                    {state.approver.code} | {state.approver.lastName} {state.approver.firstName} (
-                    {state.approver.position})
-                  </CTableDataCell>
-                  <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Form.FieldName.IMPORTER(Strings.IncomingOfficialDispatch.NAME)}
-                  </CTableHeaderCell>
-                  <CTableDataCell>
-                    {state.importer.code} | {state.importer.lastName} {state.importer.firstName} (
-                    {state.importer.position})
-                  </CTableDataCell>
-                </CTableRow>
-                <CTableRow>
-                  <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Form.FieldName.HANDLER()}
-                  </CTableHeaderCell>
-                  <CTableDataCell colSpan={3}>
-                    {state.handler.map((el, ind) => {
-                      return (
-                        <div key={ind} className="mx-0 px-0">
-                          {el.code} | {el.lastName} {el.firstName} ({el.position})
-                        </div>
-                      )
-                    })}
-                  </CTableDataCell>
-                </CTableRow>
-                <CTableRow>
-                  <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Form.FieldName._ID}
-                  </CTableHeaderCell>
-                  <CTableDataCell>{state._id}</CTableDataCell>
-                  <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Form.FieldName.__V}
-                  </CTableHeaderCell>
-                  <CTableDataCell>{state.__v}</CTableDataCell>
-                </CTableRow>
-                <CTableRow>
-                  <CTableHeaderCell className="py-2">
-                    {Strings.Form.FieldName.CREATED_AT}
-                  </CTableHeaderCell>
-                  <CTableDataCell>{Helpers.formatDateFromString(state.createdAt)}</CTableDataCell>
-                  <CTableHeaderCell>{Strings.Form.FieldName.UPDATED_AT}</CTableHeaderCell>
-                  <CTableDataCell>{Helpers.formatDateFromString(state.updatedAt)}</CTableDataCell>
-                </CTableRow>
+                {[0].includes(loggedUser.right.scope) && (
+                  <>
+                    <CTableRow>
+                      <CTableHeaderCell
+                        colSpan={4}
+                        className="text-center bg-primary bg-gradient bg-opacity-25"
+                      >
+                        <h3>{Strings.Common.DATABASE_INFO}</h3>
+                      </CTableHeaderCell>
+                    </CTableRow>
+                    <CTableRow>
+                      <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
+                        {Strings.Form.FieldName.APPROVER(Strings.IncomingOfficialDispatch.NAME)}
+                      </CTableHeaderCell>
+                      <CTableDataCell>
+                        {state.approver.code} | {state.approver.lastName} {state.approver.firstName}{' '}
+                        ({state.approver.position})
+                      </CTableDataCell>
+                      <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
+                        {Strings.Form.FieldName.IMPORTER(Strings.IncomingOfficialDispatch.NAME)}
+                      </CTableHeaderCell>
+                      <CTableDataCell>
+                        {state.importer.code} | {state.importer.lastName} {state.importer.firstName}{' '}
+                        ({state.importer.position})
+                      </CTableDataCell>
+                    </CTableRow>
+                    <CTableRow>
+                      <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
+                        {Strings.Form.FieldName.HANDLER()}
+                      </CTableHeaderCell>
+                      <CTableDataCell colSpan={3}>
+                        {state.handler.map((el, ind) => {
+                          return (
+                            <div key={ind} className="mx-0 px-0">
+                              {el.code} | {el.lastName} {el.firstName} ({el.position})
+                            </div>
+                          )
+                        })}
+                      </CTableDataCell>
+                    </CTableRow>
+                    <CTableRow>
+                      <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
+                        {Strings.Form.FieldName._ID}
+                      </CTableHeaderCell>
+                      <CTableDataCell>{state._id}</CTableDataCell>
+                      <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
+                        {Strings.Form.FieldName.__V}
+                      </CTableHeaderCell>
+                      <CTableDataCell>{state.__v}</CTableDataCell>
+                    </CTableRow>
+                    <CTableRow>
+                      <CTableHeaderCell className="py-2">
+                        {Strings.Form.FieldName.CREATED_AT}
+                      </CTableHeaderCell>
+                      <CTableDataCell>
+                        {Helpers.formatDateFromString(state.createdAt)}
+                      </CTableDataCell>
+                      <CTableHeaderCell>{Strings.Form.FieldName.UPDATED_AT}</CTableHeaderCell>
+                      <CTableDataCell>
+                        {Helpers.formatDateFromString(state.updatedAt)}
+                      </CTableDataCell>
+                    </CTableRow>
+                  </>
+                )}
               </CTable>
             </CCardBody>
             <CCardFooter>

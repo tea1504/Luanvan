@@ -31,6 +31,7 @@ const Constants = {
     // Type
     GET_TYPES: (limit = 10, pageNumber = 1, filter = '') =>
       `/types?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
+    GET_LIST_TYPE: `/types/list`,
     GET_TYPE: (id) => `/types/` + id,
     CREATE_TYPE: '/types',
     CREATE_TYPES: '/types/csv',
@@ -59,6 +60,7 @@ const Constants = {
     DELETE_SECURITIES: '/securities',
 
     // Status
+    GET_LIST_STATUS: `/statuses/list`,
     GET_STATUSES: (limit = 10, pageNumber = 1, filter = '') =>
       `/statuses?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
     GET_STATUS: (id) => `/statuses/` + id,
@@ -89,6 +91,7 @@ const Constants = {
     DELETE_RIGHTS: '/rights',
 
     // Organization
+    GET_LIST_ORGANIZATIONS: `/organizations/list`,
     GET_ORGANIZATIONS: (limit = 5, pageNumber = 1, filter = '') =>
       `/organizations?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
     GET_ORGANIZATIONS_BY_ORGAN_ID: (id = '', limit = 10, pageNumber = 1, filter = '') =>
