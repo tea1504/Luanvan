@@ -127,10 +127,7 @@ var authService = {
   getInfo: async (id) => {
     try {
       const officer = await officerModel
-        .findById(
-          id,
-          "-_id -password -organ -deleted -createdAt -updatedAt -__v"
-        )
+        .findById(id, "-password -organ -deleted -createdAt -updatedAt -__v")
         .populate("right")
         .populate("status");
       if (!officer) return { status: 404, message: "không tìm thấy thông tin" };

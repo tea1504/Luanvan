@@ -31,7 +31,7 @@ const _nav = [
     icon: <FaHome className="nav-icon" />,
   },
   {
-    component: CNavItem,
+    component: CNavGroup,
     name: {
       vi: vn.IncomingOfficialDispatch.NAME,
       en: en.IncomingOfficialDispatch.NAME,
@@ -40,6 +40,26 @@ const _nav = [
     right: Strings.Common.READ_OD,
     to: Screens.IOD,
     icon: <FaFileImport className="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: {
+          vi: vn.Common.LIST,
+          en: en.Common.LIST,
+        },
+        role: [0, 1],
+        to: Screens.IOD,
+      },
+      {
+        component: CNavItem,
+        name: {
+          vi: vn.IncomingOfficialDispatch.Common.NEED_PROGRESS,
+          en: en.IncomingOfficialDispatch.Common.NEED_PROGRESS,
+        },
+        role: [0, 1],
+        to: Screens.IOD_PROGRESSING,
+      },
+    ],
   },
   {
     component: CNavTitle,

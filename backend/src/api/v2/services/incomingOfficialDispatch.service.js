@@ -413,6 +413,67 @@ var incomingOfficialDispatchService = {
       }
     }
   },
+  cancelApproval: async (id = "", userID = "") => {
+    try {
+      const item = await model.findOne({
+        _id: id,
+        deleted: false,
+      });
+      if (!item)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.IOD._),
+        };
+      const user = await officerModel.findById(userID, { deleted: false });
+      if (!user)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Officer._),
+        };
+      const PENDING = await statusModel.findOne({
+        name: "PENDING",
+        deleted: false,
+      });
+      item.traceHeaderList.push({
+        date: new Date(),
+        status: PENDING._id.toString(),
+        officer: user._id.toString(),
+        command: `${user.lastName} ${user.firstName} đã hủy duyệt văn bản`,
+        header: PENDING.name,
+      });
+      item.status = PENDING._id.toString();
+      item.handler = [];
+      item.arrivalNumber = null;
+      item.save();
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.PUT_200(Constants.String.Language._),
+        data: item,
+      };
+    } catch (error) {
+      switch (error.name) {
+        case "ValidationError":
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.ERR_406,
+            data: { error: error.errors },
+          };
+        case "CastError":
+        case "MongoServerError":
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.ERR_406,
+            data: { error: error.message },
+          };
+        default:
+          return {
+            status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
+            message: Constants.String.Message.ERR_500,
+            data: { error: error.message },
+          };
+      }
+    }
+  },
 };
 
 module.exports = incomingOfficialDispatchService;

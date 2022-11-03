@@ -8,6 +8,7 @@ const readCategories = require("../middlewares/readCategories.middleware");
 const createCategories = require("../middlewares/createCategories.middleware");
 const updateCategories = require("../middlewares/updateCategories.middleware");
 const deleteCategories = require("../middlewares/deleteCategories.middleware");
+const adminMiddleware = require("./../middlewares/admin.middleware");
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -22,43 +23,55 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage });
 
-route.get(Constants.ApiPath.Officers.SLASH, readCategories, controller.getMany);
+route.get(
+  Constants.ApiPath.Officers.SLASH,
+  adminMiddleware,
+  readCategories,
+  controller.getMany
+);
 route.get(
   Constants.ApiPath.Officers.ORGAN_ID,
+  adminMiddleware,
   readCategories,
   controller.getManyByOrganId
 );
+route.get(Constants.ApiPath.Officers.USER_ID, controller.getManyByUser);
 route.get(
-  Constants.ApiPath.Officers.USER_ID,
+  Constants.ApiPath.Officers.ID,
+  adminMiddleware,
   readCategories,
-  controller.getManyByUser
+  controller.getOne
 );
-route.get(Constants.ApiPath.Officers.ID, readCategories, controller.getOne);
 route.post(
   Constants.ApiPath.Officers.SLASH,
+  adminMiddleware,
   createCategories,
   upload.single("avatar"),
   controller.postOne
 );
 route.post(
   Constants.ApiPath.Officers.CREATE_MULTI,
+  adminMiddleware,
   createCategories,
   upload.single("file"),
   controller.postMany
 );
 route.put(
   Constants.ApiPath.Officers.ID,
+  adminMiddleware,
   updateCategories,
   upload.single("avatar"),
   controller.putOne
 );
 route.delete(
   Constants.ApiPath.Officers.ID,
+  adminMiddleware,
   deleteCategories,
   controller.deleteOne
 );
 route.delete(
   Constants.ApiPath.Officers.SLASH,
+  adminMiddleware,
   deleteCategories,
   controller.deleteMany
 );

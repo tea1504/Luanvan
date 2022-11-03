@@ -65,7 +65,6 @@ route.use(
 route.use(
   Constants.ApiPath.Officers.ROOT,
   authMiddleware,
-  adminMiddleware,
   officerRouter
 );
 route.use(

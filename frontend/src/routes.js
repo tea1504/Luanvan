@@ -42,6 +42,7 @@ const IODCreateOrUpdate = React.lazy(() =>
 )
 const IODDetail = React.lazy(() => import('./views/incomingOfficialDispatch/IODDetail'))
 const IODApproval = React.lazy(() => import('./views/incomingOfficialDispatch/IODApproval'))
+const IODListProgress = React.lazy(() => import('./views/incomingOfficialDispatch/IODListProgress'))
 const User = React.lazy(() => import('./views/user/User'))
 const UserChangePassword = React.lazy(() => import('./views/user/UserChangePassword'))
 
@@ -350,6 +351,15 @@ const routes = [
     element: IODApproval,
     role: [0, 1],
     right: Strings.Common.APPROVE_OD,
+  },
+  {
+    path: Screens.IOD_PROGRESSING,
+    name: {
+      vi: vn.IncomingOfficialDispatch.Common.NEED_PROGRESS,
+      en: en.IncomingOfficialDispatch.Common.NEED_PROGRESS,
+    },
+    element: IODListProgress,
+    role: [0, 1],
   },
 ]
 

@@ -64,6 +64,13 @@ class IODService extends BaseService {
     })
     return result
   }
+  async cancelApproval(id, data) {
+    const result = await this.api.put({
+      path: Constants.ApiPath.APPROVE_CANCEL_IOD(id),
+      data: data,
+    })
+    return result
+  }
   // async deleteOne(id) {
   //   const result = await this.api.delete({
   //     path: Constants.ApiPath.DELETE_OFFICER(id),

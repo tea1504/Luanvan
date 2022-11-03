@@ -175,6 +175,24 @@ var incomingOfficialDispatchController = {
       return next(error);
     }
   },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
+  cancelApproval: async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const list = id.split(".");
+      const result = await service.cancelApproval(
+        list[list.length - 1],
+        req.userID
+      );
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  },
 };
 
 module.exports = incomingOfficialDispatchController;

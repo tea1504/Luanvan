@@ -377,8 +377,14 @@ export default function IODCreateOrUpdate() {
       setOfficer([])
       const result = await officerService.getManyByUser(10000, 1)
       result.data.data.data.map((el) => {
-        var item = { value: el._id, label: `${el.lastName} ${el.firstName} (${el.position})` }
-        setOfficer((prevState) => [...prevState, item])
+        var item
+        if (el.right.approveOD) {
+          item = {
+            value: el._id,
+            label: `${el.code} | ${el.lastName} ${el.firstName} (${el.position})`,
+          }
+          setOfficer((prevState) => [...prevState, item])
+        }
       })
       dispatch(setLoading(false))
     } catch (error) {

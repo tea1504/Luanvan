@@ -167,32 +167,34 @@ const ActionButton = ({ data }) => {
             </CButton>
           </CTooltip>
         )}
-      {loggedUser.right[Strings.Common.APPROVE_OD] && ['PENDING'].includes(data.status.name) && (
-        <CTooltip content={Strings.Common.APPROVE}>
-          <CButton
-            size="sm"
-            color="success"
-            className="m-1"
-            onClick={() =>
-              navigate(
-                Screens.IOD_APPROVE(
-                  `${Helpers.toSlug(
-                    Helpers.getMaVanBan(
-                      data.code,
-                      data.organ.code,
-                      data.type.notation,
-                      data.issuedDate,
-                      localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
-                    ),
-                  )}.${data._id}`,
-                ),
-              )
-            }
-          >
-            <FaTasks style={{ color: 'whitesmoke' }} />
-          </CButton>
-        </CTooltip>
-      )}
+      {loggedUser.right[Strings.Common.APPROVE_OD] &&
+        ['PENDING'].includes(data.status.name) &&
+        data.approver.code === loggedUser.code && (
+          <CTooltip content={Strings.Common.APPROVE}>
+            <CButton
+              size="sm"
+              color="success"
+              className="m-1"
+              onClick={() =>
+                navigate(
+                  Screens.IOD_APPROVE(
+                    `${Helpers.toSlug(
+                      Helpers.getMaVanBan(
+                        data.code,
+                        data.organ.code,
+                        data.type.notation,
+                        data.issuedDate,
+                        localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
+                      ),
+                    )}.${data._id}`,
+                  ),
+                )
+              }
+            >
+              <FaTasks style={{ color: 'whitesmoke' }} />
+            </CButton>
+          </CTooltip>
+        )}
     </div>
   )
 }

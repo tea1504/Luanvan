@@ -37,7 +37,7 @@ route.get(
 );
 route.get(
   Constants.ApiPath.IncomingOfficialDispatch.GET_ARRIVAL_NUMBER,
-  createOD,
+  approveOD,
   controller.getNewArrivalNumber
 );
 route.get(
@@ -55,6 +55,11 @@ route.put(
   Constants.ApiPath.IncomingOfficialDispatch.APPROVAL,
   approveOD,
   controller.approval
+);
+route.put(
+  Constants.ApiPath.IncomingOfficialDispatch.APPROVAL_CANCEL,
+  approveOD,
+  controller.cancelApproval
 );
 
 module.exports = route;

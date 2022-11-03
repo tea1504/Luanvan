@@ -97,6 +97,29 @@ export default function IODDetail() {
   const [visible, setVisible] = useState(false)
   const [link, setLink] = useState('')
 
+  const showError = (error) => {
+    switch (error.status) {
+      case 401:
+        MySwal.fire({
+          title: Strings.Message.COMMON_ERROR,
+          icon: 'error',
+          text: error.message,
+        }).then(() => {
+          localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
+          localStorage.clear(Constants.StorageKeys.USER_INFO)
+          navigate(Screens.LOGIN)
+        })
+        break
+      default:
+        MySwal.fire({
+          title: Strings.Message.COMMON_ERROR,
+          icon: 'error',
+          text: error.message,
+        })
+        break
+    }
+  }
+
   const getState = async (id = '') => {
     if (store.length > 0) {
       const s = store.find((el) => el._id === id)
@@ -116,26 +139,7 @@ export default function IODDetail() {
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
-      switch (error.status) {
-        case 401:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          }).then(() => {
-            localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
-            localStorage.clear(Constants.StorageKeys.USER_INFO)
-            navigate(Screens.LOGIN)
-          })
-          break
-        default:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          })
-          break
-      }
+      showError(error)
     }
   }
 
@@ -227,6 +231,24 @@ export default function IODDetail() {
         ))}
       </CRow>
     )
+  }
+
+  const handleOnClickCancelButton = async () => {
+    try {
+      dispatch(setLoading(true))
+      await service.cancelApproval(id)
+      dispatch(setLoading(false))
+      await MySwal.fire({
+        title: Strings.Message.CancelApproval.TITLE,
+        icon: 'success',
+        text: Strings.Message.CancelApproval.SUCCESS,
+        confirmButtonText: Strings.Common.OK,
+      })
+      navigate(-1)
+    } catch (error) {
+      dispatch(setLoading(false))
+      showError(error)
+    }
   }
 
   useEffect(() => {
@@ -605,9 +627,54 @@ export default function IODDetail() {
               </CTable>
             </CCardBody>
             <CCardFooter>
-              <CButton className="w-100" onClick={() => navigate(-1)}>
-                {Strings.Common.BACK}
-              </CButton>
+              <CRow>
+                {loggedUser.right[Strings.Common.APPROVE_OD] &&
+                  ['PENDING'].includes(state.status.name) &&
+                  state.approver.code === loggedUser.code && (
+                    <CCol>
+                      <CButton
+                        className="w-100"
+                        color="success"
+                        onClick={() =>
+                          navigate(
+                            Screens.IOD_APPROVE(
+                              `${Helpers.toSlug(
+                                Helpers.getMaVanBan(
+                                  state.code,
+                                  state.organ.code,
+                                  state.type.notation,
+                                  state.issuedDate,
+                                  localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
+                                ),
+                              )}.${state._id}`,
+                            ),
+                          )
+                        }
+                      >
+                        {Strings.Common.APPROVE}
+                      </CButton>
+                    </CCol>
+                  )}
+                {loggedUser.right[Strings.Common.APPROVE_OD] &&
+                  !['PENDING', 'IMPLEMENT'].includes(state.status.name) &&
+                  state.approver.code === loggedUser.code && (
+                    <CCol>
+                      <CButton className="w-100" color="danger" onClick={handleOnClickCancelButton}>
+                        {Strings.Common.APPROVE_CANCEL}
+                      </CButton>
+                    </CCol>
+                  )}
+                <CCol>
+                  <CButton
+                    className="w-100"
+                    color="secondary"
+                    variant="outline"
+                    onClick={() => navigate(-1)}
+                  >
+                    {Strings.Common.BACK}
+                  </CButton>
+                </CCol>
+              </CRow>
             </CCardFooter>
           </CCard>
         </CCol>

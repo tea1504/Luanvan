@@ -252,7 +252,7 @@ export default function IODApproval() {
       setOfficer([])
       const result = await officerService.getManyByUser(10000, 1)
       result.data.data.data.map((el) => {
-        var item = { value: el._id, label: `${el.lastName} ${el.firstName} (${el.position})` }
+        var item = { value: el._id, label: `${el.code} | ${el.lastName} ${el.firstName} (${el.position})` }
         setOfficer((prevState) => [...prevState, item])
       })
       dispatch(setLoading(false))

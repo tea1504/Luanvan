@@ -89,6 +89,7 @@ const Constants = {
       CREATE_MULTI: "/csv",
       GET_ARRIVAL_NUMBER: "/new-arrival-number",
       APPROVAL: "/approval/:id",
+      APPROVAL_CANCEL: "/cancel-approval/:id",
       FILE: "/file/:id",
       ID: "/:id",
     },
