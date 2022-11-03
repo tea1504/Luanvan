@@ -474,6 +474,119 @@ var incomingOfficialDispatchService = {
       }
     }
   },
+  handle: async (
+    id = "",
+    userID = "",
+    data = { done: false, newHandler: [], command: "", sendEmail: [] }
+  ) => {
+    try {
+      if (!data.command) data.command = "";
+      const item = await model.findOne({
+        _id: id,
+        deleted: false,
+      });
+      if (!item)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.IOD._),
+        };
+      const user = await officerModel.findById(userID, { deleted: false });
+      if (!user)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Officer._),
+        };
+      var status;
+      if (data.done)
+        status = await statusModel.findOne({
+          name: "PROGRESSED",
+          deleted: false,
+        });
+      else
+        status = await statusModel.findOne({
+          name: "PROGRESSING",
+          deleted: false,
+        });
+      item.traceHeaderList.push({
+        date: new Date(),
+        status: status._id.toString(),
+        officer: user._id.toString(),
+        command: `${user.lastName} ${user.firstName} cho ý kiến ${data.command}`,
+        header: status.name,
+      });
+      item.status = status._id.toString();
+      item.handler.push(...data.newHandler);
+      item.save();
+      const result = await model
+        .findOne({ _id: id, deleted: false })
+        .populate("type")
+        .populate("language")
+        .populate("priority")
+        .populate("security")
+        .populate("organ")
+        .populate("approver")
+        .populate("importer")
+        .populate("handler")
+        .populate("status")
+        .populate("traceHeaderList.officer")
+        .populate("traceHeaderList.status");
+      const listOfficer = await officerModel.find({
+        _id: { $in: [...data.sendEmail, ...data.newHandler] },
+      });
+      const listEmail = listOfficer.map((el) => el.emailAddress);
+      console.log(listEmail, data.newHandler, [
+        ...data.sendEmail,
+        ...data.newHandler,
+      ]);
+      if (listEmail.length !== 0) {
+        var mailOptions = {
+          from: process.env.MAIL_USER,
+          bcc: listEmail.join(", "),
+          subject: "email_title",
+          html: `<img src="https://imggroup.com.vn/Content/images/logo-img.png" height="100"/>
+          <br/>
+          <span style="width: 100%; font-family: Tahoma,Geneva, sans-serif;">
+              Bạn có <strong>1 thông báo</strong> xử lý văn bản
+          </span>
+`,
+        };
+        transporter.sendMail(mailOptions, function (error, info) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log("Email sent: " + info.response);
+          }
+        });
+      }
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.PUT_200(Constants.String.Language._),
+        data: result,
+      };
+    } catch (error) {
+      switch (error.name) {
+        case "ValidationError":
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.ERR_406,
+            data: { error: error.errors },
+          };
+        case "CastError":
+        case "MongoServerError":
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.ERR_406,
+            data: { error: error.message },
+          };
+        default:
+          return {
+            status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
+            message: Constants.String.Message.ERR_500,
+            data: { error: error.message },
+          };
+      }
+    }
+  },
 };
 
 module.exports = incomingOfficialDispatchService;

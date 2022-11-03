@@ -61,5 +61,9 @@ route.put(
   approveOD,
   controller.cancelApproval
 );
+route.put(
+  Constants.ApiPath.IncomingOfficialDispatch.HANDLE,
+  controller.handle
+);
 
 module.exports = route;

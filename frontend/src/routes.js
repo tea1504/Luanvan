@@ -43,6 +43,7 @@ const IODCreateOrUpdate = React.lazy(() =>
 const IODDetail = React.lazy(() => import('./views/incomingOfficialDispatch/IODDetail'))
 const IODApproval = React.lazy(() => import('./views/incomingOfficialDispatch/IODApproval'))
 const IODListProgress = React.lazy(() => import('./views/incomingOfficialDispatch/IODListProgress'))
+const IODHandle = React.lazy(() => import('./views/incomingOfficialDispatch/IODHandle'))
 const User = React.lazy(() => import('./views/user/User'))
 const UserChangePassword = React.lazy(() => import('./views/user/UserChangePassword'))
 
@@ -359,6 +360,15 @@ const routes = [
       en: en.IncomingOfficialDispatch.Common.NEED_PROGRESS,
     },
     element: IODListProgress,
+    role: [0, 1],
+  },
+  {
+    path: Screens.IOD_HANDLE(),
+    name: {
+      vi: vn.IncomingOfficialDispatch.Common.HANDLE,
+      en: en.IncomingOfficialDispatch.Common.HANDLE,
+    },
+    element: IODHandle,
     role: [0, 1],
   },
 ]

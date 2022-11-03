@@ -12,7 +12,7 @@ import { setData, setTotal } from 'src/store/slice/IOD.slide'
 import Constants from 'src/constants'
 import Helpers from 'src/commons/helpers'
 import IODService from 'src/services/IOD.service'
-import { FaInfoCircle, FaPenSquare, FaTasks, FaTrash } from 'react-icons/fa'
+import { FaHandshake, FaInfoCircle, FaPenSquare, FaTasks, FaTrash } from 'react-icons/fa'
 
 const service = new IODService()
 const MySwal = withReactContent(Swal)
@@ -192,6 +192,33 @@ const ActionButton = ({ data }) => {
               }
             >
               <FaTasks style={{ color: 'whitesmoke' }} />
+            </CButton>
+          </CTooltip>
+        )}
+      {['PROGRESSING'].includes(data.status.name) &&
+        data.handler.filter((el) => el.code === loggedUser.code).length !== 0 && (
+          <CTooltip content={Strings.Common.HANDLE}>
+            <CButton
+              size="sm"
+              color="primary"
+              className="m-1"
+              onClick={() =>
+                navigate(
+                  Screens.IOD_HANDLE(
+                    `${Helpers.toSlug(
+                      Helpers.getMaVanBan(
+                        data.code,
+                        data.organ.code,
+                        data.type.notation,
+                        data.issuedDate,
+                        localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
+                      ),
+                    )}.${data._id}`,
+                  ),
+                )
+              }
+            >
+              <FaHandshake style={{ color: 'whitesmoke' }} />
             </CButton>
           </CTooltip>
         )}

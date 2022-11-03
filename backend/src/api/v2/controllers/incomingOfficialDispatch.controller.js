@@ -193,6 +193,27 @@ var incomingOfficialDispatchController = {
       return next(error);
     }
   },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
+  handle: async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const list = id.split(".");
+      var { newHandler, done, command, sendEmail } = req.body;
+      const result = await service.handle(list[list.length - 1], req.userID, {
+        newHandler,
+        done,
+        command,
+        sendEmail,
+      });
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  },
 };
 
 module.exports = incomingOfficialDispatchController;

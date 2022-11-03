@@ -9,6 +9,7 @@ var fs = require("fs");
 require("dotenv").config();
 var nodemailer = require("nodemailer");
 const rightModel = require("../models/right.model");
+const officerModel = require("../models/officer.model");
 
 var transporter = nodemailer.createTransport({
   service: "gmail",
@@ -19,6 +20,40 @@ var transporter = nodemailer.createTransport({
 });
 
 var officerService = {
+  getList: async (userID = "") => {
+    try {
+      const user = await officerModel.findById(userID, { deleted: false });
+      if (!user)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Officer._),
+        };
+      const result = await officerModel.find(
+        { organ: user.organ, deleted: false },
+        "code firstName lastName position"
+      );
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.POST_200(Constants.String.Officer._),
+        data: result,
+      };
+    } catch (error) {
+      switch (error.name) {
+        case "CastError":
+          return {
+            status: Constants.ApiCode.NOT_ACCEPTABLE,
+            message: Constants.String.Message.ERR_406,
+            data: { error: error.message },
+          };
+        default:
+          return {
+            status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
+            message: Constants.String.Message.ERR_500,
+            data: { error: error.message },
+          };
+      }
+    }
+  },
   /**
    * @param {number} limit
    * @param {number} pageNumber

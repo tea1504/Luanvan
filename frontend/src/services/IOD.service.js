@@ -1,3 +1,4 @@
+import Helpers from 'src/commons/helpers'
 import Constants from 'src/constants'
 import BaseService from './base.service'
 
@@ -67,6 +68,14 @@ class IODService extends BaseService {
   async cancelApproval(id, data) {
     const result = await this.api.put({
       path: Constants.ApiPath.APPROVE_CANCEL_IOD(id),
+      data: data,
+    })
+    return result
+  }
+  async handle(id, data) {
+    data.command = Helpers.htmlDecode(data.command)
+    const result = await this.api.put({
+      path: Constants.ApiPath.HANDLE(id),
       data: data,
     })
     return result

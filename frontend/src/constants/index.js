@@ -106,6 +106,7 @@ const Constants = {
     // Organization
     GET_OFFICERS: (limit = 5, pageNumber = 1, filter = '') =>
       `/officers?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
+    GET_LIST_OFFICERS: `/officers/list`,
     GET_OFFICERS_BY_ORGAN_ID: (id = '', limit = 10, pageNumber = 1, filter = '') =>
       `/officers/organ/${id}?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
     GET_OFFICERS_BY_USER: (limit = 10, pageNumber = 1, filter = '') =>
@@ -130,6 +131,7 @@ const Constants = {
     UPDATE_IOD: (id = '') => '/incoming-official-dispatch/' + id,
     APPROVE_IOD: (id = '') => '/incoming-official-dispatch/approval/' + id,
     APPROVE_CANCEL_IOD: (id = '') => '/incoming-official-dispatch/cancel-approval/' + id,
+    HANDLE: (id = '') => '/incoming-official-dispatch/handle/' + id,
     DELETE_IOD: (id = '') => '/incoming-official-dispatch/' + id,
     DELETE_IODS: '/incoming-official-dispatch',
 

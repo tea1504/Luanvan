@@ -2,6 +2,12 @@ import Constants from 'src/constants'
 import BaseService from './base.service'
 
 class OfficerService extends BaseService {
+  async getList() {
+    const result = await this.api.get({
+      path: Constants.ApiPath.GET_LIST_OFFICERS,
+    })
+    return result
+  }
   async getMany(limit = 10, pageNumber = 1, filter = '') {
     const result = await this.api.get({
       path: Constants.ApiPath.GET_OFFICERS(limit, pageNumber, filter),
