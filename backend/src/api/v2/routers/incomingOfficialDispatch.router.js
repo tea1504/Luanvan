@@ -63,6 +63,7 @@ route.put(
 );
 route.put(
   Constants.ApiPath.IncomingOfficialDispatch.HANDLE,
+  upload.array("newFile"),
   controller.handle
 );
 

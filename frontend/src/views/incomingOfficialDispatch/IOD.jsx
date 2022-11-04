@@ -416,6 +416,7 @@ export default function IOD() {
   })
 
   useEffect(() => {
+    document.title = Strings.IncomingOfficialDispatch.Title.LIST;
     const p = parseInt(searchParams.get('page')) || store.page
     const r = parseInt(searchParams.get('rowsPerPage')) || store.rowsPerPage
     const f = searchParams.get('filter') || ''

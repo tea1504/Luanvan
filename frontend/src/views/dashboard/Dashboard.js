@@ -45,6 +45,7 @@ const Dashboard = () => {
   const navigate = useNavigate()
 
   const [IODNeedProgress, setIODNeedProgress] = useState([])
+  const [IODNeedApproval, setIODNeedApproval] = useState([])
 
   const handleMouseEnter = (e) => {
     e.currentTarget.classList.add('shadow')
@@ -106,12 +107,31 @@ const Dashboard = () => {
     }
   }
 
+  const getIODNeedApproval = async (status) => {
+    try {
+      dispatch(setLoading(true))
+      const result = await iODService.getMany(
+        10000,
+        1,
+        '',
+        `status=${status}&approver=${loggedUser._id}`,
+      )
+      setIODNeedApproval(result.data.data.data)
+      dispatch(setLoading(false))
+    } catch (error) {
+      dispatch(setLoading(false))
+      showError(error)
+    }
+  }
+
   const getStatus = async () => {
     try {
       dispatch(setLoading(true))
       const result = await statusService.getList()
-      const r = result.data.data.filter((el) => el.name === 'PROGRESSING')[0]
-      await getIODNeedProgress(r._id)
+      const progressing = result.data.data.filter((el) => el.name === 'PROGRESSING')[0]
+      const pending = result.data.data.filter((el) => el.name === 'PENDING')[0]
+      await getIODNeedProgress(progressing._id)
+      await getIODNeedApproval(pending._id)
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
@@ -135,6 +155,18 @@ const Dashboard = () => {
                     <CAccordionItem itemKey={1}>
                       <CAccordionHeader>{Strings.IncomingOfficialDispatch.NAME}</CAccordionHeader>
                       <CAccordionBody>
+                        {loggedUser.right.approveOD && (
+                          <div
+                            onClick={() => navigate(Screens.IOD_LIST_APPROVAL)}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            {Strings.IncomingOfficialDispatch.Common.NEED_APPROVAL}{' '}
+                            <CBadge color="danger" shape="rounded-pill">
+                              {IODNeedApproval.length}
+                            </CBadge>
+                          </div>
+                        )}
+                        <hr />
                         <div
                           onClick={() => navigate(Screens.IOD_PROGRESSING)}
                           style={{ cursor: 'pointer' }}
@@ -144,8 +176,6 @@ const Dashboard = () => {
                             {IODNeedProgress.length}
                           </CBadge>
                         </div>
-                        <hr />
-                        <div>{Strings.IncomingOfficialDispatch.Common.NEED_PROGRESS}</div>
                         <hr />
                         <div>{Strings.IncomingOfficialDispatch.Common.NEED_PROGRESS}</div>
                       </CAccordionBody>

@@ -10,6 +10,7 @@ import {
   CCol,
   CContainer,
   CFormCheck,
+  CFormInput,
   CFormLabel,
   CModal,
   CModalBody,
@@ -39,6 +40,7 @@ import {
   FaFileWord,
   FaImage,
   FaRegFilePdf,
+  FaTrash,
   FaVectorSquare,
 } from 'react-icons/fa'
 import { useDispatch, useSelector } from 'react-redux'
@@ -101,6 +103,8 @@ export default function IODHandle() {
     handler: [],
     newHandler: [],
     file: [],
+    newFile: [],
+    fileTemp: [],
     traceHeaderList: [],
     deleted: false,
     createdAt: '',
@@ -212,10 +216,10 @@ export default function IODHandle() {
     return result
   }
 
-  const renderFile = () => {
+  const renderFile = (file = [], numCol = 1, deleted = false) => {
     return (
-      <CRow className="px-0 mx-0" xs={{ cols: 1, gutter: 4 }}>
-        {state.file.map((el, ind) => (
+      <CRow className="px-0 mx-0" xs={{ cols: numCol, gutter: 4 }}>
+        {file.map((el, ind) => (
           <CCol key={ind}>
             <CWidgetStatsF
               icon={extension(el.name).icon}
@@ -225,18 +229,20 @@ export default function IODHandle() {
               value={el.name}
               footer={
                 <CRow xs={{ cols: 2 }}>
-                  <CCol>
-                    <CButton
-                      href={`${process.env.REACT_APP_BASE_URL}/v2${Constants.ApiPath.GET_FILE_IOD(
-                        el._id,
-                      )}?token=${token}`}
-                      variant="ghost"
-                      color="secondary"
-                      className="w-100 m-0 p-0"
-                    >
-                      <FaFileDownload /> {Strings.Common.DOWNLOAD}
-                    </CButton>
-                  </CCol>
+                  {!deleted && (
+                    <CCol>
+                      <CButton
+                        href={`${process.env.REACT_APP_BASE_URL}/v2${Constants.ApiPath.GET_FILE_IOD(
+                          el._id,
+                        )}?token=${token}`}
+                        variant="ghost"
+                        color="secondary"
+                        className="w-100 m-0 p-0"
+                      >
+                        <FaFileDownload /> {Strings.Common.DOWNLOAD}
+                      </CButton>
+                    </CCol>
+                  )}
                   <CCol>
                     <CButton
                       variant="ghost"
@@ -244,7 +250,9 @@ export default function IODHandle() {
                       className="w-100 m-0 p-0"
                       onClick={() => {
                         setLink(
-                          `${process.env.REACT_APP_BASE_URL}/${el.path}?token=${token}#toolbar=0`,
+                          deleted
+                            ? el.path
+                            : `${process.env.REACT_APP_BASE_URL}/${el.path}?token=${token}#toolbar=0`,
                         )
                         updateVisible({ preview: !visible.preview })
                       }}
@@ -252,6 +260,18 @@ export default function IODHandle() {
                       <FaEye /> {Strings.Common.PREVIEW}
                     </CButton>
                   </CCol>
+                  {deleted && (
+                    <CCol>
+                      <CButton
+                        variant="ghost"
+                        color="secondary"
+                        className="w-100 m-0 p-0"
+                        onClick={() => handleDeleteFile(el)}
+                      >
+                        <FaTrash /> {Strings.Common.DELETE}
+                      </CButton>
+                    </CCol>
+                  )}
                 </CRow>
               }
             />
@@ -324,19 +344,86 @@ export default function IODHandle() {
     else updateState({ sendEmail: [...state.sendEmail, id] })
   }
 
-  const handle = async () => {
-    try {
-      dispatch(setLoading(true))
-      const result = await service.handle(id, state)
-      dispatch(setLoading(false))
-      updateState({ ...result.data.data, command: '', newHandler: [], done: false, sendEmail: [] })
-      await MySwal.fire({
+  const handleInputFileOnChange = (e) => {
+    const file = Array.from(e.target.files)
+    updateState({
+      newFile: [...state.newFile, ...file],
+      fileTemp: [
+        ...state.fileTemp,
+        ...file.map((el, ind) => {
+          return {
+            name: el.name,
+            size: el.size,
+            path: URL.createObjectURL(el) + '#toolbar=0',
+            _id: ind,
+          }
+        }),
+      ],
+    })
+    e.target.value = ''
+  }
+
+  const handleDeleteFile = (file) => {
+    updateState({
+      fileTemp: state.newFile
+        .filter((el, ind) => ind != file._id)
+        .map((el, ind) => {
+          return {
+            name: el.name,
+            size: el.size,
+            path: URL.createObjectURL(el) + '#toolbar=0',
+            _id: ind,
+          }
+        }),
+      newFile: state.newFile.filter((el, ind) => ind != file._id),
+    })
+  }
+
+  const validate = () => {
+    var flag = true
+    if (Helpers.isNullOrEmpty(state.command)) {
+      MySwal.fire({
         title: Strings.Message.Handle.TITLE,
-        icon: 'success',
-        text: Strings.Message.Handle.SUCCESS,
+        icon: 'warning',
+        text: Strings.Message.Handle.WARNING,
         confirmButtonText: Strings.Common.OK,
       })
-      navigate(-1)
+      flag = false
+    }
+    return flag
+  }
+
+  const handle = async () => {
+    try {
+      if (validate()) {
+        dispatch(setLoading(true))
+        const result = await service.handle(id, state)
+        updateState({
+          ...result.data.data,
+          command: '',
+          newHandler: [],
+          done: false,
+          sendEmail: [],
+        })
+        dispatch(setLoading(false))
+        await MySwal.fire({
+          title: Strings.Message.Handle.TITLE,
+          icon: 'success',
+          text: Strings.Message.Handle.SUCCESS,
+          confirmButtonText: Strings.Common.OK,
+        })
+        navigate(-1)
+      }
+    } catch (error) {
+      dispatch(setLoading(false))
+      showError(error)
+    }
+  }
+
+  const handleDone = async () => {
+    try {
+      updateState({ done: true })
+      await handle()
     } catch (error) {
       dispatch(setLoading(false))
       showError(error)
@@ -440,11 +527,35 @@ export default function IODHandle() {
                   />
                 </CCol>
               </CRow>
+              <CRow className="mt-3">
+                <CCol xs={12} md={3}>
+                  <CFormLabel
+                    htmlFor={Helpers.makeID(
+                      Strings.IncomingOfficialDispatch.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.FILE),
+                    )}
+                  >
+                    {Strings.Form.FieldName.FILE()}
+                  </CFormLabel>
+                </CCol>
+                <CCol>
+                  <CFormInput
+                    type="file"
+                    multiple
+                    id={Helpers.makeID(
+                      Strings.IncomingOfficialDispatch.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.FILE),
+                    )}
+                    onChange={handleInputFileOnChange}
+                  />
+                </CCol>
+                <CCol xs={{ span: 9, offset: 3 }} className="mt-2">
+                  {state.fileTemp.length > 0 && renderFile(state.fileTemp, 2, true)}
+                </CCol>
+              </CRow>
               <CRow className="mt-2">
                 <CCol xs={12} md={3}>
-                  <CFormLabel>
-                    {Strings.IncomingOfficialDispatch.Common.HANDLE_OPINION} :
-                  </CFormLabel>
+                  <CFormLabel>{Strings.IncomingOfficialDispatch.Common.ADD_HANDLER} :</CFormLabel>
                 </CCol>
                 <CCol>
                   <Select
@@ -499,8 +610,13 @@ export default function IODHandle() {
             <CCardFooter>
               <CRow>
                 <CCol>
-                  <CButton className="w-100" color="primary" variant="outline" onClick={handle}>
+                  <CButton className="w-100" color="primary" onClick={handle}>
                     {Strings.Common.HANDLE}
+                  </CButton>
+                </CCol>
+                <CCol>
+                  <CButton className="w-100" color="primary" variant="outline" onClick={handleDone}>
+                    {Strings.Common.HANDLE_DONE}
                   </CButton>
                 </CCol>
                 <CCol>
@@ -545,7 +661,7 @@ export default function IODHandle() {
                   {state.traceHeaderList.length !== 0 && renderTraceHeaderList()}
                 </CTabPane>
                 <CTabPane role="tabpanel" aria-labelledby="profile-tab" visible={activeKey === 2}>
-                  {state.file.length !== 0 && renderFile()}
+                  {state.file.length !== 0 && renderFile(state.file, 1)}
                 </CTabPane>
               </CTabContent>
             </CCardBody>

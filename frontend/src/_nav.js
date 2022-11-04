@@ -48,7 +48,16 @@ const _nav = [
           en: en.Common.LIST,
         },
         role: [0, 1],
-        to: Screens.IOD,
+        to: Screens.IOD_LIST,
+      },
+      {
+        component: CNavItem,
+        name: {
+          vi: vn.IncomingOfficialDispatch.Common.NEED_APPROVAL,
+          en: en.IncomingOfficialDispatch.Common.NEED_APPROVAL,
+        },
+        role: [0, 1],
+        to: Screens.IOD_LIST_APPROVAL,
       },
       {
         component: CNavItem,

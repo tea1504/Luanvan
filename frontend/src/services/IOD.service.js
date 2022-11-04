@@ -74,9 +74,22 @@ class IODService extends BaseService {
   }
   async handle(id, data) {
     data.command = Helpers.htmlDecode(data.command)
-    const result = await this.api.put({
+    data.security = data.security._id
+    var formData = new FormData()
+    Object.keys(data).forEach((el) => data[el] === null && delete data[el])
+    for (const [key, value] of Object.entries(data)) {
+      if (key == 'newHandler' || key == 'newFile') {
+        Array.from(value).map((el) => {
+          formData.append(key, el)
+        })
+      } else {
+        formData.append(key, value)
+      }
+    }
+    data.command = Helpers.htmlDecode(data.command)
+    const result = await this.api.putFormData({
       path: Constants.ApiPath.HANDLE(id),
-      data: data,
+      data: formData,
     })
     return result
   }

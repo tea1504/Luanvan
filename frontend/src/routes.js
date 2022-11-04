@@ -44,6 +44,7 @@ const IODDetail = React.lazy(() => import('./views/incomingOfficialDispatch/IODD
 const IODApproval = React.lazy(() => import('./views/incomingOfficialDispatch/IODApproval'))
 const IODListProgress = React.lazy(() => import('./views/incomingOfficialDispatch/IODListProgress'))
 const IODHandle = React.lazy(() => import('./views/incomingOfficialDispatch/IODHandle'))
+const IODListApproval = React.lazy(() => import('./views/incomingOfficialDispatch/IODListApproval'))
 const User = React.lazy(() => import('./views/user/User'))
 const UserChangePassword = React.lazy(() => import('./views/user/UserChangePassword'))
 
@@ -319,7 +320,7 @@ const routes = [
     right: Strings.Common.UPDATE_CATEGORIES,
   },
   {
-    path: Screens.IOD,
+    path: Screens.IOD_LIST,
     name: { vi: vn.IncomingOfficialDispatch.NAME, en: en.IncomingOfficialDispatch.NAME },
     element: IOD,
     role: [0, 1],
@@ -369,6 +370,15 @@ const routes = [
       en: en.IncomingOfficialDispatch.Common.HANDLE,
     },
     element: IODHandle,
+    role: [0, 1],
+  },
+  {
+    path: Screens.IOD_LIST_APPROVAL,
+    name: {
+      vi: vn.IncomingOfficialDispatch.Common.APPROVE,
+      en: en.IncomingOfficialDispatch.Common.APPROVE,
+    },
+    element: IODListApproval,
     role: [0, 1],
   },
 ]

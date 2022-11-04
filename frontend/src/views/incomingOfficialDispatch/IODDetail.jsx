@@ -252,6 +252,15 @@ export default function IODDetail() {
   }
 
   useEffect(() => {
+    document.title = Strings.IncomingOfficialDispatch.Title.DETAIL(
+      Helpers.getMaVanBan(
+        state.code,
+        state.organ.code,
+        state.type.notation,
+        state.issuedDate,
+        localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
+      ),
+    )
     const list = id.split('.')
     getState(list[list.length - 1])
   }, [])

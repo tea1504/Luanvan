@@ -202,13 +202,19 @@ var incomingOfficialDispatchController = {
     try {
       const { id } = req.params;
       const list = id.split(".");
+      const files = req.files;
       var { newHandler, done, command, sendEmail } = req.body;
-      const result = await service.handle(list[list.length - 1], req.userID, {
-        newHandler,
-        done,
-        command,
-        sendEmail,
-      });
+      const result = await service.handle(
+        list[list.length - 1],
+        req.userID,
+        {
+          newHandler,
+          done,
+          command,
+          sendEmail,
+        },
+        files
+      );
       return res.status(result.status).json(result);
     } catch (error) {
       return next(error);

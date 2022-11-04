@@ -33,6 +33,7 @@ export default {
     EDIT: 'Chỉnh sửa',
     FILTER: 'Lọc',
     HANDLE: 'Xử lý',
+    HANDLE_DONE: 'Xử lý và đánh dấu xong',
     LIST: 'Danh sách',
     MORE: 'Xem thêm',
     OD_FILE: 'Nội dung toàn văn',
@@ -81,6 +82,7 @@ export default {
     Handle: {
       FAILURE: 'Xử lý văn bản thất bại',
       SUCCESS: 'Bạn đã xử lý văn bản thành công',
+      WARNING: 'Bạn cần nhập ý kiến xử lý',
       TITLE: 'Xử lý văn bản',
     },
     CancelApproval: {
@@ -198,15 +200,18 @@ export default {
     NAME: 'Văn bản đến',
     CODE: 'INCOMING_OFFICIAL_DISPATCH',
     Common: {
+      ADD_HANDLER: 'Thêm cán bộ xử lý',
       ARRIVAL_NUMBER_END: 'Số đến đến',
       ARRIVAL_NUMBER_START: 'Số đến từ',
       ARRIVAL_NUMBER: 'Số đến được điền tự động',
+      APPROVE: 'Duyệt',
       DESCRIPTION_CODE:
         'Bạn chỉ cần nhập phần số<br/> Ví dụ: <code>1/2022/QĐ-ĐHCT</code> nhập <code>1</code>',
       DESCRIPTION: 'Ý kiếm phê duyệt',
       HANDLE: 'Xử lý văn bản',
       HANDLE_OPINION: 'Ý kiến xử lý',
-      NEED_PROGRESS: 'Văn bản đến cần xử lý',
+      NEED_APPROVAL: 'Văn bản cần duyệt',
+      NEED_PROGRESS: 'Văn bản cần xử lý',
       NOT_ARRIVAL_NUMBER: 'Chưa cấp số',
       PRINT: 'In danh sách',
       SELECT_APPROVER: '- Chọn cán bộ duyệt -',
@@ -219,6 +224,12 @@ export default {
       SELECT_TYPE: 'Chọn loại văn bản',
       SEND_EMAIL_APPROVAL: 'Gửi email thông báo',
       UPLOAD_FILE: 'Đính kèm file',
+    },
+    Title: {
+      LIST: 'Danh sách văn bản đến',
+      LIST_APPROVAL: 'Danh sách văn bản đến cần duyệt',
+      LIST_HANDLE: 'Danh sách văn bản đến cần xử lý',
+      DETAIL: (m = '') => `Văn bản đến số ${m}`,
     },
   },
   Language: {

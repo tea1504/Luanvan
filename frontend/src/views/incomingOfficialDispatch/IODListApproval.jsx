@@ -104,7 +104,7 @@ export default function IODListProgress() {
       newPerPage,
       page,
       filter,
-      `${createSearchParams({ ...findParams, status: status, handler: loggedUser._id })}`,
+      `${createSearchParams({ ...findParams, status: status, approver: loggedUser._id })}`,
     )
     dispatch(setRowPerPage(newPerPage))
     dispatch(setPage(page))
@@ -125,7 +125,7 @@ export default function IODListProgress() {
       store.rowsPerPage,
       page,
       filter,
-      `${createSearchParams({ ...findParams, status: status, handler: loggedUser._id })}`,
+      `${createSearchParams({ ...findParams, status: status, approver: loggedUser._id })}`,
     )
     navigate({
       pathname: Screens.IOD_PROGRESSING,
@@ -144,7 +144,7 @@ export default function IODListProgress() {
       store.rowsPerPage,
       store.page,
       str,
-      `${createSearchParams({ ...findParams, status: status, handler: loggedUser._id })}`,
+      `${createSearchParams({ ...findParams, status: status, approver: loggedUser._id })}`,
     )
     navigate({
       pathname: Screens.IOD_PROGRESSING,
@@ -180,7 +180,7 @@ export default function IODListProgress() {
       `${createSearchParams({
         ...findParams,
         status: status,
-        handler: loggedUser._id,
+        approver: loggedUser._id,
         arrivalNumber: e.target.value,
       })}`,
     )
@@ -190,7 +190,7 @@ export default function IODListProgress() {
     try {
       dispatch(setLoading(true))
       const result = await statusService.getList()
-      const r = result.data.data.filter((el) => el.name === 'PROGRESSING')[0]
+      const r = result.data.data.filter((el) => el.name === 'PENDING')[0]
       setStatus(r._id)
       await getState(
         rowsPerPage,
@@ -199,7 +199,7 @@ export default function IODListProgress() {
         `${createSearchParams({
           ...findParams,
           status: r._id,
-          handler: loggedUser._id,
+          approver: loggedUser._id,
           arrivalNumber,
         })}`,
       )
@@ -211,7 +211,7 @@ export default function IODListProgress() {
   }
 
   useEffect(() => {
-    document.title = Strings.IncomingOfficialDispatch.Title.LIST_HANDLE;
+    document.title = Strings.IncomingOfficialDispatch.Title.LIST_APPROVAL;
     const p = parseInt(searchParams.get('page')) || store.page
     const r = parseInt(searchParams.get('rowsPerPage')) || store.rowsPerPage
     const f = searchParams.get('filter') || ''
@@ -231,11 +231,11 @@ export default function IODListProgress() {
         <CCol>
           <CCard className="mb-3 border-secondary border-top-5">
             <CCardHeader className="text-center py-3" component="h3">
-              {Strings.IncomingOfficialDispatch.NAME}
+              {Strings.IncomingOfficialDispatch.Common.APPROVE}
             </CCardHeader>
             <CCardBody>
               <CRow className="py-1">
-                <CCol xs={12} md={6} className="mt-1">
+                <CCol xs={12} className="mt-1">
                   <CInputGroup className="flex-nowrap">
                     <CFormInput
                       placeholder={Strings.Common.FILTER}
@@ -246,47 +246,6 @@ export default function IODListProgress() {
                       id="addon-wrapping"
                       style={{ cursor: 'pointer' }}
                       onClick={() => handleOnChangeFilter('')}
-                    >
-                      <FaEraser />
-                    </CInputGroupText>
-                  </CInputGroup>
-                </CCol>
-                <CCol xs={12} md={6} className="mt-1">
-                  <CInputGroup className="flex-nowrap">
-                    <CFormInput
-                      type="number"
-                      placeholder={Strings.Form.FieldName.ARRIVAL_NUMBER}
-                      value={findParams.arrivalNumber}
-                      onChange={handleOnChangeArrivalNumber}
-                    />
-                    <CInputGroupText
-                      id="addon-wrapping"
-                      style={{ cursor: 'pointer' }}
-                      onClick={() => {
-                        updateFindParams({ arrivalNumber: '' })
-                        navigate({
-                          pathname: Screens.IOD_PROGRESSING,
-                          search: `?${createSearchParams({
-                            page: store.page,
-                            rowsPerPage: store.rowsPerPage,
-                            filter: filter,
-                            ...findParams,
-                            status: status,
-                            arrivalNumber: '',
-                          })}`,
-                        })
-                        getState(
-                          store.rowsPerPage,
-                          store.page,
-                          filter,
-                          `${createSearchParams({
-                            ...findParams,
-                            status: status,
-                            handler: loggedUser._id,
-                            arrivalNumber: '',
-                          })}`,
-                        )
-                      }}
                     >
                       <FaEraser />
                     </CInputGroupText>

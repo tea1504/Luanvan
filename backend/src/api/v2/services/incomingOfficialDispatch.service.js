@@ -477,10 +477,17 @@ var incomingOfficialDispatchService = {
   handle: async (
     id = "",
     userID = "",
-    data = { done: false, newHandler: [], command: "", sendEmail: [] }
+    data = { done: false, newHandler: [], command: "", sendEmail: [] },
+    files = []
   ) => {
     try {
       if (!data.command) data.command = "";
+      if (!data.newHandler) data.newHandler = [];
+      else if (
+        typeof data.newHandler === "string" ||
+        data.newHandler instanceof String
+      )
+        data.newHandler = [data.newHandler];
       const item = await model.findOne({
         _id: id,
         deleted: false,
@@ -497,7 +504,7 @@ var incomingOfficialDispatchService = {
           message: Constants.String.Message.ERR_404(Constants.String.Officer._),
         };
       var status;
-      if (data.done)
+      if (data.done === "true")
         status = await statusModel.findOne({
           name: "PROGRESSED",
           deleted: false,
@@ -516,6 +523,14 @@ var incomingOfficialDispatchService = {
       });
       item.status = status._id.toString();
       item.handler.push(...data.newHandler);
+      files.map((el) => {
+        item.file.push({
+          name: el.originalname,
+          path: "uploads/" + item.security + "/" + el.filename,
+          typeFile: el.mimetype,
+          size: el.size,
+        });
+      });
       item.save();
       const result = await model
         .findOne({ _id: id, deleted: false })
