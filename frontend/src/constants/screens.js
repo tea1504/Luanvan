@@ -68,14 +68,17 @@ const Screens = {
 
   // Incoming Official Dispatch
   IOD: '/cong-van-den',
-  IOD_LIST: '/cong-van-den/danh-sach',
+  IOD_LIST: '/cong-van-den/danh-sach.',
+  IOD_LIST_: (f = ':func') => '/cong-van-den/danh-sach/' + f,
   IOD_DETAIL: (id = ':id') => '/cong-van-den/chi-tiet/' + id,
   IOD_CREATE: '/cong-van-den/tao-moi',
   IOD_UPDATE: (id = ':id') => '/cong-van-den/cap-nhat/' + id,
   IOD_APPROVE: (id = ':id') => '/cong-van-den/phe-duyet/' + id,
-  IOD_PROGRESSING: '/cong-van-den/van-ban-can-xu-ly',
+  IOD_PROGRESSING: '/cong-van-den/danh-sach/van-ban-can-xu-ly',
   IOD_HANDLE: (id = ':id') => '/cong-van-den/xu-ly-van-ban/' + id,
-  IOD_LIST_APPROVAL: '/cong-van-den/danh-sach-van-ban-can-duyet',
+  IOD_LIST_APPROVAL: '/cong-van-den/danh-sach/van-ban-can-duyet',
+  APPROVAL: 'van-ban-can-duyet',
+  HANDLE: 'van-ban-can-xu-ly',
 
   // user
   OFFICER_INFO: '/officer',

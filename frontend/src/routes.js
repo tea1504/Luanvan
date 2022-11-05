@@ -1,6 +1,7 @@
 import React from 'react'
 import en from './commons/locales/en'
 import vn from './commons/locales/vn'
+import Constants from './constants'
 import Screens from './constants/screens'
 import Strings from './constants/strings'
 
@@ -320,8 +321,18 @@ const routes = [
     right: Strings.Common.UPDATE_CATEGORIES,
   },
   {
-    path: Screens.IOD_LIST,
+    path: Screens.IOD,
     name: { vi: vn.IncomingOfficialDispatch.NAME, en: en.IncomingOfficialDispatch.NAME },
+    element: IOD,
+    role: [0, 1],
+    right: Strings.Common.READ_OD,
+  },
+  {
+    path: Screens.IOD_LIST,
+    name: {
+      vi: vn.IncomingOfficialDispatch.Title.LIST,
+      en: en.IncomingOfficialDispatch.Title.LIST,
+    },
     element: IOD,
     role: [0, 1],
     right: Strings.Common.READ_OD,
@@ -355,15 +366,6 @@ const routes = [
     right: Strings.Common.APPROVE_OD,
   },
   {
-    path: Screens.IOD_PROGRESSING,
-    name: {
-      vi: vn.IncomingOfficialDispatch.Common.NEED_PROGRESS,
-      en: en.IncomingOfficialDispatch.Common.NEED_PROGRESS,
-    },
-    element: IODListProgress,
-    role: [0, 1],
-  },
-  {
     path: Screens.IOD_HANDLE(),
     name: {
       vi: vn.IncomingOfficialDispatch.Common.HANDLE,
@@ -373,12 +375,10 @@ const routes = [
     role: [0, 1],
   },
   {
-    path: Screens.IOD_LIST_APPROVAL,
-    name: {
-      vi: vn.IncomingOfficialDispatch.Common.APPROVE,
-      en: en.IncomingOfficialDispatch.Common.APPROVE,
-    },
-    element: IODListApproval,
+    path: Screens.IOD_LIST_(),
+    name: { vi: vn.IncomingOfficialDispatch.NAME, en: en.IncomingOfficialDispatch.NAME },
+    element: IOD,
+    exact: true,
     role: [0, 1],
   },
 ]

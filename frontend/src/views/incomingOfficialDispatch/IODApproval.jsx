@@ -7,6 +7,7 @@ import {
   CCardHeader,
   CCol,
   CContainer,
+  CFormFeedback,
   CFormLabel,
   CModal,
   CModalBody,
@@ -108,6 +109,13 @@ export default function IODApproval() {
   }
   const [link, setLink] = useState('')
   const [officer, setOfficer] = useState([])
+  const [error, setError] = useState({ handler: null })
+  const updateError = (newState) => {
+    setError((prevState) => ({
+      ...prevState,
+      ...newState,
+    }))
+  }
 
   const showError = (error) => {
     switch (error.status) {
@@ -252,7 +260,10 @@ export default function IODApproval() {
       setOfficer([])
       const result = await officerService.getManyByUser(10000, 1)
       result.data.data.data.map((el) => {
-        var item = { value: el._id, label: `${el.code} | ${el.lastName} ${el.firstName} (${el.position})` }
+        var item = {
+          value: el._id,
+          label: `${el.code} | ${el.lastName} ${el.firstName} (${el.position})`,
+        }
         setOfficer((prevState) => [...prevState, item])
       })
       dispatch(setLoading(false))
@@ -295,6 +306,23 @@ export default function IODApproval() {
     } catch (error) {
       dispatch(setLoading(false))
       showError(error)
+    }
+  }
+
+  const validate = () => {
+    const flag = true
+    if (state.handler.length === 0) {
+      updateError({ handler: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
+      flag = false
+    }
+    return flag
+  }
+
+  const handleOnClickApprovalAndAssignment = () => {
+    updateError({ handler: null })
+    if (validate()) {
+      updateVisible({ assignment: false })
+      approval()
     }
   }
 
@@ -594,18 +622,27 @@ export default function IODApproval() {
               else updateState({ handler: null })
             }}
             isMulti
+            styles={{
+              control: (provided) => ({
+                ...provided,
+                borderColor: error.handler
+                  ? Constants.Styles.ERROR_COLOR
+                  : Constants.Styles.BORDER_COLOR,
+              }),
+            }}
             isClearable={Helpers.isNullOrEmpty(id)}
           />
+          <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
+            {error.handler &&
+              Strings.Form.Validation[error.handler](Strings.Form.FieldName.HANDLER())}
+          </CFormFeedback>
         </CModalBody>
         <CModalFooter>
           <CButton
             disabled={loading}
             className="w-100"
             color="primary"
-            onClick={() => {
-              updateVisible({ assignment: false })
-              approval()
-            }}
+            onClick={handleOnClickApprovalAndAssignment}
           >
             {Strings.Common.APPROVE_ASSIGNMENT}
           </CButton>

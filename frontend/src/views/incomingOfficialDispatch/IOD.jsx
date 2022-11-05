@@ -25,7 +25,7 @@ import React, { useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaArrowRight, FaEraser, FaPlusSquare, FaPrint, FaSearch } from 'react-icons/fa'
 import { useDispatch, useSelector } from 'react-redux'
-import { createSearchParams, useNavigate, useSearchParams } from 'react-router-dom'
+import { createSearchParams, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import Helpers from 'src/commons/helpers'
 import configs from 'src/configs'
 import Constants from 'src/constants'
@@ -54,6 +54,7 @@ const organizationService = new OrganizationService()
 const MySwal = withReactContent(Swal)
 
 export default function IOD() {
+  const { func = Constants.IOD_FUNCTION_LIST } = useParams()
   const dispatch = useDispatch()
   let loading = useSelector((state) => state.config.loading)
   let loggedUser = useSelector((state) => state.user.user)
@@ -66,6 +67,13 @@ export default function IOD() {
 
   const store = useSelector((state) => state.IOD)
 
+  const pathname =
+    func === Constants.IOD_FUNCTION_LIST
+      ? Screens.IOD_LIST
+      : func === Constants.IOD_FUNCTION_APPROVAL
+      ? Screens.IOD_LIST_(Screens.APPROVAL)
+      : Screens.IOD_LIST_(Screens.HANDLE)
+
   const [filter, setFilter] = useState('')
   const [selectionRows, setSelectionRows] = useState([])
   const [toggleCleared, setToggleCleared] = useState(false)
@@ -73,16 +81,14 @@ export default function IOD() {
   const [status, setStatus] = useState([])
   const [organ, setOrgan] = useState([])
   const [datePicker, setDatePicker] = useState({ start: null, end: null })
-  const [findParams, setFindParams] = useState({
-    type: '',
+  const [findSpecialParams, setFindSpecialParams] = useState({
     status: '',
-    arrivalNumber: null,
-    issuedStartDate: new Date(),
-    issuedEndDate: new Date(),
-    arrivalNumberStart: null,
-    arrivalNumberEnd: null,
-    organ: '',
+    handler: '',
+    approver: '',
   })
+  const updateFindSpecialParams = (newState) =>
+    setFindSpecialParams((prevState) => ({ ...prevState, ...newState }))
+  const [findParams, setFindParams] = useState({})
   const updateFindParams = (newState) =>
     setFindParams((prevState) => ({ ...prevState, ...newState }))
   const [visible, setVisible] = useState(false)
@@ -134,11 +140,17 @@ export default function IOD() {
   }
 
   const handlePerRowsChange = (newPerPage, page) => {
-    getState(newPerPage, page, filter, `${createSearchParams(findParams)}`)
+    getState(
+      newPerPage,
+      page,
+      filter,
+      `${createSearchParams({ ...findParams, ...findSpecialParams })}`,
+    )
     dispatch(setRowPerPage(newPerPage))
     dispatch(setPage(page))
+    console.log('findSpecialParams', findSpecialParams)
     navigate({
-      pathname: Screens.IOD,
+      pathname: pathname,
       search: `?${createSearchParams({
         page: page,
         rowsPerPage: newPerPage,
@@ -150,9 +162,14 @@ export default function IOD() {
 
   const handlePageChange = (page) => {
     dispatch(setPage(page))
-    getState(store.rowsPerPage, page, filter, `${createSearchParams(findParams)}`)
+    getState(
+      store.rowsPerPage,
+      page,
+      filter,
+      `${createSearchParams({ ...findParams, ...findSpecialParams })}`,
+    )
     navigate({
-      pathname: Screens.IOD,
+      pathname: pathname,
       search: `?${createSearchParams({
         page: page,
         rowsPerPage: store.rowsPerPage,
@@ -166,7 +183,7 @@ export default function IOD() {
     setFilter(str)
     getState(store.rowsPerPage, store.page, str, `${createSearchParams(findParams)}`)
     navigate({
-      pathname: Screens.IOD,
+      pathname: pathname,
       search: `?${createSearchParams({
         page: store.page,
         rowsPerPage: store.rowsPerPage,
@@ -250,7 +267,7 @@ export default function IOD() {
     }
   }
 
-  const getStatus = async () => {
+  const getStatus = async (rowsPerPage, page, filter) => {
     try {
       dispatch(setLoading(true))
       setType([])
@@ -259,6 +276,53 @@ export default function IOD() {
         var item = { value: el._id, label: `${el.name} - ${Helpers.htmlDecode(el.description)}` }
         setStatus((prevState) => [...prevState, item])
       })
+      var statusTemp = {}
+      switch (func) {
+        case Constants.IOD_FUNCTION_HANDLE:
+          statusTemp = result.data.data.filter((el) => el.name === 'PROGRESSING')[0]
+          updateFindSpecialParams({
+            status: statusTemp._id,
+            handler: loggedUser._id,
+            approver: '',
+          })
+          await getState(
+            rowsPerPage,
+            page,
+            filter,
+            `${createSearchParams({
+              ...findParams,
+              status: statusTemp._id,
+              handler: loggedUser._id,
+            })}`,
+          )
+          break
+        case Constants.IOD_FUNCTION_APPROVAL:
+          statusTemp = result.data.data.filter((el) => el.name === 'PENDING')[0]
+          updateFindSpecialParams({
+            status: statusTemp._id,
+            handler: '',
+            approver: loggedUser._id,
+          })
+          await getState(
+            rowsPerPage,
+            page,
+            filter,
+            `${createSearchParams({
+              ...findParams,
+              status: statusTemp._id,
+              approver: loggedUser._id,
+            })}`,
+          )
+          break
+        default:
+          await getState(rowsPerPage, page, filter, `${createSearchParams(findParams)}`)
+          updateFindSpecialParams({
+            status: '',
+            handler: '',
+            approver: '',
+          })
+          break
+      }
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
@@ -282,15 +346,16 @@ export default function IOD() {
     }
   }
 
-  const handleOnChangeSelecteType = (selectedItem) => {
+  const handleOnChangeSelectType = (selectedItem) => {
     updateFindParams({ type: selectedItem ? selectedItem.value : '' })
     navigate({
-      pathname: Screens.IOD,
+      pathname: pathname,
       search: `?${createSearchParams({
         page: store.page,
         rowsPerPage: store.rowsPerPage,
         filter: filter,
         ...findParams,
+        ...findSpecialParams,
         type: selectedItem ? selectedItem.value : '',
       })}`,
     })
@@ -300,6 +365,7 @@ export default function IOD() {
       filter,
       `${createSearchParams({
         ...findParams,
+        ...findSpecialParams,
         type: selectedItem ? selectedItem.value : '',
       })}`,
     )
@@ -308,7 +374,7 @@ export default function IOD() {
   const handleOnChangeSelecteStatus = (selectedItem) => {
     updateFindParams({ status: selectedItem ? selectedItem.value : '' })
     navigate({
-      pathname: Screens.IOD,
+      pathname: pathname,
       search: `?${createSearchParams({
         page: store.page,
         rowsPerPage: store.rowsPerPage,
@@ -323,6 +389,7 @@ export default function IOD() {
       filter,
       `${createSearchParams({
         ...findParams,
+        ...findSpecialParams,
         status: selectedItem ? selectedItem.value : '',
       })}`,
     )
@@ -331,7 +398,7 @@ export default function IOD() {
   const handleOnChangeArrivalNumber = (e) => {
     updateFindParams({ arrivalNumber: e.target.value })
     navigate({
-      pathname: Screens.IOD,
+      pathname: pathname,
       search: `?${createSearchParams({
         page: store.page,
         rowsPerPage: store.rowsPerPage,
@@ -346,6 +413,7 @@ export default function IOD() {
       filter,
       `${createSearchParams({
         ...findParams,
+        ...findSpecialParams,
         arrivalNumber: e.target.value,
       })}`,
     )
@@ -373,7 +441,7 @@ export default function IOD() {
     try {
       dispatch(setLoading(true))
       navigate({
-        pathname: Screens.IOD,
+        pathname: pathname,
         search: `?${createSearchParams({
           page: store.page,
           rowsPerPage: store.rowsPerPage,
@@ -381,7 +449,12 @@ export default function IOD() {
           ...findParams,
         })}`,
       })
-      await getState(store.rowsPerPage, store.page, filter, `${createSearchParams(findParams)}`)
+      await getState(
+        store.rowsPerPage,
+        store.page,
+        filter,
+        `${createSearchParams({ ...findParams, ...findSpecialParams })}`,
+      )
       setVisible(false)
       dispatch(setLoading(false))
     } catch (error) {
@@ -394,7 +467,7 @@ export default function IOD() {
     try {
       dispatch(setLoading(true))
       navigate({
-        pathname: Screens.IOD,
+        pathname: pathname,
         search: `?${createSearchParams({
           page: store.page,
           rowsPerPage: store.rowsPerPage,
@@ -402,7 +475,12 @@ export default function IOD() {
         })}`,
       })
       setFindParams({})
-      await getState(store.rowsPerPage, store.page, filter)
+      await getState(
+        store.rowsPerPage,
+        store.page,
+        filter,
+        createSearchParams(findSpecialParams).toString(),
+      )
       setVisible(false)
       dispatch(setLoading(false))
     } catch (error) {
@@ -416,31 +494,43 @@ export default function IOD() {
   })
 
   useEffect(() => {
-    document.title = Strings.IncomingOfficialDispatch.Title.LIST;
+    document.title = Strings.IncomingOfficialDispatch.Title.LIST
+
     const p = parseInt(searchParams.get('page')) || store.page
     const r = parseInt(searchParams.get('rowsPerPage')) || store.rowsPerPage
     const f = searchParams.get('filter') || ''
     const type = searchParams.get('type') || ''
     const status = searchParams.get('status') || ''
+    const organ = searchParams.get('organ') || ''
     const arrivalNumber = searchParams.get('arrivalNumber') || ''
     const arrivalNumberStart = searchParams.get('arrivalNumberStart') || ''
     const arrivalNumberEnd = searchParams.get('arrivalNumberEnd') || ''
     const issuedStartDate = searchParams.get('issuedStartDate') || ''
     const issuedEndDate = searchParams.get('issuedEndDate') || ''
-    getState(
-      r,
-      p,
-      f,
-      `${createSearchParams({
-        type,
-        status,
-        arrivalNumber,
-        arrivalNumberStart,
-        arrivalNumberEnd,
-        issuedStartDate,
-        issuedEndDate,
-      })}`,
-    )
+
+    console.log('func', func)
+    const findParamsObject =
+      func === Constants.IOD_FUNCTION_LIST
+        ? {
+            type,
+            status,
+            arrivalNumber,
+            issuedStartDate,
+            issuedEndDate,
+            arrivalNumberStart,
+            arrivalNumberEnd,
+            organ,
+          }
+        : {
+            type,
+            arrivalNumber,
+            issuedStartDate,
+            issuedEndDate,
+            arrivalNumberStart,
+            arrivalNumberEnd,
+            organ,
+          }
+
     setFilter(f)
     dispatch(setPage(p))
     dispatch(setRowPerPage(r))
@@ -448,19 +538,11 @@ export default function IOD() {
       start: issuedStartDate ? new Date(parseInt(issuedStartDate)) : null,
       end: issuedEndDate ? new Date(parseInt(issuedEndDate)) : null,
     })
-    setFindParams({
-      type,
-      status,
-      arrivalNumber,
-      arrivalNumberStart,
-      arrivalNumberEnd,
-      issuedStartDate,
-      issuedEndDate,
-    })
+    setFindParams(findParamsObject)
     getType()
-    getStatus()
+    getStatus(r, p, f, arrivalNumber)
     getOrgan()
-  }, [])
+  }, [func])
 
   return (
     <CContainer fluid>
@@ -468,7 +550,11 @@ export default function IOD() {
         <CCol>
           <CCard className="mb-3 border-secondary border-top-5">
             <CCardHeader className="text-center py-3" component="h3">
-              {Strings.IncomingOfficialDispatch.NAME}
+              {func === Constants.IOD_FUNCTION_LIST && Strings.IncomingOfficialDispatch.NAME}
+              {func === Constants.IOD_FUNCTION_APPROVAL &&
+                Strings.IncomingOfficialDispatch.Title.LIST_APPROVAL}
+              {func === Constants.IOD_FUNCTION_HANDLE &&
+                Strings.IncomingOfficialDispatch.Title.LIST_HANDLE}
             </CCardHeader>
             <CCardBody>
               <CRow className="py-1">
@@ -525,7 +611,13 @@ export default function IOD() {
                 <div className="d-none">
                   <IODToPrint ref={printRef} data={store.data} />
                 </div>
-                <CCol xs={12} md={4} className="mt-1">
+              </CRow>
+              <CRow
+                xs={{ cols: 1 }}
+                md={{ cols: func === Constants.IOD_FUNCTION_LIST ? 3 : 2 }}
+                className="pb-1"
+              >
+                <CCol className="mt-1">
                   <Select
                     id={Helpers.makeID(Strings.IncomingOfficialDispatch.CODE, Strings.Type.CODE)}
                     value={
@@ -535,7 +627,7 @@ export default function IOD() {
                     }
                     options={type}
                     placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_TYPE}
-                    onChange={(selectedItem) => handleOnChangeSelecteType(selectedItem)}
+                    onChange={(selectedItem) => handleOnChangeSelectType(selectedItem)}
                     styles={{
                       menu: (provided) => ({
                         ...provided,
@@ -545,27 +637,32 @@ export default function IOD() {
                     isClearable
                   />
                 </CCol>
-                <CCol xs={12} md={4} className="mt-1">
-                  <Select
-                    id={Helpers.makeID(Strings.IncomingOfficialDispatch.CODE, Strings.Status.CODE)}
-                    value={
-                      status.filter((el) => el.value === findParams.status).length > 0
-                        ? status.filter((el) => el.value === findParams.status)[0]
-                        : null
-                    }
-                    options={status}
-                    placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_STATUS}
-                    onChange={(selectedItem) => handleOnChangeSelecteStatus(selectedItem)}
-                    styles={{
-                      menu: (provided) => ({
-                        ...provided,
-                        zIndex: 999999,
-                      }),
-                    }}
-                    isClearable
-                  />
-                </CCol>
-                <CCol xs={12} md={4} className="mt-1">
+                {func === Constants.IOD_FUNCTION_LIST && (
+                  <CCol className="mt-1">
+                    <Select
+                      id={Helpers.makeID(
+                        Strings.IncomingOfficialDispatch.CODE,
+                        Strings.Status.CODE,
+                      )}
+                      value={
+                        status.filter((el) => el.value === findParams.status).length > 0
+                          ? status.filter((el) => el.value === findParams.status)[0]
+                          : null
+                      }
+                      options={status}
+                      placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_STATUS}
+                      onChange={(selectedItem) => handleOnChangeSelecteStatus(selectedItem)}
+                      styles={{
+                        menu: (provided) => ({
+                          ...provided,
+                          zIndex: 999999,
+                        }),
+                      }}
+                      isClearable
+                    />
+                  </CCol>
+                )}
+                <CCol className="mt-1">
                   <CInputGroup className="flex-nowrap">
                     <CFormInput
                       type="number"
@@ -579,7 +676,7 @@ export default function IOD() {
                       onClick={(e) => {
                         updateFindParams({ arrivalNumber: '' })
                         navigate({
-                          pathname: Screens.IOD,
+                          pathname: pathname,
                           search: `?${createSearchParams({
                             page: store.page,
                             rowsPerPage: store.rowsPerPage,
@@ -594,6 +691,7 @@ export default function IOD() {
                           filter,
                           `${createSearchParams({
                             ...findParams,
+                            ...findSpecialParams,
                             arrivalNumber: '',
                           })}`,
                         )
@@ -743,31 +841,36 @@ export default function IOD() {
               />
             </CCol>
           </CRow>
-          <CRow className="mt-2">
-            <CCol xs={12} sm={2}>
-              <CFormLabel
-                htmlFor={Helpers.makeID(Strings.IncomingOfficialDispatch.CODE, Strings.Status.CODE)}
-              >
-                {Strings.Status.NAME}
-              </CFormLabel>
-            </CCol>
-            <CCol>
-              <Select
-                id={Helpers.makeID(Strings.IncomingOfficialDispatch.CODE, Strings.Status.CODE)}
-                value={
-                  status.filter((el) => el.value === findParams.status).length > 0
-                    ? status.filter((el) => el.value === findParams.status)[0]
-                    : null
-                }
-                options={status}
-                placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_STATUS}
-                onChange={(selectedItem) =>
-                  updateFindParams({ status: selectedItem ? selectedItem.value : null })
-                }
-                isClearable
-              />
-            </CCol>
-          </CRow>
+          {func === Constants.IOD_FUNCTION_LIST && (
+            <CRow className="mt-2">
+              <CCol xs={12} sm={2}>
+                <CFormLabel
+                  htmlFor={Helpers.makeID(
+                    Strings.IncomingOfficialDispatch.CODE,
+                    Strings.Status.CODE,
+                  )}
+                >
+                  {Strings.Status.NAME}
+                </CFormLabel>
+              </CCol>
+              <CCol>
+                <Select
+                  id={Helpers.makeID(Strings.IncomingOfficialDispatch.CODE, Strings.Status.CODE)}
+                  value={
+                    status.filter((el) => el.value === findParams.status).length > 0
+                      ? status.filter((el) => el.value === findParams.status)[0]
+                      : null
+                  }
+                  options={status}
+                  placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_STATUS}
+                  onChange={(selectedItem) =>
+                    updateFindParams({ status: selectedItem ? selectedItem.value : null })
+                  }
+                  isClearable
+                />
+              </CCol>
+            </CRow>
+          )}
           <CRow className="mt-2">
             <CCol xs={12} sm={2}>
               <CFormLabel

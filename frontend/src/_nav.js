@@ -57,7 +57,7 @@ const _nav = [
           en: en.IncomingOfficialDispatch.Common.NEED_APPROVAL,
         },
         role: [0, 1],
-        to: Screens.IOD_LIST_APPROVAL,
+        to: Screens.IOD_LIST_(Screens.APPROVAL),
       },
       {
         component: CNavItem,
@@ -66,7 +66,7 @@ const _nav = [
           en: en.IncomingOfficialDispatch.Common.NEED_PROGRESS,
         },
         role: [0, 1],
-        to: Screens.IOD_PROGRESSING,
+        to: Screens.IOD_LIST_(Screens.HANDLE),
       },
     ],
   },
