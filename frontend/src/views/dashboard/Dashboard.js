@@ -46,6 +46,8 @@ const Dashboard = () => {
 
   const [IODNeedProgress, setIODNeedProgress] = useState([])
   const [IODNeedApproval, setIODNeedApproval] = useState([])
+  const [IODNeedImplement, setIODNeedImplement] = useState([])
+  const [IODLate, setIODLate] = useState([])
 
   const handleMouseEnter = (e) => {
     e.currentTarget.classList.add('shadow')
@@ -124,14 +126,52 @@ const Dashboard = () => {
     }
   }
 
+  const getIODNeedImplement = async (status) => {
+    try {
+      dispatch(setLoading(true))
+      const result = await iODService.getMany(
+        10000,
+        1,
+        '',
+        `statusMulti=${status}&approver_importer=${loggedUser._id}`,
+      )
+      setIODNeedImplement(result.data.data.data)
+      dispatch(setLoading(false))
+    } catch (error) {
+      dispatch(setLoading(false))
+      showError(error)
+    }
+  }
+  const getIODLate = async (status) => {
+    try {
+      dispatch(setLoading(true))
+      const result = await iODService.getMany(
+        10000,
+        1,
+        '',
+        `status=${status}&importer=${loggedUser._id}`,
+      )
+      setIODLate(result.data.data.data)
+      dispatch(setLoading(false))
+    } catch (error) {
+      dispatch(setLoading(false))
+      showError(error)
+    }
+  }
+
   const getStatus = async () => {
     try {
       dispatch(setLoading(true))
       const result = await statusService.getList()
       const progressing = result.data.data.filter((el) => el.name === 'PROGRESSING')[0]
       const pending = result.data.data.filter((el) => el.name === 'PENDING')[0]
+      const progressed = result.data.data.filter((el) => el.name === 'PROGRESSED')[0]
+      const approved = result.data.data.filter((el) => el.name === 'APPROVED')[0]
+      const late = result.data.data.filter((el) => el.name === 'LATE')[0]
       await getIODNeedProgress(progressing._id)
       await getIODNeedApproval(pending._id)
+      await getIODNeedImplement(progressed._id + ',' + approved._id)
+      await getIODLate(late._id)
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
@@ -157,7 +197,7 @@ const Dashboard = () => {
                       <CAccordionBody>
                         {loggedUser.right.approveOD && (
                           <div
-                            onClick={() => navigate(Screens.IOD_LIST_APPROVAL)}
+                            onClick={() => navigate(Screens.IOD_LIST_(Screens.APPROVAL))}
                             style={{ cursor: 'pointer' }}
                           >
                             {Strings.IncomingOfficialDispatch.Common.NEED_APPROVAL}{' '}
@@ -168,7 +208,7 @@ const Dashboard = () => {
                         )}
                         <hr />
                         <div
-                          onClick={() => navigate(Screens.IOD_PROGRESSING)}
+                          onClick={() => navigate(Screens.IOD_LIST_(Screens.HANDLE))}
                           style={{ cursor: 'pointer' }}
                         >
                           {Strings.IncomingOfficialDispatch.Common.NEED_PROGRESS}{' '}
@@ -177,7 +217,27 @@ const Dashboard = () => {
                           </CBadge>
                         </div>
                         <hr />
-                        <div>{Strings.IncomingOfficialDispatch.Common.NEED_PROGRESS}</div>
+                        <div
+                          onClick={() => navigate(Screens.IOD_LIST_(Screens.LATE))}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          {Strings.IncomingOfficialDispatch.Common.LATE}{' '}
+                          <CBadge color="danger" shape="rounded-pill">
+                            {IODLate.length}
+                          </CBadge>
+                        </div>
+                        <hr />
+                        {loggedUser.right.approveOD && loggedUser.right.createOD && (
+                          <div
+                            onClick={() => navigate(Screens.IOD_LIST_(Screens.IMPLEMENT))}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            {Strings.IncomingOfficialDispatch.Common.NEED_IMPLEMENT}{' '}
+                            <CBadge color="danger" shape="rounded-pill">
+                              {IODNeedImplement.length}
+                            </CBadge>
+                          </div>
+                        )}
                       </CAccordionBody>
                     </CAccordionItem>
                   </CAccordion>

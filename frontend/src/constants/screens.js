@@ -77,8 +77,11 @@ const Screens = {
   IOD_PROGRESSING: '/cong-van-den/danh-sach/van-ban-can-xu-ly',
   IOD_HANDLE: (id = ':id') => '/cong-van-den/xu-ly-van-ban/' + id,
   IOD_LIST_APPROVAL: '/cong-van-den/danh-sach/van-ban-can-duyet',
-  APPROVAL: 'van-ban-can-duyet',
-  HANDLE: 'van-ban-can-xu-ly',
+  APPROVAL: 'van-ban-cho-duyet',
+  HANDLE: 'van-ban-cho-xu-ly',
+  IMPLEMENT: 'van-ban-cho-trien-khai',
+  LATE: 'van-ban-da-tre-han-xu-ly',
+  REFUSE: 'van-ban-bi-tu-choi',
 
   // user
   OFFICER_INFO: '/officer',

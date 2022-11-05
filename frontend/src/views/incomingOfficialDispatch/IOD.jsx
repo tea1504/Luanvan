@@ -46,15 +46,17 @@ import OrganizationService from 'src/services/organization.service'
 import { useReactToPrint } from 'react-to-print'
 import { IODToPrint } from './IODToPrint'
 import { useRef } from 'react'
+import OfficerService from 'src/services/officer.service'
 
 const service = new IODService()
 const typeService = new TypeService()
 const statusService = new StatusService()
 const organizationService = new OrganizationService()
+const officerService = new OfficerService()
 const MySwal = withReactContent(Swal)
 
 export default function IOD() {
-  const { func = Constants.IOD_FUNCTION_LIST } = useParams()
+  const { func = Screens.IOD_LIST } = useParams()
   const dispatch = useDispatch()
   let loading = useSelector((state) => state.config.loading)
   let loggedUser = useSelector((state) => state.user.user)
@@ -67,18 +69,14 @@ export default function IOD() {
 
   const store = useSelector((state) => state.IOD)
 
-  const pathname =
-    func === Constants.IOD_FUNCTION_LIST
-      ? Screens.IOD_LIST
-      : func === Constants.IOD_FUNCTION_APPROVAL
-      ? Screens.IOD_LIST_(Screens.APPROVAL)
-      : Screens.IOD_LIST_(Screens.HANDLE)
+  const pathname = func === Screens.IOD_LIST ? Screens.IOD_LIST : Screens.IOD_LIST_(func)
 
   const [filter, setFilter] = useState('')
   const [selectionRows, setSelectionRows] = useState([])
   const [toggleCleared, setToggleCleared] = useState(false)
   const [type, setType] = useState([])
   const [status, setStatus] = useState([])
+  const [officer, setOfficer] = useState([])
   const [organ, setOrgan] = useState([])
   const [datePicker, setDatePicker] = useState({ start: null, end: null })
   const [findSpecialParams, setFindSpecialParams] = useState({
@@ -254,7 +252,6 @@ export default function IOD() {
   const getType = async () => {
     try {
       dispatch(setLoading(true))
-      setType([])
       const result = await typeService.getList()
       result.data.data.map((el) => {
         var item = { value: el._id, label: `${el.name} - ${el.notation}` }
@@ -267,10 +264,27 @@ export default function IOD() {
     }
   }
 
+  const getOfficer = async () => {
+    try {
+      dispatch(setLoading(true))
+      const result = await officerService.getList()
+      result.data.data.map((el) => {
+        var item = {
+          value: el._id,
+          label: `${el.code} | ${el.lastName} ${el.firstName} (${el.position})`,
+        }
+        setOfficer((prevState) => [...prevState, item])
+      })
+      dispatch(setLoading(false))
+    } catch (error) {
+      dispatch(setLoading(false))
+      showError(error)
+    }
+  }
+
   const getStatus = async (rowsPerPage, page, filter) => {
     try {
       dispatch(setLoading(true))
-      setType([])
       const result = await statusService.getList()
       result.data.data.map((el) => {
         var item = { value: el._id, label: `${el.name} - ${Helpers.htmlDecode(el.description)}` }
@@ -278,12 +292,15 @@ export default function IOD() {
       })
       var statusTemp = {}
       switch (func) {
-        case Constants.IOD_FUNCTION_HANDLE:
+        case Screens.HANDLE:
           statusTemp = result.data.data.filter((el) => el.name === 'PROGRESSING')[0]
           updateFindSpecialParams({
+            statusMulti: '',
             status: statusTemp._id,
             handler: loggedUser._id,
             approver: '',
+            approver_importer: '',
+            importer: '',
           })
           await getState(
             rowsPerPage,
@@ -291,17 +308,24 @@ export default function IOD() {
             filter,
             `${createSearchParams({
               ...findParams,
+              statusMulti: '',
               status: statusTemp._id,
               handler: loggedUser._id,
+              approver: '',
+              approver_importer: '',
+              importer: '',
             })}`,
           )
           break
-        case Constants.IOD_FUNCTION_APPROVAL:
+        case Screens.APPROVAL:
           statusTemp = result.data.data.filter((el) => el.name === 'PENDING')[0]
           updateFindSpecialParams({
+            statusMulti: '',
             status: statusTemp._id,
-            handler: '',
             approver: loggedUser._id,
+            handler: '',
+            approver_importer: '',
+            importer: '',
           })
           await getState(
             rowsPerPage,
@@ -309,18 +333,96 @@ export default function IOD() {
             filter,
             `${createSearchParams({
               ...findParams,
+              statusMulti: '',
+              status: '',
               status: statusTemp._id,
               approver: loggedUser._id,
+              handler: '',
+              approver_importer: '',
+              importer: '',
+            })}`,
+          )
+          break
+        case Screens.IMPLEMENT:
+          statusTemp = result.data.data
+            .filter((el) => ['APPROVED', 'PROGRESSED'].includes(el.name))
+            .map((el) => el._id)
+            .join(',')
+          updateFindSpecialParams({
+            statusMulti: statusTemp,
+            status: '',
+            handler: '',
+            approver: '',
+            approver_importer: loggedUser._id,
+            importer: '',
+          })
+          await getState(
+            rowsPerPage,
+            page,
+            filter,
+            `${createSearchParams({
+              ...findParams,
+              statusMulti: statusTemp,
+              handler: '',
+              approver: '',
+              approver_importer: loggedUser._id,
+              importer: '',
+            })}`,
+          )
+          break
+        case Screens.REFUSE:
+          statusTemp = result.data.data.filter((el) => ['REFUSE'].includes(el.name))[0]
+          updateFindSpecialParams({
+            statusMulti: '',
+            status: statusTemp._id,
+            handler: '',
+            approver: '',
+            approver_importer: '',
+            importer: loggedUser._id,
+          })
+          await getState(
+            rowsPerPage,
+            page,
+            filter,
+            `${createSearchParams({
+              ...findParams,
+              statusMulti: '',
+              status: statusTemp._id,
+              handler: '',
+              approver: '',
+              approver_importer: '',
+              importer: loggedUser._id,
+            })}`,
+          )
+          break
+        case Screens.LATE:
+          statusTemp = result.data.data.filter((el) => ['LATE'].includes(el.name))[0]
+          updateFindSpecialParams({
+            statusMulti: '',
+            status: statusTemp._id,
+            handler: loggedUser._id,
+            approver: '',
+            approver_importer: '',
+            importer: '',
+          })
+          await getState(
+            rowsPerPage,
+            page,
+            filter,
+            `${createSearchParams({
+              ...findParams,
+              statusMulti: '',
+              status: statusTemp._id,
+              handler: loggedUser._id,
+              approver: '',
+              approver_importer: '',
+              importer: '',
             })}`,
           )
           break
         default:
           await getState(rowsPerPage, page, filter, `${createSearchParams(findParams)}`)
-          updateFindSpecialParams({
-            status: '',
-            handler: '',
-            approver: '',
-          })
+          setFindSpecialParams({})
           break
       }
       dispatch(setLoading(false))
@@ -333,7 +435,6 @@ export default function IOD() {
   const getOrgan = async () => {
     try {
       dispatch(setLoading(true))
-      setOrgan([])
       const result = await organizationService.getList()
       result.data.data.map((el) => {
         var item = { value: el._id, label: `${el.name} - ${el.code}` }
@@ -357,6 +458,7 @@ export default function IOD() {
         ...findParams,
         ...findSpecialParams,
         type: selectedItem ? selectedItem.value : '',
+        typeMulti: '',
       })}`,
     })
     getState(
@@ -371,7 +473,7 @@ export default function IOD() {
     )
   }
 
-  const handleOnChangeSelecteStatus = (selectedItem) => {
+  const handleOnChangeSelectStatus = (selectedItem) => {
     updateFindParams({ status: selectedItem ? selectedItem.value : '' })
     navigate({
       pathname: pathname,
@@ -381,6 +483,7 @@ export default function IOD() {
         filter: filter,
         ...findParams,
         status: selectedItem ? selectedItem.value : '',
+        statusMulti: '',
       })}`,
     })
     getState(
@@ -440,6 +543,7 @@ export default function IOD() {
   const handleOnClickSearchButton = async () => {
     try {
       dispatch(setLoading(true))
+      console.log(findParams)
       navigate({
         pathname: pathname,
         search: `?${createSearchParams({
@@ -474,7 +578,19 @@ export default function IOD() {
           filter: filter,
         })}`,
       })
-      setFindParams({})
+      const objectReset = {
+        typeMulti: '',
+        organMulti: '',
+        statusMulti: '',
+        handler: '',
+        approver: '',
+      }
+      if (func === Screens.IOD_LIST_(Screens.APPROVAL)) {
+        delete objectReset.approver
+        delete objectReset.handler
+      }
+      if (func === Screens.IOD_LIST_(Screens.HANDLE)) delete objectReset.handler
+      setFindParams(objectReset)
       await getState(
         store.rowsPerPage,
         store.page,
@@ -495,41 +611,62 @@ export default function IOD() {
 
   useEffect(() => {
     document.title = Strings.IncomingOfficialDispatch.Title.LIST
+    setType([])
+    setStatus([])
+    setOrgan([])
+    setOfficer([])
 
     const p = parseInt(searchParams.get('page')) || store.page
     const r = parseInt(searchParams.get('rowsPerPage')) || store.rowsPerPage
     const f = searchParams.get('filter') || ''
     const type = searchParams.get('type') || ''
+    const typeMulti = searchParams.get('typeMulti') || ''
     const status = searchParams.get('status') || ''
+    const statusMulti = searchParams.get('statusMulti') || ''
     const organ = searchParams.get('organ') || ''
+    const organMulti = searchParams.get('organMulti') || ''
     const arrivalNumber = searchParams.get('arrivalNumber') || ''
     const arrivalNumberStart = searchParams.get('arrivalNumberStart') || ''
     const arrivalNumberEnd = searchParams.get('arrivalNumberEnd') || ''
     const issuedStartDate = searchParams.get('issuedStartDate') || ''
     const issuedEndDate = searchParams.get('issuedEndDate') || ''
+    const handler = searchParams.get('handler') || ''
+    const approver = searchParams.get('approver') || ''
+    const importer = searchParams.get('importer') || ''
 
-    console.log('func', func)
-    const findParamsObject =
-      func === Constants.IOD_FUNCTION_LIST
-        ? {
-            type,
-            status,
-            arrivalNumber,
-            issuedStartDate,
-            issuedEndDate,
-            arrivalNumberStart,
-            arrivalNumberEnd,
-            organ,
-          }
-        : {
-            type,
-            arrivalNumber,
-            issuedStartDate,
-            issuedEndDate,
-            arrivalNumberStart,
-            arrivalNumberEnd,
-            organ,
-          }
+    const findParamsObject = {
+      type,
+      typeMulti,
+      arrivalNumber,
+      issuedStartDate,
+      issuedEndDate,
+      arrivalNumberStart,
+      arrivalNumberEnd,
+      organ,
+      organMulti,
+      importer,
+    }
+
+    switch (func) {
+      case Screens.IOD_LIST:
+        findParamsObject.status = status
+        findParamsObject.statusMulti = statusMulti
+        findParamsObject.handler = handler
+        findParamsObject.approver = approver
+        break
+      case Screens.IOD_LIST_(Screens.HANDLE):
+        findParamsObject.approver = approver
+        break
+      case Screens.IOD_LIST_(Screens.APPROVAL):
+        break
+      case Screens.IOD_LIST_(Screens.IMPLEMENT):
+        findParamsObject.handler = handler
+        findParamsObject.approver = approver
+        break
+
+      default:
+        break
+    }
 
     setFilter(f)
     dispatch(setPage(p))
@@ -539,9 +676,10 @@ export default function IOD() {
       end: issuedEndDate ? new Date(parseInt(issuedEndDate)) : null,
     })
     setFindParams(findParamsObject)
-    getType()
     getStatus(r, p, f, arrivalNumber)
+    getType()
     getOrgan()
+    getOfficer()
   }, [func])
 
   return (
@@ -550,11 +688,12 @@ export default function IOD() {
         <CCol>
           <CCard className="mb-3 border-secondary border-top-5">
             <CCardHeader className="text-center py-3" component="h3">
-              {func === Constants.IOD_FUNCTION_LIST && Strings.IncomingOfficialDispatch.NAME}
-              {func === Constants.IOD_FUNCTION_APPROVAL &&
-                Strings.IncomingOfficialDispatch.Title.LIST_APPROVAL}
-              {func === Constants.IOD_FUNCTION_HANDLE &&
-                Strings.IncomingOfficialDispatch.Title.LIST_HANDLE}
+              {func === Screens.IOD_LIST && Strings.IncomingOfficialDispatch.NAME}
+              {func === Screens.APPROVAL && Strings.IncomingOfficialDispatch.Title.LIST_APPROVAL}
+              {func === Screens.HANDLE && Strings.IncomingOfficialDispatch.Title.LIST_HANDLE}
+              {func === Screens.IMPLEMENT && Strings.IncomingOfficialDispatch.Title.LIST_IMPLEMENT}
+              {func === Screens.REFUSE && Strings.IncomingOfficialDispatch.Title.LIST_REFUSE}
+              {func === Screens.LATE && Strings.IncomingOfficialDispatch.Title.LIST_LATE}
             </CCardHeader>
             <CCardBody>
               <CRow className="py-1">
@@ -614,7 +753,7 @@ export default function IOD() {
               </CRow>
               <CRow
                 xs={{ cols: 1 }}
-                md={{ cols: func === Constants.IOD_FUNCTION_LIST ? 3 : 2 }}
+                md={{ cols: func === Screens.IOD_LIST ? 3 : 2 }}
                 className="pb-1"
               >
                 <CCol className="mt-1">
@@ -637,7 +776,7 @@ export default function IOD() {
                     isClearable
                   />
                 </CCol>
-                {func === Constants.IOD_FUNCTION_LIST && (
+                {func === Screens.IOD_LIST && (
                   <CCol className="mt-1">
                     <Select
                       id={Helpers.makeID(
@@ -651,7 +790,7 @@ export default function IOD() {
                       }
                       options={status}
                       placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_STATUS}
-                      onChange={(selectedItem) => handleOnChangeSelecteStatus(selectedItem)}
+                      onChange={(selectedItem) => handleOnChangeSelectStatus(selectedItem)}
                       styles={{
                         menu: (provided) => ({
                           ...provided,
@@ -807,6 +946,7 @@ export default function IOD() {
             <CCol xs={12} sm={1}>
               <CButton
                 className="w-100"
+                color="danger"
                 onClick={() => updateFindParams({ arrivalNumberStart: '', arrivalNumberEnd: '' })}
               >
                 {Strings.Common.DELETE}
@@ -828,20 +968,24 @@ export default function IOD() {
               <Select
                 id={Helpers.makeID(Strings.IncomingOfficialDispatch.CODE, Strings.Type.CODE)}
                 value={
-                  type.filter((el) => el.value === findParams.type).length > 0
-                    ? type.filter((el) => el.value === findParams.type)[0]
+                  type.filter((el) => findParams.typeMulti.includes(el.value)).length > 0
+                    ? type.filter((el) => findParams.typeMulti.includes(el.value))
                     : null
                 }
                 options={type}
                 placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_TYPE}
                 onChange={(selectedItem) =>
-                  updateFindParams({ type: selectedItem ? selectedItem.value : null })
+                  updateFindParams({
+                    typeMulti: selectedItem ? selectedItem.map((el) => el.value).join(',') : '',
+                    type: '',
+                  })
                 }
+                isMulti
                 isClearable
               />
             </CCol>
           </CRow>
-          {func === Constants.IOD_FUNCTION_LIST && (
+          {func === Screens.IOD_LIST && (
             <CRow className="mt-2">
               <CCol xs={12} sm={2}>
                 <CFormLabel
@@ -857,15 +1001,24 @@ export default function IOD() {
                 <Select
                   id={Helpers.makeID(Strings.IncomingOfficialDispatch.CODE, Strings.Status.CODE)}
                   value={
-                    status.filter((el) => el.value === findParams.status).length > 0
-                      ? status.filter((el) => el.value === findParams.status)[0]
+                    findParams.statusMulti === undefined
+                      ? null
+                      : status.filter((el) => findParams.statusMulti.includes(el.value)).length > 0
+                      ? status.filter((el) => findParams.statusMulti.includes(el.value))
                       : null
                   }
                   options={status}
                   placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_STATUS}
-                  onChange={(selectedItem) =>
-                    updateFindParams({ status: selectedItem ? selectedItem.value : null })
-                  }
+                  onChange={(selectedItem) => {
+                    updateFindParams({
+                      statusMulti:
+                        selectedItem.length !== 0
+                          ? selectedItem.map((el) => el.value).join(',')
+                          : '',
+                      status: '',
+                    })
+                  }}
+                  isMulti
                   isClearable
                 />
               </CCol>
@@ -889,15 +1042,131 @@ export default function IOD() {
                   Helpers.propName(Strings, Strings.Form.FieldName.ORGANIZATION_IOD),
                 )}
                 value={
-                  organ.filter((el) => el.value === findParams.organ).length > 0
-                    ? organ.filter((el) => el.value === findParams.organ)[0]
+                  organ.filter((el) => findParams.organMulti.includes(el.value)).length > 0
+                    ? organ.filter((el) => findParams.organMulti.includes(el.value))
                     : null
                 }
                 options={organ}
-                placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_TYPE}
+                placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_ORGANIZATION}
                 onChange={(selectedItem) =>
-                  updateFindParams({ organ: selectedItem ? selectedItem.value : null })
+                  updateFindParams({
+                    organMulti: selectedItem ? selectedItem.map((el) => el.value).join(',') : '',
+                    organ: '',
+                  })
                 }
+                isMulti
+                isClearable
+              />
+            </CCol>
+          </CRow>
+          {func === Screens.IOD_LIST && (
+            <CRow className="mt-2">
+              <CCol xs={12} sm={2}>
+                <CFormLabel
+                  htmlFor={Helpers.makeID(
+                    Strings.IncomingOfficialDispatch.CODE,
+                    Helpers.propName(Strings, Strings.Form.FieldName.HANDLER),
+                  )}
+                >
+                  {Strings.Form.FieldName.HANDLER()}
+                </CFormLabel>
+              </CCol>
+              <CCol>
+                <Select
+                  id={Helpers.makeID(
+                    Strings.IncomingOfficialDispatch.CODE,
+                    Helpers.propName(Strings, Strings.Form.FieldName.HANDLER),
+                  )}
+                  value={
+                    findParams.handler === undefined
+                      ? null
+                      : officer.filter((el) => findParams.handler.includes(el.value)).length > 0
+                      ? officer.filter((el) => findParams.handler.includes(el.value))
+                      : null
+                  }
+                  options={officer}
+                  placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_OFFICER}
+                  onChange={(selectedItem) =>
+                    updateFindParams({
+                      handler: selectedItem ? selectedItem.map((el) => el.value).join(',') : '',
+                    })
+                  }
+                  isMulti
+                  isClearable
+                />
+              </CCol>
+            </CRow>
+          )}
+          {(func === Screens.IOD_LIST || func === Screens.IOD_LIST_(Screens.HANDLE)) && (
+            <CRow className="mt-2">
+              <CCol xs={12} sm={2}>
+                <CFormLabel
+                  htmlFor={Helpers.makeID(
+                    Strings.IncomingOfficialDispatch.CODE,
+                    Helpers.propName(Strings, Strings.Form.FieldName.APPROVER),
+                  )}
+                >
+                  {Strings.Form.FieldName.APPROVER()}
+                </CFormLabel>
+              </CCol>
+              <CCol>
+                <Select
+                  id={Helpers.makeID(
+                    Strings.IncomingOfficialDispatch.CODE,
+                    Helpers.propName(Strings, Strings.Form.FieldName.APPROVER),
+                  )}
+                  value={
+                    findParams.approver === undefined
+                      ? null
+                      : officer.filter((el) => findParams.approver.includes(el.value)).length > 0
+                      ? officer.filter((el) => findParams.approver.includes(el.value))
+                      : null
+                  }
+                  options={officer}
+                  placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_OFFICER}
+                  onChange={(selectedItem) =>
+                    updateFindParams({
+                      approver: selectedItem ? selectedItem.map((el) => el.value).join(',') : '',
+                    })
+                  }
+                  isMulti
+                  isClearable
+                />
+              </CCol>
+            </CRow>
+          )}
+          <CRow className="mt-2">
+            <CCol xs={12} sm={2}>
+              <CFormLabel
+                htmlFor={Helpers.makeID(
+                  Strings.IncomingOfficialDispatch.CODE,
+                  Helpers.propName(Strings, Strings.Form.FieldName.IMPORTER),
+                )}
+              >
+                {Strings.Form.FieldName.IMPORTER()}
+              </CFormLabel>
+            </CCol>
+            <CCol>
+              <Select
+                id={Helpers.makeID(
+                  Strings.IncomingOfficialDispatch.CODE,
+                  Helpers.propName(Strings, Strings.Form.FieldName.IMPORTER),
+                )}
+                value={
+                  findParams.importer === undefined
+                    ? null
+                    : officer.filter((el) => findParams.importer.includes(el.value)).length > 0
+                    ? officer.filter((el) => findParams.importer.includes(el.value))
+                    : null
+                }
+                options={officer}
+                placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_OFFICER}
+                onChange={(selectedItem) =>
+                  updateFindParams({
+                    importer: selectedItem ? selectedItem.map((el) => el.value).join(',') : '',
+                  })
+                }
+                isMulti
                 isClearable
               />
             </CCol>

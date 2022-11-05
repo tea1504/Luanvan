@@ -23,6 +23,20 @@ var incomingOfficialDispatchService = {
     params = {}
   ) => {
     try {
+      const statusCheck = await statusModel.find(
+        { name: { $in: ["PENDING", "PROGRESSING"] } },
+        "_id"
+      );
+      const lateStatus = await statusModel.findOne({ name: "LATE" });
+      const findLatedIOD = await model.find({
+        deleted: false,
+        dueDate: { $lt: new Date() },
+        status: { $in: [...statusCheck] },
+      });
+      await model.updateMany(
+        { _id: { $in: [...findLatedIOD.map((el) => el._id)] } },
+        { status: lateStatus._id }
+      );
       const user = await officerModel.findById(userID, { deleted: false });
       if (!user)
         return {
@@ -36,17 +50,56 @@ var incomingOfficialDispatchService = {
         (el) => params[el] === "" && delete params[el]
       );
       var between = {};
-      if (params.arrivalNumberStart)
+      if (params.arrivalNumberStart) {
         between.arrivalNumber = {
           $gte: parseInt(params.arrivalNumberStart),
           $lte: parseInt(params.arrivalNumberEnd),
         };
-      if (params.issuedStartDate)
+        delete params.arrivalNumberStart;
+        delete params.arrivalNumberEnd;
+      }
+      if (params.issuedStartDate) {
         between.issuedDate = {
           $gte: parseInt(params.issuedStartDate),
           $lte: parseInt(params.issuedEndDate),
         };
+        delete params.issuedStartDate;
+        delete params.issuedEndDate;
+      }
       if (params.arrivalNumber < 1) params.arrivalNumber = null;
+      if (params.typeMulti) {
+        between.type = { $in: params.typeMulti.split(",") };
+        delete params.type;
+        delete params.typeMulti;
+      }
+      if (params.statusMulti) {
+        between.status = { $in: params.statusMulti.split(",") };
+        delete params.status;
+        delete params.statusMulti;
+      }
+      if (params.organMulti) {
+        between.organ = { $in: params.organMulti.split(",") };
+        delete params.organMulti;
+      }
+      if (params.handler) {
+        between.handler = { $in: params.handler.split(",") };
+        delete params.handler;
+      }
+      if (params.approver) {
+        between.approver = { $in: params.approver.split(",") };
+        delete params.approver;
+      }
+      if (params.approver_importer) {
+        between["$or"] = [
+          { approver: params.approver_importer },
+          { importer: params.approver_importer },
+        ];
+        delete params.approver_importer;
+      }
+      if (params.importer) {
+        between.importer = { $in: params.importer.split(",") };
+        delete params.importer;
+      }
       const khongMat = await securityModel.findOne({ name: "Không" });
       const result = {};
       const total = await model.countDocuments({
@@ -54,12 +107,12 @@ var incomingOfficialDispatchService = {
         deleted: false,
         ...params,
         ...between,
-        // $or: [
-        //   { security: khongMat._id.toString() },
-        //   { importer: userID },
-        //   { handler: userID },
-        //   { approver: userID },
-        // ],
+        $or: [
+          { security: khongMat._id.toString() },
+          { importer: userID },
+          { handler: { $all: [mongoose.Types.ObjectId(userID)] } },
+          { approver: userID },
+        ],
       });
       let startIndex = (pageNumber - 1) * limit;
       let endIndex = pageNumber * limit;
@@ -104,6 +157,8 @@ var incomingOfficialDispatchService = {
         .skip(startIndex)
         .limit(limit)
         .sort({ createdAt: -1 });
+      console.log(params, between);
+      console.log(result);
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.GET_200(Constants.String.Language._),

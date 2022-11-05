@@ -43,9 +43,7 @@ const IODCreateOrUpdate = React.lazy(() =>
 )
 const IODDetail = React.lazy(() => import('./views/incomingOfficialDispatch/IODDetail'))
 const IODApproval = React.lazy(() => import('./views/incomingOfficialDispatch/IODApproval'))
-const IODListProgress = React.lazy(() => import('./views/incomingOfficialDispatch/IODListProgress'))
 const IODHandle = React.lazy(() => import('./views/incomingOfficialDispatch/IODHandle'))
-const IODListApproval = React.lazy(() => import('./views/incomingOfficialDispatch/IODListApproval'))
 const User = React.lazy(() => import('./views/user/User'))
 const UserChangePassword = React.lazy(() => import('./views/user/UserChangePassword'))
 

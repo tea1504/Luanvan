@@ -48,6 +48,7 @@ const _nav = [
           en: en.Common.LIST,
         },
         role: [0, 1],
+        right: Strings.Common.READ_OD,
         to: Screens.IOD_LIST,
       },
       {
@@ -57,6 +58,7 @@ const _nav = [
           en: en.IncomingOfficialDispatch.Common.NEED_APPROVAL,
         },
         role: [0, 1],
+        right: Strings.Common.READ_OD,
         to: Screens.IOD_LIST_(Screens.APPROVAL),
       },
       {
@@ -66,7 +68,38 @@ const _nav = [
           en: en.IncomingOfficialDispatch.Common.NEED_PROGRESS,
         },
         role: [0, 1],
+        right: Strings.Common.READ_OD,
         to: Screens.IOD_LIST_(Screens.HANDLE),
+      },
+      {
+        component: CNavItem,
+        name: {
+          vi: vn.IncomingOfficialDispatch.Common.NEED_IMPLEMENT,
+          en: en.IncomingOfficialDispatch.Common.NEED_IMPLEMENT,
+        },
+        role: [0, 1],
+        right: Strings.Common.READ_OD,
+        to: Screens.IOD_LIST_(Screens.IMPLEMENT),
+      },
+      {
+        component: CNavItem,
+        name: {
+          vi: vn.IncomingOfficialDispatch.Common.LATE,
+          en: en.IncomingOfficialDispatch.Common.LATE,
+        },
+        role: [0, 1],
+        right: Strings.Common.READ_OD,
+        to: Screens.IOD_LIST_(Screens.LATE),
+      },
+      {
+        component: CNavItem,
+        name: {
+          vi: vn.IncomingOfficialDispatch.Common.REFUSE,
+          en: en.IncomingOfficialDispatch.Common.REFUSE,
+        },
+        role: [0, 1],
+        right: Strings.Common.CREATE_OD,
+        to: Screens.IOD_LIST_(Screens.REFUSE),
       },
     ],
   },

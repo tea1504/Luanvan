@@ -22,14 +22,24 @@ var transporter = nodemailer.createTransport({
 var officerService = {
   getList: async (userID = "") => {
     try {
-      const user = await officerModel.findById(userID, { deleted: false });
+      const newStatus = await officerStatusModel.findOne({ name: "NEW" });
+      const lockedStatus = await officerStatusModel.findOne({ name: "LOCKED" });
+      const user = await officerModel.findById(userID, {
+        deleted: false,
+      });
       if (!user)
         return {
           status: Constants.ApiCode.NOT_FOUND,
           message: Constants.String.Message.ERR_404(Constants.String.Officer._),
         };
       const result = await officerModel.find(
-        { organ: user.organ, deleted: false },
+        {
+          organ: user.organ,
+          deleted: false,
+          status: {
+            $nin: [newStatus._id.toString(), lockedStatus._id.toString()],
+          },
+        },
         "code firstName lastName position"
       );
       return {

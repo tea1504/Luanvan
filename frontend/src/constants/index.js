@@ -251,9 +251,6 @@ const Constants = {
   DefaultLanguage: 'vi',
 
   COCCOC_BRAND_NAME: 'CocCoc',
-  IOD_FUNCTION_LIST:"danh-sach",
-  IOD_FUNCTION_APPROVAL:"van-ban-can-duyet",
-  IOD_FUNCTION_HANDLE:"van-ban-can-xu-ly",
 }
 
 export default Constants
