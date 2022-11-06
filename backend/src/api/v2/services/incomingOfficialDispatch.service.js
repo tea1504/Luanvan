@@ -6,6 +6,8 @@ const model = require("./../models/incomingOfficialDispatch.model");
 var nodemailer = require("nodemailer");
 const securityModel = require("../models/security.model");
 const { default: mongoose } = require("mongoose");
+const showError = require("./error.service");
+const organizationModel = require("../models/organization.model");
 var transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -157,8 +159,6 @@ var incomingOfficialDispatchService = {
         .skip(startIndex)
         .limit(limit)
         .sort({ createdAt: -1 });
-      console.log(params, between);
-      console.log(result);
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.GET_200(Constants.String.Language._),
@@ -174,6 +174,20 @@ var incomingOfficialDispatchService = {
   },
   getOne: async (id) => {
     try {
+      const statusCheck = await statusModel.find(
+        { name: { $in: ["PENDING", "PROGRESSING"] } },
+        "_id"
+      );
+      const lateStatus = await statusModel.findOne({ name: "LATE" });
+      const findLatedIOD = await model.find({
+        deleted: false,
+        dueDate: { $lt: new Date() },
+        status: { $in: [...statusCheck] },
+      });
+      await model.updateMany(
+        { _id: { $in: [...findLatedIOD.map((el) => el._id)] } },
+        { status: lateStatus._id }
+      );
       const item = await model
         .findOne({ _id: id, deleted: false })
         .populate("type")
@@ -248,7 +262,7 @@ var incomingOfficialDispatchService = {
       }
     }
   },
-  getNewArrivalNumber: async (userID) => {
+  getNewArrivalNumber: async (userID = "") => {
     try {
       const date = new Date();
       const user = await officerModel.findById(userID, { deleted: false });
@@ -290,9 +304,30 @@ var incomingOfficialDispatchService = {
       };
     }
   },
-  postOne: async (id, data, files) => {
+  postOne: async (
+    userID = "",
+    data = {
+      code: "",
+      issuedDate: 0,
+      subject: "",
+      type: "",
+      language: "",
+      pageAmount: 0,
+      description: "",
+      signerInfoName: "",
+      signerInfoPosition: "",
+      dueDate: 0,
+      priority: "",
+      security: "",
+      organ: "",
+      approver: "",
+      handler: [],
+      sendEmail: "",
+    },
+    files = []
+  ) => {
     try {
-      data.importer = id;
+      data.importer = userID;
       data.arrivalDate = new Date().getTime();
       const status = await statusModel.findOne({
         name: "PENDING",
@@ -306,7 +341,7 @@ var incomingOfficialDispatchService = {
       data.status = status._id.toString();
       data.traceHeaderList = [];
       data.traceHeaderList.push({
-        officer: id,
+        officer: userID,
         command: status.description,
         date: new Date().getTime(),
         header: status.name,
@@ -351,26 +386,32 @@ var incomingOfficialDispatchService = {
         data: result,
       };
     } catch (error) {
-      switch (error.name) {
-        case "ValidationError":
-          return {
-            status: Constants.ApiCode.NOT_ACCEPTABLE,
-            message: Constants.String.Message.ERR_406,
-            data: { error: error.errors },
-          };
-        case "MongoServerError":
-          return {
-            status: Constants.ApiCode.NOT_ACCEPTABLE,
-            message: Constants.String.Message.ERR_406,
-            data: { error: error.message },
-          };
-        default:
-          return {
-            status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
-            message: Constants.String.Message.ERR_500,
-            data: { error: error.message },
-          };
-      }
+      return showError(error);
+    }
+  },
+  putOne: async (id = "", userID = "", data = { dueDate: 0 }, files = []) => {
+    try {
+      const user = await officerModel.findById(userID, { deleted: false });
+      if (!user)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Officer._),
+        };
+      const iod = await model.findById(id, { deleted: false });
+      if (!iod)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Officer._),
+        };
+      iod.dueDate = data.dueDate;
+      iod.save();
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.PUT_200(Constants.String.IOD._),
+        data: iod,
+      };
+    } catch (error) {
+      return showError(error);
     }
   },
   approval: async (
@@ -445,27 +486,7 @@ var incomingOfficialDispatchService = {
         data: item,
       };
     } catch (error) {
-      switch (error.name) {
-        case "ValidationError":
-          return {
-            status: Constants.ApiCode.NOT_ACCEPTABLE,
-            message: Constants.String.Message.ERR_406,
-            data: { error: error.errors },
-          };
-        case "CastError":
-        case "MongoServerError":
-          return {
-            status: Constants.ApiCode.NOT_ACCEPTABLE,
-            message: Constants.String.Message.ERR_406,
-            data: { error: error.message },
-          };
-        default:
-          return {
-            status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
-            message: Constants.String.Message.ERR_500,
-            data: { error: error.message },
-          };
-      }
+      showError(error);
     }
   },
   cancelApproval: async (id = "", userID = "") => {
@@ -634,27 +655,95 @@ var incomingOfficialDispatchService = {
         data: result,
       };
     } catch (error) {
-      switch (error.name) {
-        case "ValidationError":
-          return {
-            status: Constants.ApiCode.NOT_ACCEPTABLE,
-            message: Constants.String.Message.ERR_406,
-            data: { error: error.errors },
-          };
-        case "CastError":
-        case "MongoServerError":
-          return {
-            status: Constants.ApiCode.NOT_ACCEPTABLE,
-            message: Constants.String.Message.ERR_406,
-            data: { error: error.message },
-          };
-        default:
-          return {
-            status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
-            message: Constants.String.Message.ERR_500,
-            data: { error: error.message },
-          };
+      showError(error);
+    }
+  },
+  refuse: async (
+    id = "",
+    userID = "",
+    data = { refuse: "", sendEmailImporter: "", sendEmailOrgan: "" }
+  ) => {
+    try {
+      const item = await model.findOne({
+        _id: id,
+        deleted: false,
+      });
+      if (!item)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.IOD._),
+        };
+      const user = await officerModel.findById(userID, { deleted: false });
+      if (!user)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Officer._),
+        };
+      const REFUSE = await statusModel.findOne({
+        name: "REFUSE",
+        deleted: false,
+      });
+      if (!REFUSE)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Status._),
+        };
+      item.status = REFUSE._id;
+      item.traceHeaderList.push({
+        command: data.refuse,
+        header: REFUSE.name,
+        officer: user._id,
+        status: REFUSE._id,
+      });
+      item.save();
+      if (data.sendEmailImporter || data.sendEmailImporter === "true") {
+        var mailOptions = {
+          from: process.env.MAIL_USER,
+          to: user.emailAddress,
+          subject: "email_title",
+          html: `<img src="https://imggroup.com.vn/Content/images/logo-img.png" height="100"/>
+          <br/>
+          <span style="width: 100%; font-family: Tahoma,Geneva, sans-serif;">
+              Bạn có <strong>${data.refuse}</strong> xử lý văn bản
+          </span>
+`,
+        };
+        transporter.sendMail(mailOptions, function (error, info) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log("Email sent: " + info.response);
+          }
+        });
       }
+      if (data.sendEmailOrgan || data.sendEmailOrgan === "true") {
+        const organ = await organizationModel.findById(user.organ);
+        var mailOptions = {
+          from: process.env.MAIL_USER,
+          to: organ.emailAddress,
+          subject: "email_title",
+          html: `<img src="https://imggroup.com.vn/Content/images/logo-img.png" height="100"/>
+          <br/>
+          <span style="width: 100%; font-family: Tahoma,Geneva, sans-serif;">
+              Bạn có <strong>${data.refuse}</strong> xử lý văn bản
+          </span>
+`,
+        };
+        transporter.sendMail(mailOptions, function (error, info) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log("Email sent: " + info.response);
+          }
+        });
+      }
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.PUT_200(Constants.String.Language._),
+        data: item,
+      };
+    } catch (error) {
+      showError(error);
     }
   },
 };

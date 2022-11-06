@@ -3,8 +3,8 @@ info:
   title: E-Office API's Document
   version: "1.0.0"
 servers:
-  - url: http://10.10.42.189:5000/v2
   - url: http://localhost:5000/v2
+  - url: http://10.10.42.189:5000/v2
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -2830,6 +2830,82 @@ paths:
           description: Không có quyền truy cập
         404:
           description: Không tìm thấy loại văn bản hoặc liên kết
+        406:
+          description: Dữ liệu không được chấp nhận
+        500:
+          description: Lỗi hệ thống
+    put:
+      summary: Thêm nhiều bản ghi
+      tags:
+        - Incoming Official Dispatch
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: number
+                issuedDate:
+                  type: number
+                subject:
+                  type: string
+                type: 
+                  type: string
+                language: 
+                  type: string
+                pageAmount:
+                  type: number
+                description:
+                  type: string
+                signerInfoName:
+                  type: string
+                signerInfoPosition:
+                  type: string
+                dueDate:
+                  type: number
+                arrivalNumber:
+                  type: number
+                arrivalDate:
+                  type: number
+                priority:
+                  type: string
+                security:
+                  type: string
+                organ:
+                  type: string
+                approver:
+                  type: string
+                importer:
+                  type: string
+                handler:
+                  type: array
+                  items:
+                    type: string
+                file:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        200:
+          description: Thêm mới thành công
+        400:
+          description: Cú pháp không hợp lệ
+        401:
+          description: Phiên đăng nhập hết hạn
+        403:
+          description: Không có quyền truy cập
+        404:
+          description: Không tìm thấy liên kết
         406:
           description: Dữ liệu không được chấp nhận
         500:

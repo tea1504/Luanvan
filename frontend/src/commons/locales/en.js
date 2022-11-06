@@ -52,6 +52,7 @@ export default {
     READ_OFFICER: 'readOfficer',
     READ_RIGHT: 'readRight',
     RESET: 'Đặt lại',
+    REFUSE: 'Từ chối',
     SCOPE0: 'Toàn hệ thống',
     SCOPE1: 'Trong đơn vị',
     SEARCH: 'Tìm kiếm',
@@ -78,6 +79,11 @@ export default {
       FAILURE: 'Duyệt văn bản thất bại',
       SUCCESS: 'Bạn đã duyệt văn bản thành công',
       TITLE: 'Duyệt văn bản',
+    },
+    Refuse: {
+      FAILURE: 'Từ chối văn bản thất bại',
+      SUCCESS: 'Bạn đã từ chối văn bản thành công',
+      TITLE: 'Từ chối văn bản',
     },
     Handle: {
       FAILURE: 'Xử lý văn bản thất bại',
@@ -206,7 +212,7 @@ export default {
       APPROVE: 'Duyệt',
       DESCRIPTION_CODE:
         'Bạn chỉ cần nhập phần số<br/> Ví dụ: <code>1/2022/QĐ-ĐHCT</code> nhập <code>1</code>',
-      DESCRIPTION: 'Ý kiếm phê duyệt',
+      DESCRIPTION: 'Ý kiến phê duyệt',
       HANDLE_OPINION: 'Ý kiến xử lý',
       HANDLE: 'Xử lý văn bản',
       LATE: 'Văn bản trễ hạn xử lý',
@@ -216,6 +222,7 @@ export default {
       NOT_ARRIVAL_NUMBER: 'Chưa cấp số',
       PRINT: 'In danh sách',
       REFUSE: 'Văn bản bị từ chối',
+      REFUSE_REASON: 'Lý do từ chối',
       SELECT_APPROVER: '- Chọn cán bộ duyệt -',
       SELECT_LANGUAGE: '- Chọn ngôn ngữ văn bản đến -',
       SELECT_OFFICER: 'Chọn cán bộ',
@@ -225,6 +232,8 @@ export default {
       SELECT_STATUS: 'Chọn trạng thái',
       SELECT_TYPE: 'Chọn loại văn bản',
       SEND_EMAIL_APPROVAL: 'Gửi email thông báo',
+      SEND_EMAIL_IMPORTER: 'Gửi email thông báo cho cán bộ nhập',
+      SEND_EMAIL_ORGAN: 'Gửi email thông báo cho đơn vị ban hành văn bản',
       UPLOAD_FILE: 'Đính kèm file',
     },
     Title: {

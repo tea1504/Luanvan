@@ -7,6 +7,7 @@ import {
   CCardHeader,
   CCol,
   CContainer,
+  CFormCheck,
   CFormFeedback,
   CFormLabel,
   CModal,
@@ -93,6 +94,10 @@ export default function IODApproval() {
     createdAt: '',
     updatedAt: '',
     __v: 0,
+
+    refuse: '',
+    sendEmailImporter: true,
+    sendEmailOrgan: true,
   })
   const updateState = (newState) => {
     setState((prevState) => ({
@@ -100,7 +105,7 @@ export default function IODApproval() {
       ...newState,
     }))
   }
-  const [visible, setVisible] = useState({ preview: false, assignment: false })
+  const [visible, setVisible] = useState({ preview: false, assignment: false, refuse: false })
   const updateVisible = (newState) => {
     setVisible((prevState) => ({
       ...prevState,
@@ -109,7 +114,7 @@ export default function IODApproval() {
   }
   const [link, setLink] = useState('')
   const [officer, setOfficer] = useState([])
-  const [error, setError] = useState({ handler: null })
+  const [error, setError] = useState({ handler: null, refuse: null })
   const updateError = (newState) => {
     setError((prevState) => ({
       ...prevState,
@@ -277,7 +282,6 @@ export default function IODApproval() {
     try {
       dispatch(setLoading(true))
       const result = await service.approval(id, state)
-      console.log(result)
       dispatch(setLoading(false))
       await MySwal.fire({
         title: Strings.Message.Approval.TITLE,
@@ -309,18 +313,49 @@ export default function IODApproval() {
     }
   }
 
-  const validate = () => {
-    const flag = true
-    if (state.handler.length === 0) {
-      updateError({ handler: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
-      flag = false
+  const validate = (mode) => {
+    var flag = true
+    switch (mode) {
+      case 'refuse':
+        if (Helpers.isNullOrEmpty(state.refuse)) {
+          updateError({ refuse: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
+          flag = false
+        }
+        break
+      default:
+        if (state.handler.length === 0) {
+          updateError({ handler: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
+          flag = false
+        }
+        break
     }
     return flag
   }
 
-  const handleOnClickApprovalAndAssignment = () => {
-    updateError({ handler: null })
-    if (validate()) {
+  const refuse = async () => {
+    try {
+      updateError({ handler: null, refuse: null })
+      if (validate('refuse')) {
+        dispatch(setLoading(true))
+        await service.refuse(id, state)
+        dispatch(setLoading(false))
+        await MySwal.fire({
+          title: Strings.Message.Refuse.TITLE,
+          icon: 'success',
+          text: Strings.Message.Refuse.SUCCESS,
+          confirmButtonText: Strings.Common.OK,
+        })
+        navigate(-1)
+      }
+    } catch (error) {
+      dispatch(setLoading(false))
+      showError(error)
+    }
+  }
+
+  const handleOnClickApprovalAndAssignment = async () => {
+    updateError({ handler: null, refuse: null })
+    if (validate('handler')) {
       updateVisible({ assignment: false })
       approval()
     }
@@ -549,7 +584,7 @@ export default function IODApproval() {
             </CCardBody>
             <CCardFooter>
               <CRow>
-                <CCol xs={12} sm={4}>
+                <CCol>
                   <CButton
                     disabled={loading}
                     className="w-100"
@@ -559,7 +594,7 @@ export default function IODApproval() {
                     {Strings.Common.APPROVE}
                   </CButton>
                 </CCol>
-                <CCol xs={12} sm={4}>
+                <CCol>
                   <CButton
                     disabled={loading}
                     className="w-100"
@@ -569,7 +604,18 @@ export default function IODApproval() {
                     {Strings.Common.APPROVE_ASSIGNMENT}
                   </CButton>
                 </CCol>
-                <CCol xs={12} sm={4}>
+                <CCol>
+                  <CButton
+                    disabled={loading}
+                    className="w-100"
+                    color="danger"
+                    variant="outline"
+                    onClick={() => updateVisible({ refuse: true })}
+                  >
+                    {Strings.Common.REFUSE}
+                  </CButton>
+                </CCol>
+                <CCol>
                   <CButton
                     className="w-100"
                     color="secondary"
@@ -609,7 +655,7 @@ export default function IODApproval() {
         scrollable
       >
         <CModalHeader>{Strings.Common.ASSIGNMENT}</CModalHeader>
-        <CModalBody style={{ minHeight: '60vh' }}>
+        <CModalBody>
           <CFormLabel htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Priority.CODE)}>
             {Strings.Form.FieldName.PRIORITY(Strings.IncomingOfficialDispatch.NAME)}{' '}
           </CFormLabel>
@@ -645,6 +691,73 @@ export default function IODApproval() {
             onClick={handleOnClickApprovalAndAssignment}
           >
             {Strings.Common.APPROVE_ASSIGNMENT}
+          </CButton>
+        </CModalFooter>
+      </CModal>
+      <CModal
+        alignment="center"
+        size="xl"
+        visible={visible.refuse}
+        onClose={() => {
+          updateVisible({ refuse: false })
+        }}
+        scrollable
+      >
+        <CModalHeader>{Strings.Common.ASSIGNMENT}</CModalHeader>
+        <CModalBody>
+          <CRow>
+            <CCol>
+              <CFormLabel
+                htmlFor={Helpers.makeID(
+                  Strings.Officer.CODE,
+                  Helpers.propName(Strings, Strings.IncomingOfficialDispatch.Common.REFUSE_REASON),
+                )}
+              >
+                {Strings.IncomingOfficialDispatch.Common.REFUSE_REASON}
+              </CFormLabel>
+              <CKEditor
+                id={Helpers.makeID(
+                  Strings.Officer.CODE,
+                  Helpers.propName(Strings, Strings.IncomingOfficialDispatch.Common.REFUSE_REASON),
+                )}
+                editor={ClassicEditor}
+                config={ckEditorConfig}
+                data={state.refuse}
+                onChange={(event, editor) => {
+                  const data = editor.getData()
+                  updateState({ refuse: data })
+                }}
+              />
+              <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
+                {error.refuse &&
+                  Strings.Form.Validation[error.refuse](
+                    Strings.IncomingOfficialDispatch.Common.REFUSE_REASON,
+                  )}
+              </CFormFeedback>
+            </CCol>
+          </CRow>
+          <CRow className="mt-3">
+            <CCol xs={12} sm={6}>
+              <CFormCheck
+                id="sendEmailImporter"
+                checked={state.sendEmailImporter}
+                label={Strings.IncomingOfficialDispatch.Common.SEND_EMAIL_IMPORTER}
+                onChange={() => updateState({ sendEmailImporter: !state.sendEmailImporter })}
+              />
+            </CCol>
+            <CCol xs={12} sm={6}>
+              <CFormCheck
+                id="sendEmailOrgan"
+                checked={state.sendEmailOrgan}
+                label={Strings.IncomingOfficialDispatch.Common.SEND_EMAIL_ORGAN}
+                onChange={() => updateState({ sendEmailOrgan: !state.sendEmailOrgan })}
+              />
+            </CCol>
+          </CRow>
+        </CModalBody>
+        <CModalFooter>
+          <CButton disabled={loading} className="w-100" color="danger" onClick={refuse}>
+            {Strings.Common.REFUSE}
           </CButton>
         </CModalFooter>
       </CModal>

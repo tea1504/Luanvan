@@ -158,6 +158,30 @@ var incomingOfficialDispatchController = {
    * @param {import("express").Response} res
    * @param {import("express").RequestHandler} next
    */
+  putOne: async (req, res, next) => {
+    try {
+      const files = req.files;
+      const { id } = req.params;
+      const list = id.split(".");
+      var { dueDate } = req.body;
+      const result = await service.putOne(
+        list[list.length - 1],
+        req.userID,
+        {
+          dueDate,
+        },
+        files
+      );
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
   approval: async (req, res, next) => {
     try {
       const { id } = req.params;
@@ -215,6 +239,26 @@ var incomingOfficialDispatchController = {
         },
         files
       );
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
+  refuse: async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const list = id.split(".");
+      var { refuse, sendEmailImporter, sendEmailOrgan } = req.body;
+      const result = await service.refuse(list[list.length - 1], req.userID, {
+        refuse,
+        sendEmailImporter,
+        sendEmailOrgan,
+      });
       return res.status(result.status).json(result);
     } catch (error) {
       return next(error);

@@ -86,10 +86,16 @@ class IODService extends BaseService {
         formData.append(key, value)
       }
     }
-    data.command = Helpers.htmlDecode(data.command)
     const result = await this.api.putFormData({
       path: Constants.ApiPath.HANDLE(id),
       data: formData,
+    })
+    return result
+  }
+  async refuse(id, data) {
+    const result = await this.api.put({
+      path: Constants.ApiPath.REFUSE(id),
+      data: data,
     })
     return result
   }

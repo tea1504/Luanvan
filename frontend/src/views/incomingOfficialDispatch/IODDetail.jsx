@@ -665,7 +665,7 @@ export default function IODDetail() {
                     </CCol>
                   )}
                 {loggedUser.right[Strings.Common.APPROVE_OD] &&
-                  !['PENDING', 'IMPLEMENT'].includes(state.status.name) &&
+                  ['APPROVED', 'PROGRESSED'].includes(state.status.name) &&
                   state.approver.code === loggedUser.code && (
                     <CCol>
                       <CButton className="w-100" color="danger" onClick={handleOnClickCancelButton}>

@@ -52,6 +52,11 @@ route.post(
   controller.postOne
 );
 route.put(
+  Constants.ApiPath.IncomingOfficialDispatch.ID,
+  upload.array("file"),
+  controller.putOne
+);
+route.put(
   Constants.ApiPath.IncomingOfficialDispatch.APPROVAL,
   approveOD,
   controller.approval
@@ -65,6 +70,10 @@ route.put(
   Constants.ApiPath.IncomingOfficialDispatch.HANDLE,
   upload.array("newFile"),
   controller.handle
+);
+route.put(
+  Constants.ApiPath.IncomingOfficialDispatch.REFUSE,
+  controller.refuse
 );
 
 module.exports = route;

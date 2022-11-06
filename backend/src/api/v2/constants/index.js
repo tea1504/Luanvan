@@ -91,6 +91,7 @@ const Constants = {
       FILE: "/file/:id",
       GET_ARRIVAL_NUMBER: "/new-arrival-number",
       HANDLE: "/handle/:id",
+      REFUSE: "/refuse/:id",
       ID: "/:id",
       ROOT: "/incoming-official-dispatch",
       SLASH: "/",

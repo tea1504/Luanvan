@@ -132,6 +132,7 @@ const Constants = {
     APPROVE_IOD: (id = '') => '/incoming-official-dispatch/approval/' + id,
     APPROVE_CANCEL_IOD: (id = '') => '/incoming-official-dispatch/cancel-approval/' + id,
     HANDLE: (id = '') => '/incoming-official-dispatch/handle/' + id,
+    REFUSE: (id = '') => '/incoming-official-dispatch/refuse/' + id,
     DELETE_IOD: (id = '') => '/incoming-official-dispatch/' + id,
     DELETE_IODS: '/incoming-official-dispatch',
 
