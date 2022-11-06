@@ -7,8 +7,12 @@ import {
   CCardHeader,
   CCol,
   CContainer,
+  CFormCheck,
+  CFormFeedback,
+  CFormLabel,
   CModal,
   CModalBody,
+  CModalFooter,
   CModalHeader,
   CRow,
   CTable,
@@ -42,6 +46,9 @@ import { setLoading } from 'src/store/slice/config.slice'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import ODPreview from '../officialDispatch/ODPreview'
+import { CKEditor } from '@ckeditor/ckeditor5-react'
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
+import ckEditorConfig from 'src/configs/ckEditor.config'
 
 const service = new IODService()
 const MySwal = withReactContent(Swal)
@@ -87,6 +94,9 @@ export default function IODDetail() {
     createdAt: '',
     updatedAt: '',
     __v: 0,
+
+    cancel: '',
+    sendEmail: true,
   })
   const updateState = (newState) => {
     setState((prevState) => ({
@@ -94,7 +104,20 @@ export default function IODDetail() {
       ...newState,
     }))
   }
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useState({ preview: false, cancel: false })
+  const updateVisible = (newState) => {
+    setVisible((prevState) => ({
+      ...prevState,
+      ...newState,
+    }))
+  }
+  const [error, setError] = useState({ cancel: false })
+  const updateError = (newState) => {
+    setError((prevState) => ({
+      ...prevState,
+      ...newState,
+    }))
+  }
   const [link, setLink] = useState('')
 
   const showError = (error) => {
@@ -143,48 +166,49 @@ export default function IODDetail() {
     }
   }
 
-  const renderFile = () => {
-    const extension = (name) => {
-      const result = {}
-      switch (Helpers.getFileExtension(name)) {
-        case 'pdf':
-          result.icon = <FaRegFilePdf size="2rem" />
-          result.color = 'danger'
-          break
-        case 'doc':
-        case 'docx':
-          result.icon = <FaFileWord size="2rem" />
-          result.color = 'info'
-          break
-        case 'xls':
-        case 'xlsx':
-          result.icon = <FaFileExcel size="2rem" />
-          result.color = 'success'
-          break
-        case 'csv':
-          result.icon = <FaFileCsv size="2rem" />
-          result.color = 'success'
-          break
-        case 'apng':
-        case 'avif':
-        case 'gif':
-        case 'jprg':
-        case 'png':
-        case 'webp':
-          result.icon = <FaImage size="2rem" />
-          result.color = 'warning'
-          break
-        case 'svg':
-          result.icon = <FaVectorSquare size="2rem" />
-          result.color = 'warning'
-          break
-        default:
-          result.icon = <FaFile size="2rem" />
-          result.color = 'dark'
-          break
-      }
-      return result
+  const extension = (name) => {
+    const result = {}
+    switch (Helpers.getFileExtension(name)) {
+      case 'pdf':
+        result.icon = <FaRegFilePdf size="2rem" />
+        result.color = 'danger'
+        break
+      case 'doc':
+      case 'docx':
+        result.icon = <FaFileWord size="2rem" />
+        result.color = 'info'
+        break
+      case 'xls':
+      case 'xlsx':
+        result.icon = <FaFileExcel size="2rem" />
+        result.color = 'success'
+        break
+      case 'csv':
+        result.icon = <FaFileCsv size="2rem" />
+        result.color = 'success'
+        break
+      case 'apng':
+      case 'avif':
+      case 'gif':
+      case 'jprg':
+      case 'png':
+      case 'webp':
+        result.icon = <FaImage size="2rem" />
+        result.color = 'warning'
+        break
+      case 'svg':
+        result.icon = <FaVectorSquare size="2rem" />
+        result.color = 'warning'
+        break
+      default:
+        result.icon = <FaFile size="2rem" />
+        result.color = 'dark'
+        break
     }
+    return result
+  }
+
+  const renderFile = () => {
     return (
       <CRow className="px-0 mx-0" xs={{ cols: 1, gutter: 4 }} md={{ cols: 2 }} lg={{ cols: 4 }}>
         {state.file.map((el, ind) => (
@@ -218,7 +242,7 @@ export default function IODDetail() {
                         setLink(
                           `${process.env.REACT_APP_BASE_URL}/${el.path}?token=${token}#toolbar=0`,
                         )
-                        setVisible(!visible)
+                        updateVisible({ preview: !visible.preview })
                       }}
                     >
                       <FaEye /> {Strings.Common.PREVIEW}
@@ -233,18 +257,36 @@ export default function IODDetail() {
     )
   }
 
+  const validate = (mode) => {
+    var flag = true
+    switch (mode) {
+      case 'cancel':
+        if (Helpers.isNullOrEmpty(state.cancel)) {
+          flag = false
+          updateError({ cancel: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
+        }
+        break
+
+      default:
+        break
+    }
+    return flag
+  }
+
   const handleOnClickCancelButton = async () => {
     try {
-      dispatch(setLoading(true))
-      await service.cancelApproval(id)
-      dispatch(setLoading(false))
-      await MySwal.fire({
-        title: Strings.Message.CancelApproval.TITLE,
-        icon: 'success',
-        text: Strings.Message.CancelApproval.SUCCESS,
-        confirmButtonText: Strings.Common.OK,
-      })
-      navigate(-1)
+      if (validate('cancel')) {
+        dispatch(setLoading(true))
+        await service.cancelApproval(id, state)
+        dispatch(setLoading(false))
+        await MySwal.fire({
+          title: Strings.Message.CancelApproval.TITLE,
+          icon: 'success',
+          text: Strings.Message.CancelApproval.SUCCESS,
+          confirmButtonText: Strings.Common.OK,
+        })
+        navigate(-1)
+      }
     } catch (error) {
       dispatch(setLoading(false))
       showError(error)
@@ -665,10 +707,32 @@ export default function IODDetail() {
                     </CCol>
                   )}
                 {loggedUser.right[Strings.Common.APPROVE_OD] &&
+                  loggedUser.right[Strings.Common.CREATE_OD] &&
                   ['APPROVED', 'PROGRESSED'].includes(state.status.name) &&
+                  [state.approver.code, state.importer.code].includes(loggedUser.code) && (
+                    <CCol>
+                      <CButton
+                        className="w-100"
+                        color="success"
+                        onClick={() => {
+                          updateVisible({ cancel: true })
+                        }}
+                      >
+                        {Strings.Common.IMPLEMENT}
+                      </CButton>
+                    </CCol>
+                  )}
+                {loggedUser.right[Strings.Common.APPROVE_OD] &&
+                  ['APPROVED', 'PROGRESSED', 'PROGRESSING'].includes(state.status.name) &&
                   state.approver.code === loggedUser.code && (
                     <CCol>
-                      <CButton className="w-100" color="danger" onClick={handleOnClickCancelButton}>
+                      <CButton
+                        className="w-100"
+                        color="danger"
+                        onClick={() => {
+                          updateVisible({ cancel: true })
+                        }}
+                      >
                         {Strings.Common.APPROVE_CANCEL}
                       </CButton>
                     </CCol>
@@ -691,9 +755,9 @@ export default function IODDetail() {
       <CModal
         alignment="center"
         size="xl"
-        visible={visible}
+        visible={visible.preview}
         onClose={() => {
-          setVisible(false)
+          updateVisible({ preview: false })
         }}
         fullscreen
         scrollable
@@ -702,6 +766,76 @@ export default function IODDetail() {
         <CModalBody className="p-0" style={{ height: '85vh' }}>
           <ODPreview data={link} />
         </CModalBody>
+      </CModal>
+      <CModal
+        alignment="center"
+        size="xl"
+        visible={visible.cancel}
+        onClose={() => {
+          updateVisible({ cancel: false })
+        }}
+        scrollable
+      >
+        <CModalHeader>{Strings.Common.ASSIGNMENT}</CModalHeader>
+        <CModalBody>
+          <CRow>
+            <CCol>
+              <CFormLabel
+                htmlFor={Helpers.makeID(
+                  Strings.Officer.CODE,
+                  Helpers.propName(
+                    Strings,
+                    Strings.IncomingOfficialDispatch.Common.APPROVAL_CANCEL_REASON,
+                  ),
+                )}
+              >
+                {Strings.IncomingOfficialDispatch.Common.APPROVAL_CANCEL_REASON}
+              </CFormLabel>
+              <CKEditor
+                id={Helpers.makeID(
+                  Strings.Officer.CODE,
+                  Helpers.propName(
+                    Strings,
+                    Strings.IncomingOfficialDispatch.Common.APPROVAL_CANCEL_REASON,
+                  ),
+                )}
+                editor={ClassicEditor}
+                config={ckEditorConfig}
+                data={state.cancel}
+                onChange={(event, editor) => {
+                  const data = editor.getData()
+                  updateState({ cancel: data })
+                }}
+              />
+              <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
+                {error.cancel &&
+                  Strings.Form.Validation[error.cancel](
+                    Strings.IncomingOfficialDispatch.Common.APPROVAL_CANCEL_REASON,
+                  )}
+              </CFormFeedback>
+            </CCol>
+          </CRow>
+          <CRow className="mt-3">
+            <CCol>
+              <CFormCheck
+                id="sendEmailImporter"
+                checked={state.sendEmail}
+                label={Strings.IncomingOfficialDispatch.Common.SEND_EMAIL_APPROVAL_CANCEL}
+                onChange={() => updateState({ sendEmail: !state.sendEmail })}
+              />
+            </CCol>
+          </CRow>
+        </CModalBody>
+        <CModalFooter>
+          <CButton
+            disabled={loading}
+            className="w-100"
+            color="danger"
+            onClick={handleOnClickCancelButton}
+          >
+            {Strings.Common.APPROVE_CANCEL}
+          </CButton>
+        </CModalFooter>
       </CModal>
     </CContainer>
   )

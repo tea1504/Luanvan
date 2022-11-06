@@ -81,7 +81,7 @@ export default [
   {
     name: Strings.Common.ACTION,
     cell: (row) => <ActionButton data={row} />,
-    center: true,
+    // center: true,
     maxWidth: '300px',
     minWidth: '200px',
   },

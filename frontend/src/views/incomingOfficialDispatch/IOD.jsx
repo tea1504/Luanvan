@@ -146,7 +146,6 @@ export default function IOD() {
     )
     dispatch(setRowPerPage(newPerPage))
     dispatch(setPage(page))
-    console.log('findSpecialParams', findSpecialParams)
     navigate({
       pathname: pathname,
       search: `?${createSearchParams({
@@ -179,7 +178,12 @@ export default function IOD() {
 
   const handleOnChangeFilter = (str) => {
     setFilter(str)
-    getState(store.rowsPerPage, store.page, str, `${createSearchParams(findParams)}`)
+    getState(
+      store.rowsPerPage,
+      store.page,
+      str,
+      `${createSearchParams({ ...findParams, ...findSpecialParams })}`,
+    )
     navigate({
       pathname: pathname,
       search: `?${createSearchParams({
@@ -208,7 +212,12 @@ export default function IOD() {
       if (result.isConfirmed) {
         try {
           await service.deleteMany(listId)
-          await getState()
+          await getState(
+            store.rowsPerPage,
+            store.page,
+            filter,
+            `${createSearchParams({ ...findParams, ...findSpecialParams })}`,
+          )
           setSelectionRows([])
           setToggleCleared(!toggleCleared)
           return MySwal.fire({
@@ -282,7 +291,7 @@ export default function IOD() {
     }
   }
 
-  const getStatus = async (rowsPerPage, page, filter) => {
+  const getStatus = async (rowsPerPage, page, filter, findParamsObject) => {
     try {
       dispatch(setLoading(true))
       const result = await statusService.getList()
@@ -307,7 +316,7 @@ export default function IOD() {
             page,
             filter,
             `${createSearchParams({
-              ...findParams,
+              ...findParamsObject,
               statusMulti: '',
               status: statusTemp._id,
               handler: loggedUser._id,
@@ -332,7 +341,7 @@ export default function IOD() {
             page,
             filter,
             `${createSearchParams({
-              ...findParams,
+              ...findParamsObject,
               statusMulti: '',
               status: '',
               status: statusTemp._id,
@@ -361,7 +370,7 @@ export default function IOD() {
             page,
             filter,
             `${createSearchParams({
-              ...findParams,
+              ...findParamsObject,
               statusMulti: statusTemp,
               handler: '',
               approver: '',
@@ -385,7 +394,7 @@ export default function IOD() {
             page,
             filter,
             `${createSearchParams({
-              ...findParams,
+              ...findParamsObject,
               statusMulti: '',
               status: statusTemp._id,
               handler: '',
@@ -410,7 +419,7 @@ export default function IOD() {
             page,
             filter,
             `${createSearchParams({
-              ...findParams,
+              ...findParamsObject,
               statusMulti: '',
               status: statusTemp._id,
               handler: loggedUser._id,
@@ -421,7 +430,7 @@ export default function IOD() {
           )
           break
         default:
-          await getState(rowsPerPage, page, filter, `${createSearchParams(findParams)}`)
+          await getState(rowsPerPage, page, filter, `${createSearchParams(findParamsObject)}`)
           setFindSpecialParams({})
           break
       }
@@ -448,25 +457,41 @@ export default function IOD() {
   }
 
   const handleOnChangeSelectType = (selectedItem) => {
-    updateFindParams({ type: selectedItem ? selectedItem.value : '' })
-    navigate({
-      pathname: pathname,
-      search: `?${createSearchParams({
-        page: store.page,
-        rowsPerPage: store.rowsPerPage,
-        filter: filter,
-        ...findParams,
-        ...findSpecialParams,
-        type: selectedItem ? selectedItem.value : '',
-        typeMulti: '',
-      })}`,
-    })
+    const findParamsTemp = {}
+    if (findParams.status) findParamsTemp.status = findParams.status
+    if (findParams.arrivalNumber) findParamsTemp.arrivalNumber = findParams.arrivalNumber
+    if (selectedItem) {
+      setFindParams({ type: selectedItem.value, ...findParamsTemp })
+      navigate({
+        pathname: pathname,
+        search: `?${createSearchParams({
+          page: store.page,
+          rowsPerPage: store.rowsPerPage,
+          filter: filter,
+          ...findParamsTemp,
+          ...findSpecialParams,
+          type: selectedItem.value,
+        })}`,
+      })
+    } else {
+      setFindParams(findParamsTemp)
+      navigate({
+        pathname: pathname,
+        search: `?${createSearchParams({
+          page: store.page,
+          rowsPerPage: store.rowsPerPage,
+          filter: filter,
+          ...findParamsTemp,
+          ...findSpecialParams,
+        })}`,
+      })
+    }
     getState(
       store.rowsPerPage,
       store.page,
       filter,
       `${createSearchParams({
-        ...findParams,
+        ...findParamsTemp,
         ...findSpecialParams,
         type: selectedItem ? selectedItem.value : '',
       })}`,
@@ -474,24 +499,40 @@ export default function IOD() {
   }
 
   const handleOnChangeSelectStatus = (selectedItem) => {
-    updateFindParams({ status: selectedItem ? selectedItem.value : '' })
-    navigate({
-      pathname: pathname,
-      search: `?${createSearchParams({
-        page: store.page,
-        rowsPerPage: store.rowsPerPage,
-        filter: filter,
-        ...findParams,
-        status: selectedItem ? selectedItem.value : '',
-        statusMulti: '',
-      })}`,
-    })
+    const findParamsTemp = {}
+    if (findParams.type) findParamsTemp.type = findParams.type
+    if (findParams.arrivalNumber) findParamsTemp.arrivalNumber = findParams.arrivalNumber
+    setFindParams(findParamsTemp)
+    if (selectedItem) {
+      updateFindParams({ status: selectedItem.value, ...findParamsTemp })
+      navigate({
+        pathname: pathname,
+        search: `?${createSearchParams({
+          page: store.page,
+          rowsPerPage: store.rowsPerPage,
+          filter: filter,
+          ...findParamsTemp,
+          status: selectedItem ? selectedItem.value : '',
+        })}`,
+      })
+    } else {
+      setFindParams(findParamsTemp)
+      navigate({
+        pathname: pathname,
+        search: `?${createSearchParams({
+          page: store.page,
+          rowsPerPage: store.rowsPerPage,
+          filter: filter,
+          ...findParamsTemp,
+        })}`,
+      })
+    }
     getState(
       store.rowsPerPage,
       store.page,
       filter,
       `${createSearchParams({
-        ...findParams,
+        ...findParamsTemp,
         ...findSpecialParams,
         status: selectedItem ? selectedItem.value : '',
       })}`,
@@ -499,7 +540,48 @@ export default function IOD() {
   }
 
   const handleOnChangeArrivalNumber = (e) => {
-    updateFindParams({ arrivalNumber: e.target.value })
+    const findParamsTemp = {}
+    if (findParams.type) findParamsTemp.type = findParams.type
+    if (findParams.status) findParamsTemp.status = findParams.status
+    if (e.target.value) {
+      setFindParams({ arrivalNumber: e.target.value, ...findParamsTemp })
+      navigate({
+        pathname: pathname,
+        search: `?${createSearchParams({
+          page: store.page,
+          rowsPerPage: store.rowsPerPage,
+          filter: filter,
+          ...findParamsTemp,
+          arrivalNumber: e.target.value,
+        })}`,
+      })
+    } else {
+      setFindParams(findParamsTemp)
+      navigate({
+        pathname: pathname,
+        search: `?${createSearchParams({
+          page: store.page,
+          rowsPerPage: store.rowsPerPage,
+          filter: filter,
+          ...findParamsTemp,
+        })}`,
+      })
+    }
+    getState(
+      store.rowsPerPage,
+      store.page,
+      filter,
+      `${createSearchParams({
+        ...findParamsTemp,
+        ...findSpecialParams,
+        arrivalNumber: e.target.value,
+      })}`,
+    )
+  }
+
+  const handleOnClickButtonDeleteArrivalNumber = () => {
+    updateFindParams({ arrivalNumber: '' })
+    delete findParams.arrivalNumber
     navigate({
       pathname: pathname,
       search: `?${createSearchParams({
@@ -507,7 +589,6 @@ export default function IOD() {
         rowsPerPage: store.rowsPerPage,
         filter: filter,
         ...findParams,
-        arrivalNumber: e.target.value,
       })}`,
     })
     getState(
@@ -517,7 +598,6 @@ export default function IOD() {
       `${createSearchParams({
         ...findParams,
         ...findSpecialParams,
-        arrivalNumber: e.target.value,
       })}`,
     )
   }
@@ -533,17 +613,26 @@ export default function IOD() {
         issuedEndDate: e.getTime(),
       })
     } else {
-      updateFindParams({
-        issuedStartDate: '',
-        issuedEndDate: '',
-      })
+      delete findParams.issuedStartDate
+      delete findParams.issuedEndDate
+      setFindParams(findParams)
     }
   }
 
   const handleOnClickSearchButton = async () => {
     try {
       dispatch(setLoading(true))
-      console.log(findParams)
+      delete findParams.type
+      delete findParams.status
+      delete findParams.arrivalNumber
+      if (!findParams.arrivalNumberStart) delete findParams.arrivalNumberStart
+      if (!findParams.arrivalNumberEnd) delete findParams.arrivalNumberEnd
+      if (!findParams.typeMulti) delete findParams.typeMulti
+      if (!findParams.statusMulti) delete findParams.statusMulti
+      if (!findParams.organMulti) delete findParams.organMulti
+      if (!findParams.handler) delete findParams.handler
+      if (!findParams.approver) delete findParams.approver
+      if (!findParams.importer) delete findParams.importer
       navigate({
         pathname: pathname,
         search: `?${createSearchParams({
@@ -578,19 +667,7 @@ export default function IOD() {
           filter: filter,
         })}`,
       })
-      const objectReset = {
-        typeMulti: '',
-        organMulti: '',
-        statusMulti: '',
-        handler: '',
-        approver: '',
-      }
-      if (func === Screens.IOD_LIST_(Screens.APPROVAL)) {
-        delete objectReset.approver
-        delete objectReset.handler
-      }
-      if (func === Screens.IOD_LIST_(Screens.HANDLE)) delete objectReset.handler
-      setFindParams(objectReset)
+      setFindParams({})
       await getState(
         store.rowsPerPage,
         store.page,
@@ -603,6 +680,37 @@ export default function IOD() {
       dispatch(setLoading(false))
       showError(error)
     }
+  }
+
+  const handleOnChangeArriveNumberStartInput = (e) => {
+    if (findParams.arrivalNumberEnd < parseInt(e.target.value))
+      updateFindParams({
+        arrivalNumberStart: parseInt(e.target.value),
+        arrivalNumberEnd: parseInt(e.target.value),
+      })
+    else
+      updateFindParams({
+        arrivalNumberStart: parseInt(e.target.value),
+      })
+  }
+
+  const handleOnChangeArriveNumberEndInput = (e) => {
+    if (findParams.arrivalNumberStart > parseInt(e.target.value))
+      updateFindParams({
+        arrivalNumberStart: parseInt(e.target.value),
+        arrivalNumberEnd: parseInt(e.target.value),
+      })
+    else
+      updateFindParams({
+        arrivalNumberEnd: parseInt(e.target.value),
+      })
+  }
+
+  const handleOnClickDeleteArrivalNumberRange = () => {
+    updateFindParams({
+      arrivalNumberStart: '',
+      arrivalNumberEnd: '',
+    })
   }
 
   const handleOnClickPrintButton = useReactToPrint({
@@ -634,39 +742,22 @@ export default function IOD() {
     const approver = searchParams.get('approver') || ''
     const importer = searchParams.get('importer') || ''
 
-    const findParamsObject = {
-      type,
-      typeMulti,
-      arrivalNumber,
-      issuedStartDate,
-      issuedEndDate,
-      arrivalNumberStart,
-      arrivalNumberEnd,
-      organ,
-      organMulti,
-      importer,
-    }
+    const findParamsObject = {}
 
-    switch (func) {
-      case Screens.IOD_LIST:
-        findParamsObject.status = status
-        findParamsObject.statusMulti = statusMulti
-        findParamsObject.handler = handler
-        findParamsObject.approver = approver
-        break
-      case Screens.IOD_LIST_(Screens.HANDLE):
-        findParamsObject.approver = approver
-        break
-      case Screens.IOD_LIST_(Screens.APPROVAL):
-        break
-      case Screens.IOD_LIST_(Screens.IMPLEMENT):
-        findParamsObject.handler = handler
-        findParamsObject.approver = approver
-        break
-
-      default:
-        break
-    }
+    if (type) findParamsObject.type = type
+    if (typeMulti) findParamsObject.typeMulti = typeMulti
+    if (status) findParamsObject.status = status
+    if (statusMulti) findParamsObject.statusMulti = statusMulti
+    if (organ) findParamsObject.organ = organ
+    if (organMulti) findParamsObject.organMulti = organMulti
+    if (arrivalNumber) findParamsObject.arrivalNumber = arrivalNumber
+    if (arrivalNumberStart) findParamsObject.arrivalNumberStart = arrivalNumberStart
+    if (arrivalNumberEnd) findParamsObject.arrivalNumberEnd = arrivalNumberEnd
+    if (issuedStartDate) findParamsObject.issuedStartDate = issuedStartDate
+    if (issuedEndDate) findParamsObject.issuedEndDate = issuedEndDate
+    if (handler) findParamsObject.handler = handler
+    if (approver) findParamsObject.approver = approver
+    if (importer) findParamsObject.importer = importer
 
     setFilter(f)
     dispatch(setPage(p))
@@ -675,8 +766,8 @@ export default function IOD() {
       start: issuedStartDate ? new Date(parseInt(issuedStartDate)) : null,
       end: issuedEndDate ? new Date(parseInt(issuedEndDate)) : null,
     })
-    setFindParams(findParamsObject)
-    getStatus(r, p, f, arrivalNumber)
+    updateFindParams(findParamsObject)
+    getStatus(r, p, f, findParamsObject)
     getType()
     getOrgan()
     getOfficer()
@@ -700,7 +791,6 @@ export default function IOD() {
                 <CCol xs={12} md={6} className="mt-1">
                   <CInputGroup className="flex-nowrap">
                     <CFormInput
-                      // size="sm"
                       placeholder={Strings.Common.FILTER}
                       value={filter}
                       onChange={(e) => handleOnChangeFilter(e.target.value)}
@@ -736,7 +826,7 @@ export default function IOD() {
                         <FaSearch /> {Strings.Common.ADVANCED_SEARCH}
                       </CButton>
                     )}
-                    {loggedUser?.right[Strings.Common.CREATE_OD] && (
+                    {loggedUser?.right[Strings.Common.CREATE_OD] && func === Screens.IOD_LIST && (
                       <CButton
                         color="primary"
                         variant="outline"
@@ -760,7 +850,9 @@ export default function IOD() {
                   <Select
                     id={Helpers.makeID(Strings.IncomingOfficialDispatch.CODE, Strings.Type.CODE)}
                     value={
-                      type.filter((el) => el.value === findParams.type).length > 0
+                      !findParams.type
+                        ? null
+                        : type.filter((el) => el.value === findParams.type).length > 0
                         ? type.filter((el) => el.value === findParams.type)[0]
                         : null
                     }
@@ -812,29 +904,7 @@ export default function IOD() {
                     <CInputGroupText
                       id="addon-wrapping"
                       style={{ cursor: 'pointer' }}
-                      onClick={(e) => {
-                        updateFindParams({ arrivalNumber: '' })
-                        navigate({
-                          pathname: pathname,
-                          search: `?${createSearchParams({
-                            page: store.page,
-                            rowsPerPage: store.rowsPerPage,
-                            filter: filter,
-                            ...findParams,
-                            arrivalNumber: '',
-                          })}`,
-                        })
-                        getState(
-                          store.rowsPerPage,
-                          store.page,
-                          filter,
-                          `${createSearchParams({
-                            ...findParams,
-                            ...findSpecialParams,
-                            arrivalNumber: '',
-                          })}`,
-                        )
-                      }}
+                      onClick={handleOnClickButtonDeleteArrivalNumber}
                     >
                       <FaEraser />
                     </CInputGroupText>
@@ -908,6 +978,7 @@ export default function IOD() {
                 maxDate={new Date()}
                 isClearable
                 placeholderText={Strings.Form.FieldName.ARRIVAL_DATE}
+                autoComplete="off"
               />
             </CCol>
           </CRow>
@@ -928,7 +999,7 @@ export default function IOD() {
                 placeholder={Strings.IncomingOfficialDispatch.Common.ARRIVAL_NUMBER_START}
                 min={0}
                 value={findParams.arrivalNumberStart}
-                onChange={(e) => updateFindParams({ arrivalNumberStart: e.target.value })}
+                onChange={handleOnChangeArriveNumberStartInput}
               />
             </CCol>
             <CCol xs={12} sm={1} className="text-center">
@@ -938,16 +1009,16 @@ export default function IOD() {
               <CFormInput
                 type="number"
                 placeholder={Strings.IncomingOfficialDispatch.Common.ARRIVAL_NUMBER_END}
-                min={findParams.arrivalNumberStart || 0}
+                min={0}
                 value={findParams.arrivalNumberEnd || findParams.arrivalNumberStart}
-                onChange={(e) => updateFindParams({ arrivalNumberEnd: e.target.value })}
+                onChange={handleOnChangeArriveNumberEndInput}
               />
             </CCol>
             <CCol xs={12} sm={1}>
               <CButton
                 className="w-100"
                 color="danger"
-                onClick={() => updateFindParams({ arrivalNumberStart: '', arrivalNumberEnd: '' })}
+                onClick={handleOnClickDeleteArrivalNumberRange}
               >
                 {Strings.Common.DELETE}
               </CButton>
@@ -968,7 +1039,9 @@ export default function IOD() {
               <Select
                 id={Helpers.makeID(Strings.IncomingOfficialDispatch.CODE, Strings.Type.CODE)}
                 value={
-                  type.filter((el) => findParams.typeMulti.includes(el.value)).length > 0
+                  !findParams.typeMulti
+                    ? null
+                    : type.filter((el) => findParams.typeMulti.includes(el.value)).length > 0
                     ? type.filter((el) => findParams.typeMulti.includes(el.value))
                     : null
                 }
@@ -977,7 +1050,6 @@ export default function IOD() {
                 onChange={(selectedItem) =>
                   updateFindParams({
                     typeMulti: selectedItem ? selectedItem.map((el) => el.value).join(',') : '',
-                    type: '',
                   })
                 }
                 isMulti
@@ -1015,7 +1087,6 @@ export default function IOD() {
                         selectedItem.length !== 0
                           ? selectedItem.map((el) => el.value).join(',')
                           : '',
-                      status: '',
                     })
                   }}
                   isMulti
@@ -1042,7 +1113,9 @@ export default function IOD() {
                   Helpers.propName(Strings, Strings.Form.FieldName.ORGANIZATION_IOD),
                 )}
                 value={
-                  organ.filter((el) => findParams.organMulti.includes(el.value)).length > 0
+                  !findParams.organMulti
+                    ? null
+                    : organ.filter((el) => findParams.organMulti.includes(el.value)).length > 0
                     ? organ.filter((el) => findParams.organMulti.includes(el.value))
                     : null
                 }
@@ -1051,7 +1124,6 @@ export default function IOD() {
                 onChange={(selectedItem) =>
                   updateFindParams({
                     organMulti: selectedItem ? selectedItem.map((el) => el.value).join(',') : '',
-                    organ: '',
                   })
                 }
                 isMulti

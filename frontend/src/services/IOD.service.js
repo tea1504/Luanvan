@@ -99,19 +99,19 @@ class IODService extends BaseService {
     })
     return result
   }
-  // async deleteOne(id) {
-  //   const result = await this.api.delete({
-  //     path: Constants.ApiPath.DELETE_OFFICER(id),
-  //   })
-  //   return result
-  // }
-  // async deleteMany(ids) {
-  //   const result = await this.api.delete({
-  //     path: Constants.ApiPath.DELETE_OFFICERS,
-  //     data: { ids },
-  //   })
-  //   return result
-  // }
+  async deleteOne(id) {
+    const result = await this.api.delete({
+      path: Constants.ApiPath.DELETE_IOD(id),
+    })
+    return result
+  }
+  async deleteMany(ids) {
+    const result = await this.api.delete({
+      path: Constants.ApiPath.DELETE_IODS,
+      data: { ids },
+    })
+    return result
+  }
 }
 
 export default IODService

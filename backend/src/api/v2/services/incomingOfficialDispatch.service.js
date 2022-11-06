@@ -489,7 +489,11 @@ var incomingOfficialDispatchService = {
       showError(error);
     }
   },
-  cancelApproval: async (id = "", userID = "") => {
+  cancelApproval: async (
+    id = "",
+    userID = "",
+    data = { cancel: "", sendEmail: true }
+  ) => {
     try {
       const item = await model.findOne({
         _id: id,
@@ -512,42 +516,46 @@ var incomingOfficialDispatchService = {
       });
       item.traceHeaderList.push({
         date: new Date(),
-        status: PENDING._id.toString(),
-        officer: user._id.toString(),
-        command: `${user.lastName} ${user.firstName} đã hủy duyệt văn bản`,
+        status: PENDING._id,
+        officer: user._id,
+        command: data.cancel,
         header: PENDING.name,
       });
-      item.status = PENDING._id.toString();
+      item.status = PENDING._id;
+      const handler = await officerModel.find({ _id: { $in: item.handler } });
       item.handler = [];
       item.arrivalNumber = null;
       item.save();
+      if (data.sendEmail || data.sendEmail !== "false") {
+        var mailOptions = {
+          from: process.env.MAIL_USER,
+          bcc: [
+            user.emailAddress,
+            ...handler.map((el) => el.emailAddress),
+          ].join(","),
+          subject: "[E-OFFICE] VĂN BẢN BỊ HỦY",
+          html: `<img src="https://imggroup.com.vn/Content/images/logo-img.png" height="100"/>
+          <br/>
+          <span style="width: 100%; font-family: Tahoma,Geneva, sans-serif;">
+              ${data.cancel}
+          </span>
+`,
+        };
+        transporter.sendMail(mailOptions, function (error, info) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log("Email sent: " + info.response);
+          }
+        });
+      }
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.PUT_200(Constants.String.Language._),
         data: item,
       };
     } catch (error) {
-      switch (error.name) {
-        case "ValidationError":
-          return {
-            status: Constants.ApiCode.NOT_ACCEPTABLE,
-            message: Constants.String.Message.ERR_406,
-            data: { error: error.errors },
-          };
-        case "CastError":
-        case "MongoServerError":
-          return {
-            status: Constants.ApiCode.NOT_ACCEPTABLE,
-            message: Constants.String.Message.ERR_406,
-            data: { error: error.message },
-          };
-        default:
-          return {
-            status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
-            message: Constants.String.Message.ERR_500,
-            data: { error: error.message },
-          };
-      }
+      return showError(error);
     }
   },
   handle: async (
@@ -696,7 +704,7 @@ var incomingOfficialDispatchService = {
         status: REFUSE._id,
       });
       item.save();
-      if (data.sendEmailImporter || data.sendEmailImporter === "true") {
+      if (data.sendEmailImporter || data.sendEmailImporter !== "false") {
         var mailOptions = {
           from: process.env.MAIL_USER,
           to: user.emailAddress,
@@ -716,7 +724,7 @@ var incomingOfficialDispatchService = {
           }
         });
       }
-      if (data.sendEmailOrgan || data.sendEmailOrgan === "true") {
+      if (data.sendEmailOrgan || data.sendEmailOrgan !== "false") {
         const organ = await organizationModel.findById(user.organ);
         var mailOptions = {
           from: process.env.MAIL_USER,
@@ -744,6 +752,46 @@ var incomingOfficialDispatchService = {
       };
     } catch (error) {
       showError(error);
+    }
+  },
+  deleteOne: async (id = "", userID = "") => {
+    try {
+      const deletedItem = await model.findOneAndUpdate(
+        { _id: id, deleted: false },
+        { deleted: true }
+      );
+      if (!deletedItem)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.IOD._),
+        };
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.DELETE_200(Constants.String.IOD._),
+        data: deletedItem,
+      };
+    } catch (error) {
+      return showError(error);
+    }
+  },
+  deleteMany: async (ids) => {
+    try {
+      const deletedItems = await model.updateMany(
+        { _id: { $in: ids }, deleted: false },
+        { deleted: true }
+      );
+      if (deletedItems.modifiedCount === 0)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Officer._),
+        };
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.DELETE_200(Constants.String.IOD._),
+        data: deletedItems,
+      };
+    } catch (error) {
+      return showError(error);
     }
   },
 };

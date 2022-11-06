@@ -294,7 +294,6 @@ export default function IODHandle() {
         }
         setOfficer((prevState) => [...prevState, item])
       })
-      console.log(state.handler)
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))

@@ -7,6 +7,7 @@ const controller = require("./../controllers/incomingOfficialDispatch.controller
 const readOD = require("../middlewares/readOD.middleware");
 const createOD = require("../middlewares/createOD.middleware");
 const approveOD = require("../middlewares/approveOD.middleware");
+const deleteOD = require("../middlewares/deleteOD.middleware");
 var fs = require("fs");
 
 var storage = multer.diskStorage({
@@ -58,6 +59,7 @@ route.put(
 );
 route.put(
   Constants.ApiPath.IncomingOfficialDispatch.APPROVAL,
+  createOD,
   approveOD,
   controller.approval
 );
@@ -73,7 +75,10 @@ route.put(
 );
 route.put(
   Constants.ApiPath.IncomingOfficialDispatch.REFUSE,
+  approveOD,
   controller.refuse
 );
+route.delete(Constants.ApiPath.Officers.ID, deleteOD, controller.deleteOne);
+route.delete(Constants.ApiPath.Officers.SLASH, deleteOD, controller.deleteMany);
 
 module.exports = route;

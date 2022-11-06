@@ -208,9 +208,11 @@ var incomingOfficialDispatchController = {
     try {
       const { id } = req.params;
       const list = id.split(".");
+      const { cancel, sendEmail } = req.body;
       const result = await service.cancelApproval(
         list[list.length - 1],
-        req.userID
+        req.userID,
+        { cancel, sendEmail }
       );
       return res.status(result.status).json(result);
     } catch (error) {
@@ -259,6 +261,35 @@ var incomingOfficialDispatchController = {
         sendEmailImporter,
         sendEmailOrgan,
       });
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
+  deleteOne: async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      list = id.split(".");
+      const result = await service.deleteOne(list[list.length - 1], req.userID);
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  }
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */,
+  deleteMany: async (req, res, next) => {
+    try {
+      const { ids } = req.body;
+      const result = await service.deleteMany(ids);
       return res.status(result.status).json(result);
     } catch (error) {
       return next(error);
