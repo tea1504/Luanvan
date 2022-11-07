@@ -14,9 +14,8 @@ var officialDispatch = {
       }
       res.setHeader("Content-Type", "text/html");
       const file = req.file;
-      console.log(file);
       const result = await service.processOD(file);
-      fs.unlinkSync(file.path);
+      // fs.unlinkSync(file.path);
       for (var i = 1; i <= 10; i++) {
         res.write(`|${i}/10`);
         await sleep(100);
