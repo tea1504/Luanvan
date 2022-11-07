@@ -163,12 +163,46 @@ var incomingOfficialDispatchController = {
       const files = req.files;
       const { id } = req.params;
       const list = id.split(".");
-      var { dueDate } = req.body;
+      var {
+        dueDate,
+        fileTemp,
+        code,
+        issuedDate,
+        subject,
+        type,
+        language,
+        pageAmount,
+        description,
+        signerInfoName,
+        signerInfoPosition,
+        priority,
+        security,
+        organ,
+        approver,
+        handler,
+        sendEmail,
+      } = req.body;
       const result = await service.putOne(
         list[list.length - 1],
         req.userID,
         {
           dueDate,
+          fileTemp,
+          code,
+          issuedDate,
+          subject,
+          type,
+          language,
+          pageAmount,
+          description,
+          signerInfoName,
+          signerInfoPosition,
+          priority,
+          security,
+          organ,
+          approver,
+          handler,
+          sendEmail,
         },
         files
       );
@@ -271,6 +305,29 @@ var incomingOfficialDispatchController = {
    * @param {import("express").Response} res
    * @param {import("express").RequestHandler} next
    */
+  implement: async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const list = id.split(".");
+      var { implement, sendEmail } = req.body;
+      const result = await service.implement(
+        list[list.length - 1],
+        req.userID,
+        {
+          implement,
+          sendEmail,
+        }
+      );
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
   deleteOne: async (req, res, next) => {
     try {
       const { id } = req.params;
@@ -280,13 +337,12 @@ var incomingOfficialDispatchController = {
     } catch (error) {
       return next(error);
     }
-  }
+  },
   /**
    * @param {import("express").Request} req
    * @param {import("express").Response} res
    * @param {import("express").RequestHandler} next
-   */,
-  deleteMany: async (req, res, next) => {
+   */ deleteMany: async (req, res, next) => {
     try {
       const { ids } = req.body;
       const result = await service.deleteMany(ids);

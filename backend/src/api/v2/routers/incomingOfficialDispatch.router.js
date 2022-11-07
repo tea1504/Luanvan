@@ -59,7 +59,6 @@ route.put(
 );
 route.put(
   Constants.ApiPath.IncomingOfficialDispatch.APPROVAL,
-  createOD,
   approveOD,
   controller.approval
 );
@@ -77,6 +76,11 @@ route.put(
   Constants.ApiPath.IncomingOfficialDispatch.REFUSE,
   approveOD,
   controller.refuse
+);
+route.put(
+  Constants.ApiPath.IncomingOfficialDispatch.IMPLEMENT,
+  approveOD,
+  controller.implement
 );
 route.delete(Constants.ApiPath.Officers.ID, deleteOD, controller.deleteOne);
 route.delete(Constants.ApiPath.Officers.SLASH, deleteOD, controller.deleteMany);

@@ -12,6 +12,8 @@ import {
   CCardHeader,
   CCol,
   CContainer,
+  CListGroup,
+  CListGroupItem,
   CRow,
   CWidgetStatsD,
 } from '@coreui/react'
@@ -180,6 +182,7 @@ const Dashboard = () => {
   }
 
   useEffect(() => {
+    document.title = Constants.App.NAME
     getStatus()
   }, [])
 
@@ -195,49 +198,56 @@ const Dashboard = () => {
                     <CAccordionItem itemKey={1}>
                       <CAccordionHeader>{Strings.IncomingOfficialDispatch.NAME}</CAccordionHeader>
                       <CAccordionBody>
-                        {loggedUser.right.approveOD && (
-                          <div
-                            onClick={() => navigate(Screens.IOD_LIST_(Screens.APPROVAL))}
-                            style={{ cursor: 'pointer' }}
-                          >
-                            {Strings.IncomingOfficialDispatch.Common.NEED_APPROVAL}{' '}
-                            <CBadge color="danger" shape="rounded-pill">
-                              {IODNeedApproval.length}
-                            </CBadge>
-                          </div>
-                        )}
-                        <hr />
-                        <div
-                          onClick={() => navigate(Screens.IOD_LIST_(Screens.HANDLE))}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          {Strings.IncomingOfficialDispatch.Common.NEED_PROGRESS}{' '}
-                          <CBadge color="danger" shape="rounded-pill">
-                            {IODNeedProgress.length}
-                          </CBadge>
-                        </div>
-                        <hr />
-                        <div
-                          onClick={() => navigate(Screens.IOD_LIST_(Screens.LATE))}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          {Strings.IncomingOfficialDispatch.Common.LATE}{' '}
-                          <CBadge color="danger" shape="rounded-pill">
-                            {IODLate.length}
-                          </CBadge>
-                        </div>
-                        <hr />
-                        {loggedUser.right.approveOD && loggedUser.right.createOD && (
-                          <div
-                            onClick={() => navigate(Screens.IOD_LIST_(Screens.IMPLEMENT))}
-                            style={{ cursor: 'pointer' }}
-                          >
-                            {Strings.IncomingOfficialDispatch.Common.NEED_IMPLEMENT}{' '}
-                            <CBadge color="danger" shape="rounded-pill">
-                              {IODNeedImplement.length}
-                            </CBadge>
-                          </div>
-                        )}
+                        <CListGroup flush>
+                          {loggedUser.right.approveOD && (
+                            <CListGroupItem>
+                              <div
+                                onClick={() => navigate(Screens.IOD_LIST_(Screens.APPROVAL))}
+                                style={{ cursor: 'pointer' }}
+                              >
+                                {Strings.IncomingOfficialDispatch.Common.NEED_APPROVAL}{' '}
+                                <CBadge color="danger" shape="rounded-pill">
+                                  {IODNeedApproval.length}
+                                </CBadge>
+                              </div>
+                            </CListGroupItem>
+                          )}
+                          <CListGroupItem>
+                            <div
+                              onClick={() => navigate(Screens.IOD_LIST_(Screens.HANDLE))}
+                              style={{ cursor: 'pointer' }}
+                            >
+                              {Strings.IncomingOfficialDispatch.Common.NEED_PROGRESS}{' '}
+                              <CBadge color="danger" shape="rounded-pill">
+                                {IODNeedProgress.length}
+                              </CBadge>
+                            </div>
+                          </CListGroupItem>
+                          <CListGroupItem>
+                            <div
+                              onClick={() => navigate(Screens.IOD_LIST_(Screens.LATE))}
+                              style={{ cursor: 'pointer' }}
+                            >
+                              {Strings.IncomingOfficialDispatch.Common.LATE}{' '}
+                              <CBadge color="danger" shape="rounded-pill">
+                                {IODLate.length}
+                              </CBadge>
+                            </div>
+                          </CListGroupItem>
+                          {loggedUser.right.approveOD && loggedUser.right.createOD && (
+                            <CListGroupItem>
+                              <div
+                                onClick={() => navigate(Screens.IOD_LIST_(Screens.IMPLEMENT))}
+                                style={{ cursor: 'pointer' }}
+                              >
+                                {Strings.IncomingOfficialDispatch.Common.NEED_IMPLEMENT}{' '}
+                                <CBadge color="danger" shape="rounded-pill">
+                                  {IODNeedImplement.length}
+                                </CBadge>
+                              </div>
+                            </CListGroupItem>
+                          )}
+                        </CListGroup>
                       </CAccordionBody>
                     </CAccordionItem>
                   </CAccordion>

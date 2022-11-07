@@ -1,6 +1,11 @@
 const DOMAIN = process.env.REACT_APP_BASE_URL
 
 const Constants = {
+  App: {
+    NAME: 'E-Office',
+    TITLE: (m = '') => `E-Office | ${m}`,
+  },
+
   Api: {
     BASE_URL: `${DOMAIN}/v2/`,
     TIMEOUT: 25 * 1000,
@@ -133,6 +138,7 @@ const Constants = {
     APPROVE_CANCEL_IOD: (id = '') => '/incoming-official-dispatch/cancel-approval/' + id,
     HANDLE: (id = '') => '/incoming-official-dispatch/handle/' + id,
     REFUSE: (id = '') => '/incoming-official-dispatch/refuse/' + id,
+    IMPLEMENT: (id = '') => '/incoming-official-dispatch/implement/' + id,
     DELETE_IOD: (id = '') => '/incoming-official-dispatch/' + id,
     DELETE_IODS: '/incoming-official-dispatch',
 

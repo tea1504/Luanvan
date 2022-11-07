@@ -51,13 +51,31 @@ class IODService extends BaseService {
     })
     return result
   }
-  // async createMany(data) {
-  //   const result = await this.api.postFormData({
-  //     path: Constants.ApiPath.CREATE_OFFICERS,
-  //     data: data,
-  //   })
-  //   return result
-  // }
+  async updateOne(id, data) {
+    data.status = data.status._id
+    data.subject = Helpers.htmlDecode(data.subject)
+    var formData = new FormData()
+    Object.keys(data).forEach((el) => data[el] === null && delete data[el])
+    for (const [key, value] of Object.entries(data)) {
+      if (key == 'handler' || key == 'file') {
+        Array.from(value).map((el) => {
+          formData.append(key, el)
+        })
+      }
+      if (key == 'fileTemp') {
+        Array.from(value).map((el) => {
+          formData.append(key, el._id)
+        })
+      } else {
+        formData.append(key, value)
+      }
+    }
+    const result = await this.api.putFormData({
+      path: Constants.ApiPath.UPDATE_IOD(id),
+      data: formData,
+    })
+    return result
+  }
   async approval(id, data) {
     const result = await this.api.put({
       path: Constants.ApiPath.APPROVE_IOD(id),
@@ -78,7 +96,7 @@ class IODService extends BaseService {
     var formData = new FormData()
     Object.keys(data).forEach((el) => data[el] === null && delete data[el])
     for (const [key, value] of Object.entries(data)) {
-      if (key == 'newHandler' || key == 'newFile') {
+      if (key == 'newHandler' || key == 'file') {
         Array.from(value).map((el) => {
           formData.append(key, el)
         })
@@ -95,6 +113,13 @@ class IODService extends BaseService {
   async refuse(id, data) {
     const result = await this.api.put({
       path: Constants.ApiPath.REFUSE(id),
+      data: data,
+    })
+    return result
+  }
+  async implement(id, data) {
+    const result = await this.api.put({
+      path: Constants.ApiPath.IMPLEMENT(id),
       data: data,
     })
     return result

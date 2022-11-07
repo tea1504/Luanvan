@@ -97,6 +97,7 @@ export default function IODDetail() {
 
     cancel: '',
     sendEmail: true,
+    implement: '',
   })
   const updateState = (newState) => {
     setState((prevState) => ({
@@ -104,14 +105,14 @@ export default function IODDetail() {
       ...newState,
     }))
   }
-  const [visible, setVisible] = useState({ preview: false, cancel: false })
+  const [visible, setVisible] = useState({ preview: false, cancel: false, implement: false })
   const updateVisible = (newState) => {
     setVisible((prevState) => ({
       ...prevState,
       ...newState,
     }))
   }
-  const [error, setError] = useState({ cancel: false })
+  const [error, setError] = useState({ cancel: null, implement: null })
   const updateError = (newState) => {
     setError((prevState) => ({
       ...prevState,
@@ -266,6 +267,12 @@ export default function IODDetail() {
           updateError({ cancel: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
         }
         break
+      case 'implement':
+        if (Helpers.isNullOrEmpty(state.implement)) {
+          flag = false
+          updateError({ implement: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
+        }
+        break
 
       default:
         break
@@ -275,6 +282,7 @@ export default function IODDetail() {
 
   const handleOnClickCancelButton = async () => {
     try {
+      updateError({ cancel: null, implement: null })
       if (validate('cancel')) {
         dispatch(setLoading(true))
         await service.cancelApproval(id, state)
@@ -283,6 +291,27 @@ export default function IODDetail() {
           title: Strings.Message.CancelApproval.TITLE,
           icon: 'success',
           text: Strings.Message.CancelApproval.SUCCESS,
+          confirmButtonText: Strings.Common.OK,
+        })
+        navigate(-1)
+      }
+    } catch (error) {
+      dispatch(setLoading(false))
+      showError(error)
+    }
+  }
+
+  const handleOnClickImplementButton = async () => {
+    try {
+      updateError({ cancel: null, implement: null })
+      if (validate('implement')) {
+        dispatch(setLoading(true))
+        await service.implement(id, state)
+        dispatch(setLoading(false))
+        await MySwal.fire({
+          title: Strings.Message.Implement.TITLE,
+          icon: 'success',
+          text: Strings.Message.Implement.SUCCESS,
           confirmButtonText: Strings.Common.OK,
         })
         navigate(-1)
@@ -715,7 +744,7 @@ export default function IODDetail() {
                         className="w-100"
                         color="success"
                         onClick={() => {
-                          updateVisible({ cancel: true })
+                          updateVisible({ implement: true })
                         }}
                       >
                         {Strings.Common.IMPLEMENT}
@@ -834,6 +863,76 @@ export default function IODDetail() {
             onClick={handleOnClickCancelButton}
           >
             {Strings.Common.APPROVE_CANCEL}
+          </CButton>
+        </CModalFooter>
+      </CModal>
+      <CModal
+        alignment="center"
+        size="xl"
+        visible={visible.implement}
+        onClose={() => {
+          updateVisible({ implement: false })
+        }}
+        scrollable
+      >
+        <CModalHeader>{Strings.Common.IMPLEMENT}</CModalHeader>
+        <CModalBody>
+          <CRow>
+            <CCol>
+              <CFormLabel
+                htmlFor={Helpers.makeID(
+                  Strings.Officer.CODE,
+                  Helpers.propName(
+                    Strings,
+                    Strings.IncomingOfficialDispatch.Common.IMPLEMENT_DESCRIPTION,
+                  ),
+                )}
+              >
+                {Strings.IncomingOfficialDispatch.Common.IMPLEMENT_DESCRIPTION}
+              </CFormLabel>
+              <CKEditor
+                id={Helpers.makeID(
+                  Strings.Officer.CODE,
+                  Helpers.propName(
+                    Strings,
+                    Strings.IncomingOfficialDispatch.Common.IMPLEMENT_DESCRIPTION,
+                  ),
+                )}
+                editor={ClassicEditor}
+                config={ckEditorConfig}
+                data={state.implement}
+                onChange={(event, editor) => {
+                  const data = editor.getData()
+                  updateState({ implement: data })
+                }}
+              />
+              <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
+                {error.implement &&
+                  Strings.Form.Validation[error.implement](
+                    Strings.IncomingOfficialDispatch.Common.IMPLEMENT_DESCRIPTION,
+                  )}
+              </CFormFeedback>
+            </CCol>
+          </CRow>
+          <CRow className="mt-3">
+            <CCol>
+              <CFormCheck
+                id="sendEmailImporter"
+                checked={state.sendEmail}
+                label={Strings.IncomingOfficialDispatch.Common.SEND_EMAIL_IMPORTER}
+                onChange={() => updateState({ sendEmail: !state.sendEmail })}
+              />
+            </CCol>
+          </CRow>
+        </CModalBody>
+        <CModalFooter>
+          <CButton
+            disabled={loading}
+            className="w-100"
+            color="success"
+            onClick={handleOnClickImplementButton}
+          >
+            {Strings.Common.IMPLEMENT}
           </CButton>
         </CModalFooter>
       </CModal>

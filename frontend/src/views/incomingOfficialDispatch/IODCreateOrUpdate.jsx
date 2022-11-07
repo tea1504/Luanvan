@@ -151,7 +151,6 @@ export default function IODCreateOrUpdate() {
     process: false,
     init: Helpers.isNullOrEmpty(id),
   })
-
   const updateVisible = (newState) => {
     setVisible((prevState) => ({
       ...prevState,
@@ -178,11 +177,12 @@ export default function IODCreateOrUpdate() {
           arrivalDate: new Date(s.arrivalDate).getTime(),
           dueDate: new Date(s.dueDate).getTime(),
           handler: s.handler.map((el) => el._id),
-          fileTemp: s.file.map((el) => ({
+          fileTemp: s.file.map((el, ind) => ({
             ...el,
             path: el.path.includes('blob')
               ? `${el.path}?token=${token}#toolbar=0`
               : `${process.env.REACT_APP_BASE_URL}/${el.path}?token=${token}#toolbar=0`,
+            code: ind,
           })),
         })
       }
@@ -208,34 +208,16 @@ export default function IODCreateOrUpdate() {
         arrivalDate: new Date(result.data.data.arrivalDate).getTime(),
         dueDate: new Date(result.data.data.dueDate).getTime(),
         handler: result.data.data.handler.map((el) => el._id),
-        fileTemp: result.data.data.file.map((el) => ({
+        fileTemp: result.data.data.file.map((el, ind) => ({
           ...el,
           path: `${process.env.REACT_APP_BASE_URL}/${el.path}?token=${token}#toolbar=0`,
+          code: ind,
         })),
       })
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
-      switch (error.status) {
-        case 401:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          }).then(() => {
-            localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
-            localStorage.clear(Constants.StorageKeys.USER_INFO)
-            navigate(Screens.LOGIN)
-          })
-          break
-        default:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          })
-          break
-      }
+      showError(error)
     }
   }
 
@@ -481,7 +463,7 @@ export default function IODCreateOrUpdate() {
       try {
         dispatch(setLoading(true))
         if (!id) {
-          const result = await service.createOne(state)
+          await service.createOne(state)
           MySwal.fire({
             title: Strings.Common.SUCCESS,
             icon: 'success',
@@ -508,7 +490,7 @@ export default function IODCreateOrUpdate() {
             traceHeaderList: [],
           })
         } else {
-          const result = await service.updateOne(id, state)
+          await service.updateOne(id, state)
           MySwal.fire({
             title: Strings.Common.SUCCESS,
             icon: 'success',
@@ -563,6 +545,7 @@ export default function IODCreateOrUpdate() {
   }
 
   const handleInputFileOnChange = (e) => {
+    console.log(e);
     const file = Array.from(e.target.files)
     updateState({
       file: [...state.file, ...file],
@@ -573,7 +556,7 @@ export default function IODCreateOrUpdate() {
             name: el.name,
             size: el.size,
             path: URL.createObjectURL(el) + '#toolbar=0',
-            _id: ind,
+            code: ind + state.fileTemp.length,
           }
         }),
       ],
@@ -582,20 +565,23 @@ export default function IODCreateOrUpdate() {
   }
 
   const handleDeleteFile = (file) => {
-    console.log(file)
+    console.log(file.path)
+    URL.revokeObjectURL(file.path)
     updateState({
-      fileTemp: state.file
-        .filter((el, ind) => ind != file._id)
+      fileTemp: [...state.file]
+        .filter((el, ind) => ind != file.code)
         .map((el, ind) => {
+          console.log(el)
           return {
             name: el.name,
             size: el.size,
-            path: URL.createObjectURL(el) + '#toolbar=0',
-            _id: ind,
+            path: el.path ? el.path + '#toolbar=0' : URL.createObjectURL(el),
+            code: ind,
           }
         }),
-      file: state.file.filter((el, ind) => ind != file._id),
+      file: state.file.filter((el, ind) => ind != file.code),
     })
+    console.log('---------------------------------')
   }
 
   const extension = (name) => {

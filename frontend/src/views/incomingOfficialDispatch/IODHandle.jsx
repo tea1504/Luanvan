@@ -92,9 +92,6 @@ export default function IODHandle() {
     dueDate: '',
     arrivalNumber: 0,
     arrivalDate: '',
-    command: '',
-    done: false,
-    sendEmail: [],
     priority: {},
     security: {},
     organ: {},
@@ -110,6 +107,10 @@ export default function IODHandle() {
     createdAt: '',
     updatedAt: '',
     __v: 0,
+
+    command: '',
+    done: false,
+    sendEmail: [],
   })
   const updateState = (newState) => {
     setState((prevState) => ({

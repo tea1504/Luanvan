@@ -75,7 +75,7 @@ function IODUploadFile({ state, extension, handleInputFileOnChange, updateData,h
       dispatch(setLoading(true))
       const result = await service.api.postFormData({
         path: Constants.ApiPath.POST_PROCESS_OD,
-        data: { file: state.file[process._id] },
+        data: { file: state.file[process.code] },
         config: {
           onDownloadProgress: (progressEvent) => {
             var str = progressEvent.currentTarget.response

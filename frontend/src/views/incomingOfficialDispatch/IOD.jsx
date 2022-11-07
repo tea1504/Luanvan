@@ -718,7 +718,29 @@ export default function IOD() {
   })
 
   useEffect(() => {
-    document.title = Strings.IncomingOfficialDispatch.Title.LIST
+    switch (func) {
+      case Screens.IOD_LIST:
+        document.title = Constants.App.TITLE(Strings.IncomingOfficialDispatch.Title.LIST)
+        break
+      case Screens.APPROVAL:
+        document.title = Constants.App.TITLE(Strings.IncomingOfficialDispatch.Title.LIST_APPROVAL)
+        break
+      case Screens.HANDLE:
+        document.title = Constants.App.TITLE(Strings.IncomingOfficialDispatch.Title.LIST_HANDLE)
+        break
+      case Screens.IMPLEMENT:
+        document.title = Constants.App.TITLE(Strings.IncomingOfficialDispatch.Title.LIST_IMPLEMENT)
+        break
+      case Screens.LATE:
+        document.title = Constants.App.TITLE(Strings.IncomingOfficialDispatch.Title.LIST_LATE)
+        break
+      case Screens.REFUSE:
+        document.title = Constants.App.TITLE(Strings.IncomingOfficialDispatch.Title.LIST_REFUSE)
+        break
+      default:
+        document.title = Constants.App.NAME
+        break
+    }
     setType([])
     setStatus([])
     setOrgan([])

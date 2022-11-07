@@ -3,6 +3,8 @@ const officerModel = require("../models/officer.model");
 const statusModel = require("../models/status.model");
 const incomingOfficialDispatchModel = require("./../models/incomingOfficialDispatch.model");
 const model = require("./../models/incomingOfficialDispatch.model");
+const path = require("path");
+var fs = require("fs");
 var nodemailer = require("nodemailer");
 const securityModel = require("../models/security.model");
 const { default: mongoose } = require("mongoose");
@@ -389,8 +391,32 @@ var incomingOfficialDispatchService = {
       return showError(error);
     }
   },
-  putOne: async (id = "", userID = "", data = { dueDate: 0 }, files = []) => {
+  putOne: async (
+    id = "",
+    userID = "",
+    data = {
+      code: "",
+      issuedDate: 0,
+      subject: "",
+      type: "",
+      language: "",
+      pageAmount: 0,
+      description: "",
+      signerInfoName: "",
+      signerInfoPosition: "",
+      dueDate: 0,
+      priority: "",
+      security: "",
+      organ: "",
+      approver: "",
+      handler: [],
+      fileTemp: [],
+      sendEmail: "",
+    },
+    files = []
+  ) => {
     try {
+      if (!data.fileTemp) data.fileTemp = [];
       const user = await officerModel.findById(userID, { deleted: false });
       if (!user)
         return {
@@ -403,7 +429,38 @@ var incomingOfficialDispatchService = {
           status: Constants.ApiCode.NOT_FOUND,
           message: Constants.String.Message.ERR_404(Constants.String.Officer._),
         };
-      iod.dueDate = data.dueDate;
+      if (data.organ) iod.organ = data.organ;
+      if (data.issuedDate) iod.issuedDate = data.issuedDate;
+      if (data.code) iod.code = data.code;
+      if (data.language) iod.language = data.language;
+      if (data.type) iod.type = data.type;
+      if (data.priority) iod.priority = data.priority;
+      if (data.security) iod.security = data.security;
+      if (data.subject) iod.subject = data.subject;
+      if (data.signerInfoName) iod.signerInfoName = data.signerInfoName;
+      if (data.signerInfoPosition)
+        iod.signerInfoPosition = data.signerInfoPosition;
+      if (data.pageAmount) iod.pageAmount = data.pageAmount;
+      if (data.dueDate) iod.dueDate = data.dueDate;
+      if (data.approver) iod.approver = data.approver;
+      const file = [...iod.file].filter(
+        (el) => ![...data.fileTemp].includes(el._id.toString())
+      );
+      iod.file = [...iod.file].filter((el) =>
+        [...data.fileTemp].includes(el._id.toString())
+      );
+      files.map((el) => {
+        iod.file.push({
+          name: el.originalname,
+          path: "uploads/" + data.security + "/" + el.filename,
+          typeFile: el.mimetype,
+          size: el.size,
+        });
+      });
+      file.map((el) => {
+        const pathFile = path.join(__dirname, "./../../../../public/", el.path);
+        if (fs.existsSync(pathFile)) fs.unlinkSync(pathFile);
+      });
       iod.save();
       return {
         status: Constants.ApiCode.SUCCESS,
@@ -754,21 +811,93 @@ var incomingOfficialDispatchService = {
       showError(error);
     }
   },
-  deleteOne: async (id = "", userID = "") => {
+  implement: async (
+    id = "",
+    userID = "",
+    data = { implement: "", sendEmail: "" }
+  ) => {
     try {
-      const deletedItem = await model.findOneAndUpdate(
-        { _id: id, deleted: false },
-        { deleted: true }
-      );
-      if (!deletedItem)
+      const item = await model.findOne({
+        _id: id,
+        deleted: false,
+      });
+      if (!item)
         return {
           status: Constants.ApiCode.NOT_FOUND,
           message: Constants.String.Message.ERR_404(Constants.String.IOD._),
         };
+      const user = await officerModel.findById(userID, { deleted: false });
+      if (!user)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Officer._),
+        };
+      const IMPLEMENT = await statusModel.findOne({
+        name: "IMPLEMENT",
+        deleted: false,
+      });
+      if (!IMPLEMENT)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Status._),
+        };
+      item.status = IMPLEMENT._id;
+      item.traceHeaderList.push({
+        command: data.implement,
+        header: IMPLEMENT.name,
+        officer: user._id,
+        status: IMPLEMENT._id,
+      });
+      item.save();
+      const importer = await officerModel.findById(item.importer);
+      if (data.sendEmail || data.sendEmail !== "false") {
+        var mailOptions = {
+          from: process.env.MAIL_USER,
+          to: importer.emailAddress,
+          subject: "email_title",
+          html: `<img src="https://imggroup.com.vn/Content/images/logo-img.png" height="100"/>
+          <br/>
+          <span style="width: 100%; font-family: Tahoma,Geneva, sans-serif;">
+              ${data.implement}
+          </span>
+`,
+        };
+        transporter.sendMail(mailOptions, function (error, info) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log("Email sent: " + info.response);
+          }
+        });
+      }
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.PUT_200(Constants.String.Language._),
+        data: item,
+      };
+    } catch (error) {
+      showError(error);
+    }
+  },
+  deleteOne: async (id = "", userID = "") => {
+    try {
+      const item = await model.findOneAndUpdate(
+        { _id: id, deleted: false },
+        { deleted: true }
+      );
+      if (!item)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.IOD._),
+        };
+      item.file.map((el) => {
+        const pathFile = path.join(__dirname, "./../../../../public/", el.path);
+        if (fs.existsSync(pathFile)) fs.unlinkSync(pathFile);
+      });
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.DELETE_200(Constants.String.IOD._),
-        data: deletedItem,
+        data: item,
       };
     } catch (error) {
       return showError(error);
@@ -776,19 +905,30 @@ var incomingOfficialDispatchService = {
   },
   deleteMany: async (ids) => {
     try {
-      const deletedItems = await model.updateMany(
+      const items = await model.updateMany(
         { _id: { $in: ids }, deleted: false },
         { deleted: true }
       );
-      if (deletedItems.modifiedCount === 0)
+      if (items.modifiedCount === 0)
         return {
           status: Constants.ApiCode.NOT_FOUND,
           message: Constants.String.Message.ERR_404(Constants.String.Officer._),
         };
+      const listItems = await model.find({ _id: { $in: ids } });
+      listItems.map((el) => {
+        el.file.map((f) => {
+          const pathFile = path.join(
+            __dirname,
+            "./../../../../public/",
+            f.path
+          );
+          if (fs.existsSync(pathFile)) fs.unlinkSync(pathFile);
+        });
+      });
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.DELETE_200(Constants.String.IOD._),
-        data: deletedItems,
+        data: items,
       };
     } catch (error) {
       return showError(error);

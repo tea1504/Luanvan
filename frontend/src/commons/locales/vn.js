@@ -97,6 +97,11 @@ export default {
       SUCCESS: 'Bạn đã hủy duyệt văn bản thành công',
       TITLE: 'Hủy duyệt văn bản',
     },
+    Implement: {
+      FAILURE: 'Triển khai văn bản thất bại',
+      SUCCESS: 'Bạn đã triển khai văn bản thành công',
+      TITLE: 'Triển khai văn bản',
+    },
     Create: {
       FAILURE: 'Thêm dữ liệu thất bại',
       SUCCESS: 'Bạn đã thêm dữ liệu thành công',
@@ -215,6 +220,7 @@ export default {
       DESCRIPTION_CODE:
         'Bạn chỉ cần nhập phần số<br/> Ví dụ: <code>1/2022/QĐ-ĐHCT</code> nhập <code>1</code>',
       DESCRIPTION: 'Ý kiến phê duyệt',
+      IMPLEMENT_DESCRIPTION: 'Ý kiến triển khai',
       HANDLE_OPINION: 'Ý kiến xử lý',
       HANDLE: 'Xử lý văn bản',
       LATE: 'Văn bản trễ hạn xử lý',
