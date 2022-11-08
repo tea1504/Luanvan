@@ -10,9 +10,9 @@ const saveImg = (img, fileName, type, savePath) => {
   fs.writeFileSync(savePath + fileName + type, canvas.toBuffer("image/jpeg"));
 };
 
-const cvtColor = (src) => {
+const cvtColor = (src, mode) => {
   let dst = new cv.Mat();
-  cv.cvtColor(src, dst, cv.COLOR_RGB2GRAY, 0);
+  cv.cvtColor(src, dst, mode, 0);
   return dst;
 };
 
@@ -83,7 +83,7 @@ const threshold = (src, threshold, max) => {
 };
 
 const run = async (src) => {
-  console.log(src);
+  console.log("src", src);
   const savePath = src.substring(0, src.lastIndexOf("/") + 1);
   const dom = new JSDOM();
   global.document = dom.window.document;
@@ -104,7 +104,7 @@ const run = async (src) => {
   saveImg(resizeImg, "resize1", ".jpg", savePath);
 
   // Chuyển thành ảnh xám
-  let imgGray = cvtColor(img);
+  let imgGray = cvtColor(resizeImg, cv.COLOR_RGB2GRAY);
   saveImg(imgGray, "cvtColor", ".jpg", savePath);
 
   // Nghịch đảo ảnh
@@ -160,7 +160,7 @@ const run = async (src) => {
       Math.round(Math.random() * 255),
       Math.round(Math.random() * 255)
     );
-    cv.drawContours(dst, contours, i, color, 1, cv.LINE_8, hierarchy, 100);
+    cv.drawContours(dst, contours, i, color, 1, cv.LINE_8, hierarchy);
   }
   saveImg(dst, "dst", ".jpg", savePath);
 };

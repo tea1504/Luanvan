@@ -3,8 +3,8 @@ info:
   title: E-Office API's Document
   version: "1.0.0"
 servers:
+  - url: http://10.10.34.109:5000/v2
   - url: http://localhost:5000/v2
-  - url: http://10.10.34.130:5000/v2
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -2924,6 +2924,8 @@ paths:
                 file:
                   type: string
                   format: binary
+                totalPage:
+                  type: number
       responses:
         200:
           description: OK
