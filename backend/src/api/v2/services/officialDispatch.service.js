@@ -145,6 +145,7 @@ var officialDispatchService = {
     cv.morphologyEx(src, dst, cv.MORPH_CLOSE, M);
     return dst;
   },
+
   erosion: (src, size) => {
     let dst = new cv.Mat();
     let M = cv.Mat.ones(size, size, cv.CV_8U);
@@ -173,48 +174,83 @@ var officialDispatchService = {
     return dst;
   },
 
-  findContours: (src, savePath) => {
-    let contours = new cv.MatVector();
-    let hierarchy = new cv.Mat();
-    cv.findContours(
-      src,
-      contours,
-      hierarchy,
-      cv.RETR_EXTERNAL,
-      cv.CHAIN_APPROX_SIMPLE
-    );
+  findContours: async (src, savePath, page, multiPage) => {
+    try {
+      let contours = new cv.MatVector();
+      let hierarchy = new cv.Mat();
+      cv.findContours(
+        src,
+        contours,
+        hierarchy,
+        cv.RETR_EXTERNAL,
+        cv.CHAIN_APPROX_SIMPLE
+      );
 
-    let dst = [];
-    for (let i = 0; i < contours.size(); ++i) {
-      let cnt = contours.get(i);
-      let rect = cv.boundingRect(cnt);
-      if (rect.width > 60 && rect.height > 60) {
-        let mask = cv.Mat.zeros(src.rows, src.cols, cv.CV_8UC3);
-        cv.drawContours(
-          mask,
-          contours,
-          i,
-          new cv.Scalar(255, 255, 255),
-          -1,
-          cv.LINE_8,
-          hierarchy
-        );
-        mask = mask.roi(rect);
-        officialDispatchService.saveImg(
-          mask,
-          `/${rect.x}_${rect.y}_${rect.x + rect.width}_${rect.y + rect.height}`,
-          ".jpg",
-          savePath
-        );
-        dst.push({
-          x: rect.x,
-          y: rect.y,
-          width: rect.width,
-          height: rect.height,
-        });
+      let dst = [];
+      for (let i = 0; i < contours.size(); ++i) {
+        let cnt = contours.get(i);
+        let rect = cv.boundingRect(cnt);
+        if (rect.width > 60 && rect.height > 60) {
+          let mask = cv.Mat.zeros(src.rows, src.cols, cv.CV_8UC3);
+          cv.drawContours(
+            mask,
+            contours,
+            i,
+            new cv.Scalar(255, 255, 255),
+            -1,
+            cv.LINE_8,
+            hierarchy
+          );
+          mask = mask.roi(rect);
+
+          let result = officialDispatchService.predict(
+            rect.x,
+            rect.y,
+            rect.width,
+            rect.height,
+            page === 0 ? 0 : 2,
+            multiPage > 1 ? 1 : 0,
+            savePath
+          );
+          if (result != "6" && result != "0")
+            dst.push({
+              x: rect.x,
+              y: rect.y,
+              width: rect.width,
+              height: rect.height,
+              predict: result,
+            });
+        }
       }
+      return dst;
+    } catch (error) {
+      return [];
     }
-    return dst;
+  },
+
+  predict: (x, y, w, h, page, multiPage, savePath) => {
+    console.log(x, y, w, h, page, multiPage);
+    const content =
+      `@RELATION dataset
+
+@ATTRIBUTE x REAL
+@ATTRIBUTE y REAL
+@ATTRIBUTE w REAL
+@ATTRIBUTE h REAL
+@ATTRIBUTE page {0,1,2}
+@ATTRIBUTE mutilpage {0,1}
+@ATTRIBUTE type {0,1,2,3,4,5,6,7,8}
+
+@DATA
+` + `${x},${y},${w},${h},${page},${multiPage},?`;
+    fs.writeFileSync(savePath + "/t.arff", content);
+    const result = execSync(
+      `java -cp weka.jar weka.classifiers.trees.J48 -p 7 -l d.model -T ${savePath}/t.arff`
+    );
+    return result
+      .toString()
+      .split(" ")
+      .filter((el) => el.length > 0)[14][2];
   },
 };
 

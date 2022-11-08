@@ -5,9 +5,11 @@ import {
   CCol,
   CFormInput,
   CFormLabel,
+  CFormText,
   CProgress,
   CProgressBar,
   CRow,
+  CSpinner,
   CWidgetStatsF,
 } from '@coreui/react'
 import { FaPaperclip, FaTrash } from 'react-icons/fa'
@@ -22,17 +24,25 @@ import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import BaseService from 'src/services/base.service'
 import Screens from 'src/constants/screens'
+import ODPreview from '../officialDispatch/ODPreview'
 
 const service = new BaseService()
 const MySwal = withReactContent(Swal)
 
-function IODUploadFile({ state, extension, handleInputFileOnChange, updateData,handleDeleteFile }) {
+function IODUploadFile({
+  state,
+  extension,
+  handleInputFileOnChange,
+  updateData,
+  handleDeleteFile,
+}) {
   let loading = useSelector((state) => state.config.loading)
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
   const [process, setProcess] = useState({})
   const [value, setValue] = useState(0)
+  const [totalPage, setTotalPage] = useState(1)
 
   const renderFile = () => {
     return (
@@ -48,15 +58,20 @@ function IODUploadFile({ state, extension, handleInputFileOnChange, updateData,h
               footer={
                 <CRow>
                   <CCol
-                    className="text-center" style={{ cursor: 'pointer' }}
-                    onClick={() => setProcess(el)}> alo
+                    className="text-center"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => setProcess(el)}
+                  >
+                    {Strings.Common.CHOOSE}
                   </CCol>
                   <CCol>
                     <CButton
                       variant="ghost"
                       color="secondary"
                       className="w-100 m-0 p-0"
-                      onClick={() => handleDeleteFile(el)}
+                      onClick={() => {
+                        handleDeleteFile(el)
+                      }}
                     >
                       <FaTrash /> {Strings.Common.DELETE}
                     </CButton>
@@ -75,7 +90,7 @@ function IODUploadFile({ state, extension, handleInputFileOnChange, updateData,h
       dispatch(setLoading(true))
       const result = await service.api.postFormData({
         path: Constants.ApiPath.POST_PROCESS_OD,
-        data: { file: state.file[process.code] },
+        data: { file: state.file[process.code], totalPage: totalPage },
         config: {
           onDownloadProgress: (progressEvent) => {
             var str = progressEvent.currentTarget.response
@@ -141,18 +156,43 @@ function IODUploadFile({ state, extension, handleInputFileOnChange, updateData,h
         {renderFile(true)}
       </CCol>
       <CCol xs={12} className="my-1">
-        {!Helpers.isObjectEmpty(process) && (
+        {!Helpers.isObjectEmpty(process) && state.fileTemp.length !== 0 && (
           <CProgress>
             <CProgressBar value={value} color="success" variant="striped" animated />
           </CProgress>
         )}
       </CCol>
       <CCol xs={12} className="my-1">
-        {!Helpers.isObjectEmpty(process) && (
-          <div>
-            FORM
-            <CButton onClick={() => handleClickButton()}>Xử lý</CButton>
-          </div>
+        {!Helpers.isObjectEmpty(process) && state.fileTemp.length !== 0 && (
+          <CRow>
+            <CCol xs={12}>
+              <CFormLabel>Số trang của văn bản</CFormLabel>
+              <CFormInput
+                type="number"
+                value={totalPage}
+                min={1}
+                onChange={(e) => setTotalPage(e.target.value)}
+              />
+              <CFormText>Số trang được hiểu là từ trang đầu đến phần có chữ ký</CFormText>
+            </CCol>
+            <CCol xs={12} className="mt-3">
+              {!loading && (
+                <CButton className="w-100" onClick={handleClickButton}>
+                  {Strings.Common.PROCESS}
+                </CButton>
+              )}
+              {loading && (
+                <CButton className="w-100" disabled={true}>
+                  <CSpinner size="sm" /> {Strings.Common.PROCESSING}
+                </CButton>
+              )}
+            </CCol>
+            <CCol xs={12} className="mt-3">
+              <div style={{ height: '45vh' }}>
+                <ODPreview data={process.path} />
+              </div>
+            </CCol>
+          </CRow>
         )}
       </CCol>
     </CRow>

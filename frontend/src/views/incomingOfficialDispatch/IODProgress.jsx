@@ -2,7 +2,21 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Select from 'react-select'
 import { useState } from 'react'
-import { CButton, CSpinner, CToast, CToastBody, CToaster, CToastHeader } from '@coreui/react'
+import {
+  CButton,
+  CCol,
+  CFormInput,
+  CFormLabel,
+  CFormText,
+  CProgress,
+  CProgressBar,
+  CRow,
+  CSpinner,
+  CToast,
+  CToastBody,
+  CToaster,
+  CToastHeader,
+} from '@coreui/react'
 import ODPreview from '../officialDispatch/ODPreview'
 import BaseService from 'src/services/base.service'
 import Constants from 'src/constants'
@@ -28,44 +42,28 @@ function IODProgress({ data, dataTemp, updateData }) {
   const navigate = useNavigate()
 
   const [state, setState] = useState(-1)
-  const [toast, setToast] = useState()
-
-  const exampleToast = (message) => (
-    <CToast>
-      <CToastHeader closeButton>
-        <svg
-          className="rounded me-2"
-          width="20"
-          height="20"
-          xmlns="http://www.w3.org/2000/svg"
-          preserveAspectRatio="xMidYMid slice"
-          focusable="false"
-          role="img"
-        >
-          <rect width="100%" height="100%" fill="#007aff"></rect>
-        </svg>
-        <strong className="me-auto">CoreUI for React.js</strong>
-        <small>7 min ago</small>
-      </CToastHeader>
-      <CToastBody>{message}</CToastBody>
-    </CToast>
-  )
+  const [totalPage, setTotalPage] = useState(1)
+  const [value, setValue] = useState(0)
 
   const handleClickButton = async () => {
     try {
-      dispatch(setLoading(true))
-      const result = await service.api
-        .postFormData({
+      if (state !== -1) {
+        dispatch(setLoading(true))
+        const result = await service.api.postFormData({
           path: Constants.ApiPath.POST_PROCESS_OD,
-          data: { file: data[state] },
+          data: { file: data[state], totalPage: totalPage },
           config: {
             onDownloadProgress: (progressEvent) => {
-              setToast(exampleToast(progressEvent.loaded))
+              var str = progressEvent.currentTarget.response
+              var percent = str.split('|')
+              var a = percent[percent.length - 1].split('/')
+              setValue((a[0] * 100) / a[1])
             },
           },
         })
-      updateData(JSON.parse(result.data.split('#')[1]).data)
-      dispatch(setLoading(false))
+        updateData(JSON.parse(result.data.split('#')[1]).data)
+        dispatch(setLoading(false))
+      }
     } catch (error) {
       dispatch(setLoading(false))
       switch (error.status) {
@@ -92,27 +90,44 @@ function IODProgress({ data, dataTemp, updateData }) {
   }
 
   return (
-    <div>
-      <Select
-        options={val}
-        onChange={(selectedItem) => {
-          setState(selectedItem.value)
-        }}
-      />
-      <CButton disabled={loading} onClick={handleClickButton} className="mt-3 w-100">
-        {loading && (
-          <>
-            <CSpinner size="sm" /> {Strings.Common.PROCESSING}
-          </>
-        )}{' '}
-        {!loading && Strings.Common.SUBMIT}
-      </CButton>
-
-      <div style={{ height: '60vh' }} className="mt-3">
+    <CRow>
+      <CCol xs={12}>
+        <Select
+          options={val}
+          onChange={(selectedItem) => {
+            setState(selectedItem.value)
+          }}
+        />
+      </CCol>
+      <CCol xs={12} className="my-1">
+        <CProgress>
+          <CProgressBar value={value} color="success" variant="striped" animated />
+        </CProgress>
+      </CCol>
+      <CCol xs={12}>
+        <CFormLabel>Số trang của văn bản</CFormLabel>
+        <CFormInput
+          type="number"
+          value={totalPage}
+          min={1}
+          onChange={(e) => setTotalPage(e.target.value)}
+        />
+        <CFormText>Số trang được hiểu là từ trang đầu đến phần có chữ ký</CFormText>
+      </CCol>
+      <CCol>
+        <CButton disabled={loading} onClick={handleClickButton} className="mt-3 w-100">
+          {loading && (
+            <>
+              <CSpinner size="sm" /> {Strings.Common.PROCESSING}
+            </>
+          )}{' '}
+          {!loading && Strings.Common.PROCESS}
+        </CButton>
+      </CCol>
+      <CCol xs={12} style={{ height: '60vh' }} className="mt-3">
         {state !== -1 && <ODPreview data={dataTemp[state].path} />}
-      </div>
-      <CToaster push={toast} placement="top-end" />
-    </div>
+      </CCol>
+    </CRow>
   )
 }
 

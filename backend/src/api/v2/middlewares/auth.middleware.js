@@ -11,9 +11,9 @@ const verifyToken = async (req, res, next) => {
   const token = req.headers["x-api-key"]?.slice(7) || req.query.token;
 
   if (!token) {
-    res
+    return res
       .status(403)
-      .send({ status: 403, message: Constants.String.Message.ERR_403});
+      .send({ status: 403, message: Constants.String.Message.ERR_403 });
   }
   try {
     const decoded = jwt.verify(token, process.env.PRIVATEKEY);

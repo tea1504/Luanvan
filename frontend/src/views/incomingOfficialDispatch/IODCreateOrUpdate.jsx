@@ -227,34 +227,36 @@ export default function IODCreateOrUpdate() {
   }
 
   const showError = (error) => {
-    switch (error.status) {
-      case 401:
-        MySwal.fire({
-          title: Strings.Message.COMMON_ERROR,
-          icon: 'error',
-          text: error.message,
-        }).then(() => {
-          localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
-          localStorage.clear(Constants.StorageKeys.USER_INFO)
-          navigate(Screens.LOGIN)
-        })
-        break
-      case 406:
-        const message = Object.values(error.data.error).map((el) => el.message)
-        MySwal.fire({
-          title: Strings.Message.COMMON_ERROR,
-          icon: 'error',
-          html: message.join('<br/>'),
-        })
-        break
-      default:
-        MySwal.fire({
-          title: Strings.Message.COMMON_ERROR,
-          icon: 'error',
-          text: error.message,
-        })
-        break
-    }
+    if (error.status) {
+      switch (error.status) {
+        case 401:
+          MySwal.fire({
+            title: Strings.Message.COMMON_ERROR,
+            icon: 'error',
+            text: error.message,
+          }).then(() => {
+            localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
+            localStorage.clear(Constants.StorageKeys.USER_INFO)
+            navigate(Screens.LOGIN)
+          })
+          break
+        case 406:
+          const message = Object.values(error.data.error).map((el) => el.message)
+          MySwal.fire({
+            title: Strings.Message.COMMON_ERROR,
+            icon: 'error',
+            html: message.join('<br/>'),
+          })
+          break
+        default:
+          MySwal.fire({
+            title: Strings.Message.COMMON_ERROR,
+            icon: 'error',
+            text: error.message,
+          })
+          break
+      }
+    } else console.log(error)
   }
 
   const getOrganization = async () => {
@@ -545,7 +547,7 @@ export default function IODCreateOrUpdate() {
   }
 
   const handleInputFileOnChange = (e) => {
-    console.log(e);
+    console.log(e)
     const file = Array.from(e.target.files)
     updateState({
       file: [...state.file, ...file],
@@ -1269,6 +1271,7 @@ export default function IODCreateOrUpdate() {
         onClose={() => {
           updateVisible({ process: false })
         }}
+        backdrop="static"
       >
         <CModalHeader></CModalHeader>
         <CModalBody>
