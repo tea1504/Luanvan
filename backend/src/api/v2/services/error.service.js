@@ -1,6 +1,12 @@
 const Constants = require("../constants");
 
 const showError = (error) => {
+  if (!error.name)
+    return {
+      status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
+      message: Constants.String.Message.ERR_500,
+      data: {},
+    };
   switch (error.name) {
     case "ValidationError":
       return {
@@ -23,7 +29,8 @@ const showError = (error) => {
     default:
       return {
         status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
-        message: Constants.String.Message.ERR_500,
+        // message: Constants.String.Message.ERR_500,
+        message: error.message,
         data: { error: error.message },
       };
   }

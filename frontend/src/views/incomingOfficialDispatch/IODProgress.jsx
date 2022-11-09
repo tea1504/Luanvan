@@ -61,8 +61,17 @@ function IODProgress({ data, dataTemp, updateData }) {
             },
           },
         })
-        updateData(JSON.parse(result.data.split('#')[1]).data)
+        const response = JSON.parse(result.data.split('#')[1])
         dispatch(setLoading(false))
+        if (response.status !== 200) {
+          setValue(0)
+          return MySwal.fire({
+            title: Strings.Message.COMMON_ERROR,
+            icon: 'error',
+            text: response.message,
+          })
+        }
+        updateData(response.data)
       }
     } catch (error) {
       dispatch(setLoading(false))

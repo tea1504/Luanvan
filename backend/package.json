@@ -27,6 +27,7 @@
     "pdf2pic": "^2.1.4",
     "pdfjs-dist": "^3.0.279",
     "swagger-ui-express": "^4.5.0",
+    "tesseract.js": "^3.0.3",
     "yamljs": "^0.3.0"
   }
 }
