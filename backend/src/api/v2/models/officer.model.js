@@ -68,10 +68,10 @@ const officerSchema = new mongoose.Schema(
           Constants.String.Officer.EMAIL_ADDRESS
         ),
       ],
-      match: [
-        Constants.RegExp.EMAIL_ADDRESS,
-        Constants.String.Message.MATCH(Constants.String.Officer.EMAIL_ADDRESS),
-      ],
+      // match: [
+      //   Constants.RegExp.EMAIL_ADDRESS,
+      //   Constants.String.Message.MATCH(Constants.String.Officer.EMAIL_ADDRESS),
+      // ],
     },
     phoneNumber: {
       type: String,

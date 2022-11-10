@@ -1,4 +1,4 @@
-import { CBadge, CImage } from '@coreui/react'
+import { CAvatar, CBadge, CImage } from '@coreui/react'
 import React from 'react'
 import Helpers from 'src/commons/helpers'
 import Constants from 'src/constants'
@@ -14,11 +14,12 @@ export default [
   },
   {
     cell: (row) => (
-      <CImage
+      <CAvatar
         src={`${process.env.REACT_APP_BASE_URL}/${row.file.path}?token=${localStorage.getItem(
           Constants.StorageKeys.ACCESS_TOKEN,
         )}`}
-        height={50}
+        shape="rounded"
+        size="lg"
       />
     ),
     center: true,

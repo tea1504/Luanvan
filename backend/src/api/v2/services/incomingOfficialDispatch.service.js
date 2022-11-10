@@ -47,6 +47,10 @@ var incomingOfficialDispatchService = {
           status: Constants.ApiCode.NOT_FOUND,
           message: Constants.String.Message.ERR_404(Constants.String.Officer._),
         };
+      const listUser = await officerModel.find({
+        deleted: false,
+        organ: user.organ,
+      });
       delete params.limit;
       delete params.pageNumber;
       delete params.filter;
@@ -107,7 +111,7 @@ var incomingOfficialDispatchService = {
       const khongMat = await securityModel.findOne({ name: "Không" });
       const result = {};
       const total = await model.countDocuments({
-        organ: user.organ,
+        importer: { $in: [...listUser].map((el) => el._id) },
         deleted: false,
         ...params,
         ...between,
@@ -136,7 +140,7 @@ var incomingOfficialDispatchService = {
       result.rowsPerPage = limit;
       result.data = await model
         .find({
-          organ: user.organ,
+          importer: { $in: [...listUser].map((el) => el._id) },
           deleted: false,
           ...params,
           ...between,
@@ -160,7 +164,7 @@ var incomingOfficialDispatchService = {
         .populate("traceHeaderList.status")
         .skip(startIndex)
         .limit(limit)
-        .sort({ createdAt: -1 });
+        .sort({ arrivalDate: -1, arrivalNumber: -1 });
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.GET_200(Constants.String.Language._),

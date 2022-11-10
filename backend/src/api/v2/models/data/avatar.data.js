@@ -1,0 +1,136 @@
+const avatarData = [
+  {
+    name: "1.jpg",
+    path: "avatars/1.jpg",
+    type: "jpg",
+    size: 10000,
+  },
+  {
+    name: "2.jpg",
+    path: "avatars/2.jpg",
+    type: "jpg",
+    size: 10000,
+  },
+  {
+    name: "3.jpg",
+    path: "avatars/3.jpg",
+    type: "jpg",
+    size: 10000,
+  },
+  {
+    name: "4.jpg",
+    path: "avatars/4.jpg",
+    type: "jpg",
+    size: 10000,
+  },
+  {
+    name: "5.jpg",
+    path: "avatars/5.jpg",
+    type: "jpg",
+    size: 10000,
+  },
+  {
+    name: "6.jpg",
+    path: "avatars/6.jpg",
+    type: "jpg",
+    size: 10000,
+  },
+  {
+    name: "7.jpg",
+    path: "avatars/7.jpg",
+    type: "jpg",
+    size: 10000,
+  },
+  {
+    name: "8.jpg",
+    path: "avatars/8.jpg",
+    type: "jpg",
+    size: 10000,
+  },
+  {
+    name: "9.jpg",
+    path: "avatars/9.jpg",
+    type: "jpg",
+    size: 10000,
+  },
+  {
+    name: "user1.jpg",
+    path: "avatars/user1.jpg",
+    type: "jpg",
+    size: 10000,
+  },
+  {
+    name: "user1.jpg",
+    path: "avatars/user2.jpg",
+    type: "jpg",
+    size: 10000,
+  },
+  {
+    name: "user1.jpg",
+    path: "avatars/user3.jpg",
+    type: "jpg",
+    size: 10000,
+  },
+  {
+    name: "user1.jpg",
+    path: "avatars/user4.jpg",
+    type: "jpg",
+    size: 10000,
+  },
+  {
+    name: "user1.jpg",
+    path: "avatars/user5.jpg",
+    type: "jpg",
+    size: 10000,
+  },
+  {
+    name: "user1.jpg",
+    path: "avatars/user6.jpg",
+    type: "jpg",
+    size: 10000,
+  },
+  {
+    name: "user1.jpg",
+    path: "avatars/user7.jpg",
+    type: "jpg",
+    size: 10000,
+  },
+  {
+    name: "user1.jpg",
+    path: "avatars/user8.jpg",
+    type: "jpg",
+    size: 10000,
+  },
+  {
+    name: "user1.jpg",
+    path: "avatars/user9.jpg",
+    type: "jpg",
+    size: 10000,
+  },
+  {
+    name: "user10.jpg",
+    path: "avatars/user10.jpg",
+    type: "jpg",
+    size: 10000,
+  },
+  {
+    name: "user11.jpg",
+    path: "avatars/user11.jpg",
+    type: "jpg",
+    size: 10000,
+  },
+  {
+    name: "user12.jpg",
+    path: "avatars/user12.jpg",
+    type: "jpg",
+    size: 10000,
+  },
+  {
+    name: "user13.jpg",
+    path: "avatars/user13.jpg",
+    type: "jpg",
+    size: 10000,
+  },
+];
+
+module.exports = avatarData;

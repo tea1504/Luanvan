@@ -1,62 +1,179 @@
-var result = [];
+const Helpers = require("../../commons/helpers");
+
+const organizationData = [];
 const data = [
-  { _id: "dhct00000000", name: "Đại học Cần Thơ", code: "ĐHCT" },
   {
-    _id: "cntttt000000",
-    name: "Trường Công nghệ thông tin và Truyền thông",
-    code: "CNTT&TT",
-    organ: "dhct00000000",
-  },
-  {
-    _id: "bk0000000000",
-    name: "Trường Bách khoa",
-    code: "BK",
-    organ: "dhct00000000",
-  },
-  {
-    _id: "kt0000000000",
-    name: "Trường Kinh tế",
-    code: "KT",
-    organ: "dhct00000000",
-  },
-  {
-    _id: "nn0000000000",
-    name: "Trường Nông nghiệp",
-    code: "NN",
-    organ: "dhct00000000",
-  },
-  {
-    _id: "dbdt00000000",
-    name: "Khoa dự bị Dân tộc",
-    code: "DBDT",
-    organ: "dhct00000000",
-  },
-  {
-    _id: "khct00000000",
-    name: "Khoa Khoa học Chính trị",
-    code: "KHCT",
-    organ: "dhct00000000",
-  },
-  {
-    _id: "khtn00000000",
-    name: "Khoa Khoa học Tự nhiên",
-    code: "KHTN",
-    organ: "dhct00000000",
-  },
-  {
-    _id: "khxhnv000000",
-    name: "Khoa Khoa học Xã hội và Nhân văn",
-    code: "KHXH&NV",
-    organ: "dhct00000000",
+    name: "Đại học Cần Thơ",
+    code: "ĐHCT",
+    inside: true,
+    sub: [
+      {
+        name: "Trường Công nghệ thông tin và Truyền thông",
+        code: "CNTT&TT",
+        inside: true,
+        sub: [
+          { name: "Tổ chức 1", code: "TC1", sub: [] },
+          { name: "Tổ chức 2", code: "TC2", sub: [] },
+          { name: "Tổ chức 3", code: "TC3", sub: [] },
+          { name: "Tổ chức 4", code: "TC4", sub: [] },
+          { name: "Tổ chức 5", code: "TC5", sub: [] },
+        ],
+      },
+      {
+        name: "Trường Bách khoa",
+        code: "BK",
+        inside: true,
+        sub: [],
+      },
+      {
+        name: "Trường Kinh tế",
+        code: "KT",
+        inside: true,
+        sub: [],
+      },
+      {
+        name: "Trường Nông nghiệp",
+        code: "NN",
+        inside: true,
+        sub: [],
+      },
+      {
+        name: "Khoa dự bị Dân tộc",
+        code: "DBDT",
+        inside: true,
+        sub: [],
+      },
+      {
+        name: "Khoa Khoa học Chính trị",
+        code: "KHCT",
+        inside: true,
+        sub: [],
+      },
+      {
+        name: "Khoa Khoa học Tự nhiên",
+        code: "KHTN",
+        inside: true,
+        sub: [],
+      },
+      {
+        name: "Khoa Khoa học Xã hội và Nhân văn",
+        code: "KHXH&NV",
+        inside: true,
+        sub: [],
+      },
+      {
+        name: " Trung tâm Bồi dưỡng Nghiệp vụ Sư phạm",
+        code: "BDNVSP",
+        inside: true,
+        sub: [],
+      },
+      {
+        name: " Trung tâm Chuyển giao Công nghệ và Dịch vụ",
+        code: "CGCNVDV",
+        inside: true,
+        sub: [],
+      },
+      {
+        name: " Trung tâm Công nghệ Phần mềm",
+        code: "CUSC",
+        inside: true,
+        sub: [],
+      },
+      {
+        name: " Trung tâm Dịch vụ Khoa học Nông nghiệp",
+        code: "DVKHCN",
+        inside: true,
+        sub: [],
+      },
+      {
+        name: " Trung tâm Đánh giá năng lực Ngoại ngữ",
+        code: "DGNLNN",
+        inside: true,
+        sub: [],
+      },
+      {
+        name: " Trung tâm Đào tạo, NC và Tư vấn kinh tế",
+        code: "DTNCTVKT",
+        inside: true,
+        sub: [],
+      },
+      { name: " Trung tâm Điện - Điện tử", code: "DDT", inside: true, sub: [] },
+      {
+        name: " Trung tâm Điện tử Tin học",
+        code: "DTTH",
+        inside: true,
+        sub: [],
+      },
+      {
+        name: " Trung tâm Giáo dục Quốc phòng & An ninh",
+        code: "GDQP-AN",
+        inside: true,
+        sub: [],
+      },
+      { name: " Trung tâm Học liệu", code: "LRC", inside: true, sub: [] },
+      {
+        name: " Trung tâm Kiểm định và Tư vấn Xây dựng",
+        code: "KD&TVXD",
+        inside: true,
+        sub: [],
+      },
+      {
+        name: " Trung tâm Liên kết Đào tạo",
+        code: "LKDT",
+        inside: true,
+        sub: [],
+      },
+      {
+        name: " Trung tâm NC và Ứng dụng công nghệ",
+        code: "NC&UDCN",
+        inside: true,
+        sub: [],
+      },
+      { name: " Trung tâm Ngoại ngữ", code: "FLC", inside: true, sub: [] },
+      {
+        name: " Trung tâm Quản lý chất lượng",
+        code: "QLCL",
+        inside: true,
+        sub: [],
+      },
+      {
+        name: " Trung tâm Thông tin và Quản trị mạng",
+        code: "TT&QTM",
+        inside: true,
+        sub: [],
+      },
+      {
+        name: " Trung tâm Tư vấn, Hỗ trợ và Khởi nghiệp sinh viên",
+        inside: true,
+        code: "TTHT&KNSV",
+        sub: [],
+      },
+      {
+        name: " Công ty TNHH một thành viên KHCN",
+        code: "NCKH",
+        inside: true,
+        sub: [],
+      },
+    ],
   },
 ];
 
-for (var i = 0; i < data.length; i++) {
-  result.push({
-    ...data[i],
-    emailAddress: `tranvanhoa15042000+${data[i].code}@gmail.com`,
-    phoneNumber: "0" + Math.floor(Math.random() * 999999999 + 100000000),
+let stack = [];
+for (var i = 0; i < data.length; i++) stack.push(data[i]);
+
+while (stack.length !== 0) {
+  item = stack.pop();
+  organizationData.push({
+    ...item,
+    _id: Helpers.toSlug(item.code) + "0".repeat(12 - item.code.length),
+    emailAddress: `tranvanhoa15042000+${item.code}@gmail.com`,
+    phoneNumber: "0" + Math.floor(Math.random() * 900000000 + 100000000),
   });
+  for (var j = 0; j < item.sub.length; j++)
+    stack.push({
+      ...item.sub[j],
+      organ: Helpers.toSlug(item.code) + "0".repeat(12 - item.code.length),
+    });
 }
 
-module.exports = result;
+module.exports = organizationData;

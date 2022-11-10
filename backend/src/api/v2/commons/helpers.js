@@ -9,9 +9,26 @@ const Helpers = {
         .toUpperCase();
     return "#" + code;
   },
+  randomDate: (start, end) => {
+    return new Date(
+      start.getTime() + Math.random() * (end.getTime() - start.getTime())
+    );
+  },
+  toSlug: (str = "") => {
+    str = str.toLowerCase();
+    str = str.replace(/(à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ)/g, "a");
+    str = str.replace(/(è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ)/g, "e");
+    str = str.replace(/(ì|í|ị|ỉ|ĩ)/g, "i");
+    str = str.replace(/(ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ)/g, "o");
+    str = str.replace(/(ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ)/g, "u");
+    str = str.replace(/(ỳ|ý|ỵ|ỷ|ỹ)/g, "y");
+    str = str.replace(/(đ)/g, "0");
+    str = str.replace(/(\s+)/g, "0");
+    return str;
+  },
   generatePassword: (
     length = 8,
-    wishList = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*()_+=-<>?.,;:"
+    wishList = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz@#$&"
   ) =>
     Array.from(crypto.randomFillSync(new Uint32Array(length)))
       .map((x) => wishList[x % wishList.length])

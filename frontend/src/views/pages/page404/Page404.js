@@ -5,7 +5,7 @@ import Resources from 'src/commons/resources'
 
 const Page404 = () => {
   const navigate = useNavigate()
-
+  console.log('anh', Resources.Images.ERR_404)
   return (
     <div
       className="vh-100 d-flex flex-row align-items-center justify-content-center"
