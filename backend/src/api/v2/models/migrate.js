@@ -12,6 +12,7 @@ const _status = require("./status.model");
 const _IOD = require("./incomingOfficialDispatch.model");
 const _ODT = require("./officialDispatchTravel.model");
 const Helpers = require("../commons/helpers");
+const organizationData = require("./data/organization.data");
 
 async function start() {
   console.log("Preparing ...");
@@ -415,106 +416,8 @@ async function start() {
   }
 
   console.log("Migrating Organization");
-  {
-    await _organization.deleteMany();
-    await _organization.create({
-      _id: "organ0000001",
-      name: "organization 1",
-      code: "1",
-      emailAddress: "o1.@gmail.com",
-      phoneNumber: "0939259664",
-    });
-    await _organization.create([
-      {
-        _id: "organ0000002",
-        name: "organization 2",
-        code: "2",
-        emailAddress: "o2.@gmail.com",
-        phoneNumber: "0939259665",
-        organ: "organ0000001",
-      },
-      {
-        _id: "organ0000003",
-        name: "organization 3",
-        code: "3",
-        emailAddress: "o3.@gmail.com",
-        phoneNumber: "0939359665",
-        organ: "organ0000001",
-      },
-      {
-        _id: "organ0000004",
-        name: "organization 4",
-        code: "4",
-        emailAddress: "o.4.@gmail.com",
-        phoneNumber: "0939549665",
-        organ: "organ0000001",
-      },
-      {
-        _id: "organ0000005",
-        name: "organization 5",
-        code: "5",
-        emailAddress: "o.5.@gmail.com",
-        phoneNumber: "0939559665",
-        organ: "organ0000001",
-      },
-      {
-        _id: "organ0000006",
-        name: "organization 6",
-        code: "6",
-        emailAddress: "o.6.@gmail.com",
-        phoneNumber: "0939559666",
-        organ: "organ0000001",
-      },
-      {
-        _id: "organ0000007",
-        name: "organization 7",
-        code: "7",
-        emailAddress: "o.7.@gmail.com",
-        phoneNumber: "0939579665",
-        organ: "organ0000001",
-      },
-      {
-        _id: "organ0000008",
-        name: "organization 8",
-        code: "8",
-        emailAddress: "o.8.@gmail.com",
-        phoneNumber: "0939889665",
-        organ: "organ0000001",
-      },
-      {
-        _id: "organ0000009",
-        name: "organization 9",
-        code: "9",
-        emailAddress: "o.9.@gmail.com",
-        phoneNumber: "0939559669",
-        organ: "organ0000001",
-      },
-      {
-        _id: "organ0000010",
-        name: "organization 0",
-        code: "10",
-        emailAddress: "o.1.0.@gmail.com",
-        phoneNumber: "0939559661",
-        organ: "organ0000001",
-      },
-      {
-        _id: "organ0000011",
-        name: "organization 11",
-        code: "11",
-        emailAddress: "1.1.@gmail.com",
-        phoneNumber: "0939159661",
-        organ: "organ0000001",
-      },
-      {
-        _id: "organ0000012",
-        name: "organization 12",
-        code: "12",
-        emailAddress: "1.12.@gmail.com",
-        phoneNumber: "0939159662",
-        organ: "organ0000001",
-      },
-    ]);
-  }
+  await _organization.deleteMany();
+  await _organization.create(organizationData);
 
   console.log("Migrate Officer");
   const password = await bcrypt.hash("12345", parseInt(process.env.SALT));

@@ -8,6 +8,9 @@ const { Canvas, createCanvas, Image, ImageData, loadImage } = require("canvas");
 const { JSDOM } = require("jsdom");
 const showError = require("./error.service");
 const Tesseract = require("tesseract.js");
+const organizationModel = require("../models/organization.model");
+const officerModel = require("../models/officer.model");
+const typeModel = require("../models/type.model");
 
 const worker = Tesseract.createWorker({
   logger: (m) => console.log(m),
@@ -23,36 +26,175 @@ global.HTMLImageElement = Image;
 const mm2px = 12;
 
 var officialDispatchService = {
-  processOD: async (resultPredict) => {
-    console.log(resultPredict);
-    let organ = officialDispatchService.getOrgan(resultPredict[2]);
-    let code = officialDispatchService.getCode(resultPredict[3]);
-    let date = officialDispatchService.getDate(resultPredict[4]);
-    let type = officialDispatchService.getTypeSubject(resultPredict[5]);
-    let signer = officialDispatchService.getSigner(resultPredict[7]);
-    let send = officialDispatchService.getSend(resultPredict[8]);
-    console.log(code, organ, type, date, send, signer);
+  processOD: async (userID, resultPredict) => {
+    const user = await officerModel.findById(userID);
+    // console.log(resultPredict);
+    let _organ = officialDispatchService.getOrgan(resultPredict[2]);
+    let _code = officialDispatchService.getCode(resultPredict[3]);
+    let _date = officialDispatchService.getDate(resultPredict[4]);
+    let _type = officialDispatchService.getTypeSubject(resultPredict[5]);
+    let _signer = officialDispatchService.getSigner(resultPredict[7]);
+    let _send = officialDispatchService.getSend(resultPredict[8]);
+    console.log(
+      _code.data,
+      _organ.data,
+      _type.data,
+      _date.data,
+      _send.data,
+      _signer.data
+    );
+    const organFromName =
+      await officialDispatchService.findOrganizationFromName(_organ.data.organ);
+    const organFromCode =
+      await officialDispatchService.findOrganizationFromCode(_code.data.organ);
+    const typeFromName = await officialDispatchService.findTypeFromName(
+      _type.data.type
+    );
+    const typeFromCode = await officialDispatchService.findTypeFromCode(
+      _code.data.type
+    );
+    const timeFromDate = officialDispatchService.createDate(_date.data);
+    const signerName = officialDispatchService.findSignerName(_signer.data);
+    const signerPosition = officialDispatchService.findSignerPosition(
+      _signer.data
+    );
+
+    console.log(typeFromCode, typeFromName);
+
     return {
       status: Constants.ApiCode.SUCCESS,
       message: Constants.String.Message.GET_200(Constants.String.IOD._),
       data: {
-        code: 10,
-        issuedDate: new Date().getTime(),
-        subject:
-          "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
-        type: "747970653030303030303031",
+        code: _code.data.code,
+        issuedDate: timeFromDate.getTime(),
+        subject: _type.data.subject || _code.data.subject,
+        type: typeFromCode || typeFromName,
         language: "6c616e677561676530303031",
         pageAmount: 2,
         description: "",
-        signerInfoName: "Không Biết Tên",
-        signerInfoPosition: "Không biết luôn",
-        dueDate: new Date().getTime() + 1000 * 60 * 60 * 24 * 7,
-        priority: "7072696f7269747930303030",
-        security: "736563757269747930303030",
-        organ: "6f7267616e30303030303031",
-        predict: { code, organ, type, date, send, signer },
+        signerInfoName: signerName,
+        signerInfoPosition: signerPosition,
+        organ: organFromCode || organFromName,
+        predict: { _code, _organ, _type, _date, _send, _signer },
       },
     };
+  },
+
+  findSignerName: (arr = [""]) => {
+    if (arr.length === 0) return "";
+    return arr[arr.length - 1];
+  },
+
+  findSignerPosition: (arr = [""]) => {
+    if (arr.length < 2) return "";
+    return arr[arr.length - 2];
+  },
+
+  createDate: ({ year = "", month = "", date = "", other = [""] }) => {
+    const dateIsValid = (date) => {
+      return date instanceof Date && !isNaN(date);
+    };
+    if (other.length < 3) {
+      if (dateIsValid(new Date(`${year}-${month}-${date}`)))
+        return new Date(`${year}-${month}-${date}`);
+    } else {
+      if (dateIsValid(new Date(`${other[2]}-${other[1]}-${other[0]}`)))
+        return new Date(`${other[2]}-${other[1]}-${other[0]}`);
+      if (dateIsValid(new Date(`${other[2]}-${other[0]}-${other[1]}`)))
+        return new Date(`${other[2]}-${other[0]}-${other[1]}`);
+      if (dateIsValid(new Date(`${other[1]}-${other[2]}-${other[0]}`)))
+        return new Date(`${other[2]}-${other[1]}-${other[0]}`);
+      if (dateIsValid(new Date(`${other[1]}-${other[0]}-${other[2]}`)))
+        return new Date(`${other[2]}-${other[0]}-${other[1]}`);
+      if (dateIsValid(new Date(`${other[0]}-${other[2]}-${other[1]}`)))
+        return new Date(`${other[2]}-${other[1]}-${other[0]}`);
+      if (dateIsValid(new Date(`${other[0]}-${other[1]}-${other[2]}`)))
+        return new Date(`${other[2]}-${other[0]}-${other[1]}`);
+    }
+    return new Date();
+  },
+
+  findOrganizationFromName: async (organName = "") => {
+    const organ = await organizationModel
+      .find({ deleted: false })
+      .populate("organ");
+    let organSelectedFromName = null;
+    let rand = 0;
+    organ.map((el) => {
+      const r = officialDispatchService.check(el.name, organName);
+      console.log(r);
+      if (r > rand) {
+        rand = r;
+        organSelectedFromName = el;
+      }
+    });
+    if (organSelectedFromName) return organSelectedFromName._id.toString();
+    else return null;
+  },
+
+  findOrganizationFromCode: async (organCode = "") => {
+    const organ = await organizationModel
+      .find({ deleted: false })
+      .populate("organ");
+    let organSelectedFromCode = null;
+    let rand = 0;
+    organ.map((el) => {
+      const r = officialDispatchService.check(el.code, organCode);
+      console.log(r);
+      if (r > rand) {
+        rand = r;
+        organSelectedFromCode = el;
+      }
+    });
+    if (organSelectedFromCode) return organSelectedFromCode._id.toString();
+    else return null;
+  },
+
+  findTypeFromName: async (typeName = "") => {
+    const type = await typeModel.find({ deleted: false });
+    let typeSelectedFromName = null;
+    let rand = 0;
+    type.map((el) => {
+      const r = officialDispatchService.check(el.name, typeName);
+      console.log(r);
+      if (r > rand) {
+        rand = r;
+        typeSelectedFromName = el;
+      }
+    });
+    if (typeSelectedFromName) return typeSelectedFromName._id.toString();
+    else return null;
+  },
+
+  findTypeFromCode: async (typeCode = "") => {
+    const type = await typeModel.find({ deleted: false });
+    let typeSelectedFromCode = null;
+    let rand = 0;
+    type.map((el) => {
+      const r = officialDispatchService.check(el.notation, typeCode);
+      console.log(r);
+      if (r > rand) {
+        rand = r;
+        typeSelectedFromCode = el;
+      }
+    });
+    if (typeSelectedFromCode) return typeSelectedFromCode._id.toString();
+    else return null;
+  },
+
+  check: (str = "", pattern = "") => {
+    console.log(str, pattern);
+    const len = str.length;
+    const r = str.length >= pattern.length ? 0 : pattern.length - str.length;
+    str = officialDispatchService.toSlug(str);
+    pattern = officialDispatchService.toSlug(pattern);
+    pattern.split("").map((el) => {
+      let ind = str.indexOf(el);
+      let char = str[ind];
+      str = str.replace(char, "");
+    });
+    const rand = ((len - str.length - r) * 100) / len;
+    return rand > 0 ? rand : 0;
   },
 
   getCode: (str = "") => {
@@ -61,7 +203,6 @@ var officialDispatchService = {
       const temp = str.split("\n").filter((el) => el.length > 0);
       str = temp[0].replace(/[oO]/gi, "0");
       str = str.replace(/\s/gi, "");
-      console.log(str);
       for (var i = 1; i < temp.length; i++) result.subject += temp[i] + " ";
       let myRegex;
       if (str.includes("/")) myRegex = new RegExp(":(.+)/(.+)");
@@ -73,7 +214,6 @@ var officialDispatchService = {
         result.organ = temp[temp.length - 1];
         if (temp.length > 1) result.type = temp[0];
       }
-      console.log(result);
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.GET_200(),
@@ -138,12 +278,12 @@ var officialDispatchService = {
     try {
       str = str.replace(/\s/gi, "");
       str = officialDispatchService.toSlug(str);
-      const result = { year: "", month: "", date: "", other: [] };
+      const result = { year: "", month: "1", date: "1", other: [] };
       let year = /nam(\d{1,4})/.exec(str);
       if (year) result.year = year[1];
-      let month = /thang(\d{1,4})/.exec(str);
+      let month = /thang(\d{1,2})/.exec(str);
       if (month) result.month = month[1];
-      let date = /ngay(\d{1,4})/.exec(str);
+      let date = /ngay(\d{1,2})/.exec(str);
       if (date) result.date = date[1];
       result.other = str.match(/\d+/g);
       return {
