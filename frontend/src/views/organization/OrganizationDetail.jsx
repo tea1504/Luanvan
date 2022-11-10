@@ -17,7 +17,7 @@ import {
 } from '@coreui/react'
 import React, { useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { FaEraser } from 'react-icons/fa'
+import { FaEraser, FaInfoCircle } from 'react-icons/fa'
 import { useDispatch } from 'react-redux'
 import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -30,14 +30,12 @@ import OrganizationService from 'src/services/organization.service'
 import { setLoading } from 'src/store/slice/config.slice'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
-import organizationColumns from './organizationColumns'
-import subOrganizationColumns from './subOrganizationColumns'
 
 const service = new OrganizationService()
 const MySwal = withReactContent(Swal)
 
 export default function OrganizationDetail() {
-  const { id } = useParams()
+  let { id } = useParams()
   const navigate = useNavigate()
   const dispatch = useDispatch()
   let loading = useSelector((state) => state.config.loading)
@@ -49,9 +47,7 @@ export default function OrganizationDetail() {
   const [state, setState] = useState({
     _id: '',
     name: '',
-    notation: '',
-    description: '',
-    color: '',
+    code: '',
     deleted: false,
     createdAt: '',
     updatedAt: '',
@@ -75,6 +71,7 @@ export default function OrganizationDetail() {
       ...newState,
     }))
   }
+  const [stack, setStack] = useState([])
 
   const getState = async (id = '') => {
     if (store.length > 0) {
@@ -118,7 +115,7 @@ export default function OrganizationDetail() {
     }
   }
 
-  const getOrgan = async (rowsPerPage = 5, page = 1, filter = '') => {
+  const getOrgan = async (id, rowsPerPage = 5, page = 1, filter = '') => {
     try {
       dispatch(setLoading(true))
       const result = await service.getManyByOrganId(id, rowsPerPage, page, filter)
@@ -164,14 +161,34 @@ export default function OrganizationDetail() {
     getOrgan(organ.rowsPerPage, organ.page, str)
   }
 
+  const handleOnClickDetailButton = (row) => {
+    setStack([...stack, id])
+    id = `${Helpers.toSlug(row.name)}.${row._id}`
+    console.log(stack)
+    getState(id)
+    getOrgan(id)
+    navigate(Screens.ORGANIZATION_DETAIL(id))
+  }
+
+  const handleOnBackButton = () => {
+    id = stack.pop()
+    console.log(id)
+    setStack(stack)
+    if (id) {
+      getState(id)
+      getOrgan(id)
+    }
+    navigate(-1)
+  }
+
   useEffect(() => {
     const list = id.split('.')
     getState(list[list.length - 1])
-    getOrgan()
+    getOrgan(id)
   }, [])
 
   return (
-    <CContainer>
+    <CContainer fluid>
       <CRow>
         <CCol>
           <CCard className="mb-3 border-secondary border-top-5">
@@ -241,7 +258,54 @@ export default function OrganizationDetail() {
                       </CInputGroup>
                       <DataTable
                         {...configs.dataTable.props}
-                        columns={subOrganizationColumns}
+                        columns={[
+                          {
+                            name: '#',
+                            selector: (row, index) => index + 1,
+                            maxWidth: '100px',
+                            right: true,
+                          },
+                          {
+                            name: Strings.Form.FieldName.NAME(Strings.Organization.NAME),
+                            selector: (row) => row.name,
+                            sortable: true,
+                          },
+                          {
+                            name: Strings.Form.FieldName.CODE(Strings.Organization.NAME),
+                            selector: (row) => row.code,
+                            sortable: true,
+                          },
+                          {
+                            name: Strings.Form.FieldName.EMAIL_ADDRESS(Strings.Organization.NAME),
+                            selector: (row) => row.emailAddress,
+                            sortable: true,
+                          },
+                          {
+                            name: Strings.Form.FieldName.PHONE_NUMBER(Strings.Organization.NAME),
+                            selector: (row) => row.phoneNumber,
+                            sortable: true,
+                          },
+                          {
+                            name: Strings.Form.FieldName.PHONE_NUMBER(Strings.Organization.NAME),
+                            selector: (row) => row.phoneNumber,
+                            sortable: true,
+                          },
+                          {
+                            name: Strings.Common.ACTION,
+                            cell: (row) => (
+                              <CButton
+                                color="info"
+                                className="m-1"
+                                onClick={() => handleOnClickDetailButton(row)}
+                              >
+                                <FaInfoCircle style={{ color: 'whitesmoke' }} />
+                              </CButton>
+                            ),
+                            center: true,
+                            maxWidth: '300px',
+                            minWidth: '200px',
+                          },
+                        ]}
                         title={Strings.Form.FieldName.ORGANIZATION}
                         data={organ.data}
                         onChangeRowsPerPage={handlePerRowsChange}
@@ -257,7 +321,7 @@ export default function OrganizationDetail() {
               </CTable>
             </CCardBody>
             <CCardFooter>
-              <CButton className="w-100" onClick={() => navigate(-1)}>
+              <CButton className="w-100" onClick={handleOnBackButton}>
                 {Strings.Common.BACK}
               </CButton>
             </CCardFooter>

@@ -263,8 +263,8 @@ export default function IODCreateOrUpdate() {
     try {
       dispatch(setLoading(true))
       setOrgan([])
-      const result = await organizationService.getMany(10000, 1)
-      result.data.data.data.map((el) => {
+      const result = await organizationService.getList()
+      result.data.data.map((el) => {
         var item = { value: el._id, label: `${el.name} (${el.code})` }
         setOrgan((prevState) => [...prevState, item])
       })
@@ -279,8 +279,8 @@ export default function IODCreateOrUpdate() {
     try {
       dispatch(setLoading(true))
       setStatus([])
-      const result = await statusService.getMany(10000, 1)
-      result.data.data.data.map((el) => {
+      const result = await statusService.getList()
+      result.data.data.map((el) => {
         var item = { value: el._id, label: `${el.name} - ${Helpers.htmlDecode(el.description)}` }
         setStatus((prevState) => [...prevState, item])
       })
@@ -295,8 +295,8 @@ export default function IODCreateOrUpdate() {
     try {
       dispatch(setLoading(true))
       setType([])
-      const result = await typeService.getMany(10000, 1)
-      result.data.data.data.map((el) => {
+      const result = await typeService.getList()
+      result.data.data.map((el) => {
         var item = { value: el._id, label: `${el.name} - ${el.notation}` }
         setType((prevState) => [...prevState, item])
       })

@@ -28,7 +28,6 @@ route.get(
 );
 route.get(
   Constants.ApiPath.Organization.SLASH,
-  admin,
   readCategories,
   organizationController.getMany
 );

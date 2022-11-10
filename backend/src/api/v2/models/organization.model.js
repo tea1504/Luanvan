@@ -91,6 +91,11 @@ const organizationSchema = new mongoose.Schema(
       type: mongoose.ObjectId,
       ref: "organizations",
     },
+    inside: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
     deleted: {
       type: Boolean,
       required: true,

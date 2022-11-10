@@ -8,11 +8,13 @@ var organizationService = {
   /**
    * @returns {import("./../interfaces").ResponseResult}
    */
-  getList: async () => {
+  getList: async (userID = "") => {
     try {
+      const user = await officerModel.findById(userID);
       const result = await model.find(
         {
           deleted: false,
+          $or: [{ inside: true }, { organ: user.organ }],
         },
         "name code"
       );
@@ -37,18 +39,32 @@ var organizationService = {
    * @param {string} filter
    * @returns {import("./../interfaces").ResponseResult}
    */
-  getMany: async (limit = 10, pageNumber = 1, filter = "") => {
+  getMany: async (userID = "", limit = 10, pageNumber = 1, filter = "") => {
     try {
+      const user = await officerModel.findById(userID).populate("right");
       const result = {};
-      const total = await model.countDocuments({
-        deleted: false,
-        $or: [
-          { name: { $regex: new RegExp(filter, "i") } },
-          { code: { $regex: new RegExp(filter, "i") } },
-          { emailAddress: { $regex: new RegExp(filter, "i") } },
-          { phoneNumber: { $regex: new RegExp(filter, "i") } },
-        ],
-      });
+      let total;
+      if (user.right.scope === 0)
+        total = await model.countDocuments({
+          deleted: false,
+          $or: [
+            { name: { $regex: new RegExp(filter, "i") } },
+            { code: { $regex: new RegExp(filter, "i") } },
+            { emailAddress: { $regex: new RegExp(filter, "i") } },
+            { phoneNumber: { $regex: new RegExp(filter, "i") } },
+          ],
+        });
+      else
+        total = await model.countDocuments({
+          deleted: false,
+          $or: [
+            { name: { $regex: new RegExp(filter, "i") } },
+            { code: { $regex: new RegExp(filter, "i") } },
+            { emailAddress: { $regex: new RegExp(filter, "i") } },
+            { phoneNumber: { $regex: new RegExp(filter, "i") } },
+          ],
+          $or: [{ inside: true }, { organ: user.organ }],
+        });
       let startIndex = (pageNumber - 1) * limit;
       let endIndex = pageNumber * limit;
       result.total = total;
@@ -65,19 +81,36 @@ var organizationService = {
         };
       }
       result.rowsPerPage = limit;
-      result.data = await model
-        .find({
-          deleted: false,
-          $or: [
-            { name: { $regex: new RegExp(filter, "i") } },
-            { code: { $regex: new RegExp(filter, "i") } },
-            { emailAddress: { $regex: new RegExp(filter, "i") } },
-            { phoneNumber: { $regex: new RegExp(filter, "i") } },
-          ],
-        })
-        .skip(startIndex)
-        .limit(limit)
-        .sort({ createdAt: -1 });
+
+      if (user.right.scope === 0)
+        result.data = await model
+          .find({
+            deleted: false,
+            $or: [
+              { name: { $regex: new RegExp(filter, "i") } },
+              { code: { $regex: new RegExp(filter, "i") } },
+              { emailAddress: { $regex: new RegExp(filter, "i") } },
+              { phoneNumber: { $regex: new RegExp(filter, "i") } },
+            ],
+          })
+          .skip(startIndex)
+          .limit(limit)
+          .sort({ createdAt: -1 });
+      else
+        result.data = await model
+          .find({
+            deleted: false,
+            $or: [
+              { name: { $regex: new RegExp(filter, "i") } },
+              { code: { $regex: new RegExp(filter, "i") } },
+              { emailAddress: { $regex: new RegExp(filter, "i") } },
+              { phoneNumber: { $regex: new RegExp(filter, "i") } },
+            ],
+            $or: [{ inside: true }, { organ: user.organ }],
+          })
+          .skip(startIndex)
+          .limit(limit)
+          .sort({ createdAt: -1 });
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.GET_200(
@@ -272,7 +305,7 @@ var organizationService = {
               Constants.String.Organization._
             ),
           };
-      }
+      } else delete data.organ;
       const newItem = await model.create(data);
       return {
         status: Constants.ApiCode.SUCCESS,
@@ -469,7 +502,7 @@ var organizationService = {
       if (data.organ && data.organ === findItem._id + "")
         return {
           status: Constants.ApiCode.NOT_ACCEPTABLE,
-          message: Constants.String.Message.ERR_406,
+          message: Constants.String.Message.ERR_406 + "1",
         };
       const listSubOrgan = await model.find({ organ: findItem._id }, "_id");
       var flag = false;

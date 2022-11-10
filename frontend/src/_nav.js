@@ -104,6 +104,17 @@ const _nav = [
     ],
   },
   {
+    component: CNavItem,
+    name: {
+      vi: vn.Organization.NAME,
+      en: en.Organization.NAME,
+    },
+    role: [0, 1],
+    right: Strings.Common.READ_CATEGORIES,
+    to: Screens.ORGANIZATION,
+    icon: <FaObjectGroup className="nav-icon" />,
+  },
+  {
     component: CNavTitle,
     name: {
       vi: 'Chức năng quản trị',

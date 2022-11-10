@@ -10,7 +10,7 @@ var organizationController = {
    */
   getList: async (req, res, next) => {
     try {
-      const result = await service.getList();
+      const result = await service.getList(req.userID);
       return res.status(result.status).json(result);
     } catch (error) {
       return next(error);
@@ -25,6 +25,7 @@ var organizationController = {
     try {
       const { pageNumber, limit, filter } = req.query;
       const result = await service.getMany(
+        req.userID,
         parseInt(limit),
         parseInt(pageNumber),
         filter
@@ -77,7 +78,7 @@ var organizationController = {
    */
   postOne: async (req, res, next) => {
     try {
-      const { name, code, emailAddress, phoneNumber, organ } = req.body;
+      const { name, code, emailAddress, phoneNumber, organ, inside } = req.body;
       if (!name)
         return res.status(Constants.ApiCode.BAD_REQUEST).json({
           status: Constants.ApiCode.BAD_REQUEST,
@@ -112,6 +113,7 @@ var organizationController = {
         emailAddress,
         phoneNumber,
         organ,
+        inside,
       });
       return res.status(result.status).json(result);
     } catch (error) {
@@ -152,13 +154,14 @@ var organizationController = {
     try {
       const { id } = req.params;
       list = id.split(".");
-      const { name, code, emailAddress, phoneNumber, organ } = req.body;
+      const { name, code, emailAddress, phoneNumber, organ, inside } = req.body;
       const result = await service.putOne(list[list.length - 1], {
         name,
         code,
         emailAddress,
         phoneNumber,
         organ,
+        inside,
       });
       return res.status(result.status).json(result);
     } catch (error) {

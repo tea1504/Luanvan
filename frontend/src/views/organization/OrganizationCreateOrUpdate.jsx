@@ -7,6 +7,7 @@ import {
   CCol,
   CContainer,
   CForm,
+  CFormCheck,
   CFormFeedback,
   CFormInput,
   CFormLabel,
@@ -50,7 +51,8 @@ export default function OrganizationCreateOrUpdate() {
     code: '',
     emailAddress: '',
     phoneNumber: '',
-    organ: '',
+    organ: loggedUser.right.scope === 0 ? '' : loggedUser.organ,
+    inside: false,
   })
   const updateState = (newState) => {
     setState((prevState) => ({
@@ -121,8 +123,8 @@ export default function OrganizationCreateOrUpdate() {
     try {
       dispatch(setLoading(true))
       setOrgan([{ label: Strings.Organization.Common.SELECT, value: -1 }])
-      const result = await service.getMany(10000, 1)
-      result.data.data.data.map((el) => {
+      const result = await service.getList()
+      result.data.data.map((el) => {
         var item = { value: el._id, label: `${el.name} (${el.code})` }
         if (id) {
           const list = id.split('.')
@@ -219,15 +221,22 @@ export default function OrganizationCreateOrUpdate() {
       try {
         dispatch(setLoading(true))
         if (!id) {
-          const result = await service.createOne(state)
+          await service.createOne(state)
           MySwal.fire({
             title: Strings.Common.SUCCESS,
             icon: 'success',
             text: Strings.Message.Create.SUCCESS,
           })
-          updateState({ name: '', code: '', emailAddress: '', phoneNumber: '', organ: '' })
+          updateState({
+            name: '',
+            code: '',
+            emailAddress: '',
+            phoneNumber: '',
+            organ: '',
+            inside: false,
+          })
         } else {
-          const result = await service.updateOne(id, state)
+          await service.updateOne(id, state)
           MySwal.fire({
             title: Strings.Common.SUCCESS,
             icon: 'success',
@@ -272,6 +281,7 @@ export default function OrganizationCreateOrUpdate() {
         emailAddress: '',
         phoneNumber: '',
         organ: '',
+        inside: false,
       })
   }
 
@@ -421,45 +431,58 @@ export default function OrganizationCreateOrUpdate() {
                       )}
                   </CFormFeedback>
                 </CCol>
-                <CCol xs={12} md={12}>
-                  <CFormLabel
-                    htmlFor={Helpers.makeID(
-                      Strings.Organization.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.ORGANIZATION),
-                    )}
-                  >
-                    {Strings.Form.FieldName.ORGANIZATION}
-                  </CFormLabel>
-                  <Select
-                    id={Helpers.makeID(
-                      Strings.Organization.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.ORGANIZATION),
-                    )}
-                    value={
-                      organ.filter((el) => el.value === state.organ).length > 0
-                        ? organ.filter((el) => el.value === state.organ)[0]
-                        : null
-                    }
-                    options={organ}
-                    placeholder={Strings.Organization.Common.SELECT}
-                    onChange={(selectedItem) => {
-                      if (selectedItem) updateState({ organ: selectedItem.value })
-                      else updateState({ organ: null })
-                    }}
-                    styles={{
-                      control: (provided) => ({
-                        ...provided,
-                        borderColor: error.organ
-                          ? Constants.Styles.ERROR_COLOR
-                          : Constants.Styles.BORDER_COLOR,
-                      }),
-                    }}
-                    isClearable
-                  />
-                  <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
-                    {error.organ && Strings.Form.Validation[error.organ](Strings.Organization.NAME)}
-                  </CFormFeedback>
-                </CCol>
+                {loggedUser.right.scope === 0 && (
+                  <CCol xs={12} md={12}>
+                    <CFormLabel
+                      htmlFor={Helpers.makeID(
+                        Strings.Organization.CODE,
+                        Helpers.propName(Strings, Strings.Form.FieldName.ORGANIZATION),
+                      )}
+                    >
+                      {Strings.Form.FieldName.ORGANIZATION}
+                    </CFormLabel>
+                    <Select
+                      id={Helpers.makeID(
+                        Strings.Organization.CODE,
+                        Helpers.propName(Strings, Strings.Form.FieldName.ORGANIZATION),
+                      )}
+                      value={
+                        organ.filter((el) => el.value === state.organ).length > 0
+                          ? organ.filter((el) => el.value === state.organ)[0]
+                          : null
+                      }
+                      options={organ}
+                      placeholder={Strings.Organization.Common.SELECT}
+                      onChange={(selectedItem) => {
+                        if (selectedItem) updateState({ organ: selectedItem.value })
+                        else updateState({ organ: null })
+                      }}
+                      styles={{
+                        control: (provided) => ({
+                          ...provided,
+                          borderColor: error.organ
+                            ? Constants.Styles.ERROR_COLOR
+                            : Constants.Styles.BORDER_COLOR,
+                        }),
+                      }}
+                      isClearable
+                    />
+                    <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
+                      {error.organ &&
+                        Strings.Form.Validation[error.organ](Strings.Organization.NAME)}
+                    </CFormFeedback>
+                  </CCol>
+                )}
+                {loggedUser.right.scope === 0 && (
+                  <CCol xs={12} md={12}>
+                    <CFormCheck
+                      id="check"
+                      checked={state.inside}
+                      onChange={() => updateState({ inside: !state.inside })}
+                      label={Strings.Organization.Common.INSIDE}
+                    />
+                  </CCol>
+                )}
               </CForm>
             </CCardBody>
             <CCardFooter>

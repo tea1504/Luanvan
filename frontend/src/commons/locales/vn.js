@@ -318,6 +318,7 @@ export default {
     CODE: 'ORGANIZATION',
     Common: {
       SELECT: '- Chọn tổ chức cấp trên (nếu có) -',
+      INSIDE: 'Tổ chức trong hệ thống',
     },
     Form: {
       ID: {
