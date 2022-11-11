@@ -109,7 +109,7 @@ const _nav = [
       vi: vn.Organization.NAME,
       en: en.Organization.NAME,
     },
-    role: [0, 1],
+    role: [1],
     right: Strings.Common.READ_CATEGORIES,
     to: Screens.ORGANIZATION,
     icon: <FaObjectGroup className="nav-icon" />,

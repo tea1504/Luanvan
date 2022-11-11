@@ -8,6 +8,19 @@ var languageController = {
    * @param {import("express").Response} res
    * @param {import("express").RequestHandler} next
    */
+  getList: async (req, res, next) => {
+    try {
+      const result = await languageService.getList(req.userID);
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
   getLanguages: async (req, res, next) => {
     try {
       const { pageNumber, limit, filter } = req.query;

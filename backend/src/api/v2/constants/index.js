@@ -50,6 +50,7 @@ const Constants = {
     Security: {
       ROOT: "/securities",
       SLASH: "/",
+      LIST: "/list",
       ID: "/:id",
       CREATE_MULTI: "/csv",
     },
@@ -63,6 +64,7 @@ const Constants = {
     Priority: {
       ROOT: "/priorities",
       SLASH: "/",
+      LIST: "/list",
       ID: "/:id",
       CREATE_MULTI: "/csv",
     },
@@ -112,6 +114,7 @@ const Constants = {
     Language: {
       ROOT: "/languages",
       SLASH: "/",
+      LIST: "/list",
       ID: "/:id",
       CREATE_MULTI: "/csv",
     },

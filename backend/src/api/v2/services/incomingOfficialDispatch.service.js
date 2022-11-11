@@ -39,7 +39,18 @@ var incomingOfficialDispatchService = {
       });
       await model.updateMany(
         { _id: { $in: [...findLatedIOD.map((el) => el._id)] } },
-        { status: lateStatus._id }
+        {
+          status: lateStatus._id,
+          $push: {
+            traceHeaderList: {
+              date: new Date(),
+              status: lateStatus._id,
+              officer: userID,
+              command: `Hệ thống phát hiện ` + lateStatus.description,
+              header: lateStatus.name,
+            },
+          },
+        }
       );
       const user = await officerModel.findById(userID, { deleted: false });
       if (!user)
@@ -121,6 +132,10 @@ var incomingOfficialDispatchService = {
           { handler: { $all: [mongoose.Types.ObjectId(userID)] } },
           { approver: userID },
         ],
+        $or: [
+          { subject: { $regex: filter } },
+          { description: { $regex: filter } },
+        ],
       });
       let startIndex = (pageNumber - 1) * limit;
       let endIndex = pageNumber * limit;
@@ -149,6 +164,10 @@ var incomingOfficialDispatchService = {
             { importer: userID },
             { handler: { $all: [mongoose.Types.ObjectId(userID)] } },
             { approver: userID },
+          ],
+          $or: [
+            { subject: { $regex: filter } },
+            { description: { $regex: filter } },
           ],
         })
         .populate("type")
@@ -192,7 +211,18 @@ var incomingOfficialDispatchService = {
       });
       await model.updateMany(
         { _id: { $in: [...findLatedIOD.map((el) => el._id)] } },
-        { status: lateStatus._id }
+        {
+          status: lateStatus._id,
+          $push: {
+            traceHeaderList: {
+              date: new Date(),
+              status: lateStatus._id,
+              officer: userID,
+              command: `Hệ thống phát hiện ` + lateStatus.description,
+              header: lateStatus.name,
+            },
+          },
+        }
       );
       const item = await model
         .findOne({ _id: id, deleted: false })
@@ -385,6 +415,7 @@ var incomingOfficialDispatchService = {
           }
         });
       }
+      console.log(data);
       const result = await model.create(data);
       return {
         status: Constants.ApiCode.SUCCESS,

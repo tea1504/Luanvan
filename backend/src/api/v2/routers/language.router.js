@@ -8,6 +8,7 @@ const readCategories = require("../middlewares/readCategories.middleware");
 const createCategories = require("../middlewares/createCategories.middleware");
 const updateCategories = require("../middlewares/updateCategories.middleware");
 const deleteCategories = require("../middlewares/deleteCategories.middleware");
+const adminMiddleware = require("./../middlewares/admin.middleware");
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -21,39 +22,47 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage });
 
+route.get(Constants.ApiPath.Language.LIST, languageController.getList);
 route.get(
   Constants.ApiPath.Language.SLASH,
+  adminMiddleware,
   readCategories,
   languageController.getLanguages
 );
 route.get(
   Constants.ApiPath.Language.ID,
+  adminMiddleware,
   readCategories,
   languageController.getLanguage
 );
 route.post(
   Constants.ApiPath.Language.SLASH,
+  adminMiddleware,
   createCategories,
   languageController.postLanguage
 );
 route.post(
   Constants.ApiPath.Language.CREATE_MULTI,
+  adminMiddleware,
   createCategories,
   upload.single("file"),
   languageController.postLanguages
 );
 route.put(
   Constants.ApiPath.Language.ID,
+  adminMiddleware,
   updateCategories,
   languageController.putLanguage
 );
 route.delete(
   Constants.ApiPath.Language.ID,
+  adminMiddleware,
   deleteCategories,
   languageController.deleteLanguage
 );
 route.delete(
   Constants.ApiPath.Language.SLASH,
+  adminMiddleware,
   deleteCategories,
   languageController.deleteLanguages
 );

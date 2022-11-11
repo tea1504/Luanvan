@@ -47,6 +47,7 @@ const Constants = {
     // Language
     GET_LANGUAGES: (limit = 10, pageNumber = 1, filter = '') =>
       `/languages?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
+    GET_LIST_LANGUAGES: `/languages/list`,
     GET_LANGUAGE: (id) => `/languages/` + id,
     CREATE_LANGUAGE: '/languages',
     CREATE_LANGUAGES: '/languages/csv',
@@ -57,6 +58,7 @@ const Constants = {
     // Security
     GET_SECURITIES: (limit = 10, pageNumber = 1, filter = '') =>
       `/securities?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
+    GET_LIST_SECURITIES: `/securities/list`,
     GET_SECURITY: (id) => `/securities/` + id,
     CREATE_SECURITY: '/securities',
     CREATE_SECURITIES: '/securities/csv',
@@ -78,6 +80,7 @@ const Constants = {
     // Priority
     GET_PRIORITIES: (limit = 10, pageNumber = 1, filter = '') =>
       `/priorities?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
+    GET_LIST_PRIORITIES: `/priorities/list`,
     GET_PRIORITY: (id) => `/priorities/` + id,
     CREATE_PRIORITY: '/priorities',
     CREATE_PRIORITIES: '/priorities/csv',

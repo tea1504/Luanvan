@@ -2,8 +2,21 @@ require("dotenv").config();
 const Constants = require("../constants");
 const securityModel = require("../models/security.model");
 const { parse } = require("csv-parse/sync");
+const showError = require("./error.service");
 
 var securityService = {
+  getList: async (userID = "") => {
+    try {
+      const result = await securityModel.find({ deleted: false }, "name");
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.GET_200(Constants.String.Security._),
+        data: result,
+      };
+    } catch (error) {
+      return showError(error);
+    }
+  },
   /**
    * @param {number} size
    * @param {number} page
@@ -150,8 +163,7 @@ var securityService = {
             data: list,
           };
         var item = { name: (records[i][0] + "").trim() };
-        if (records[i][1])
-          item.description = (records[i][1] + "").trim();
+        if (records[i][1]) item.description = (records[i][1] + "").trim();
         if (records[i][2]) item.color = (records[i][2] + "").trim();
         const securityName = await securityModel.findOne({
           name: item.name,

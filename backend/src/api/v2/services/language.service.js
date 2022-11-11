@@ -2,8 +2,24 @@ require("dotenv").config();
 const Constants = require("../constants");
 const languageModel = require("./../models/language.model");
 const { parse } = require("csv-parse/sync");
+const showError = require("./error.service");
 
 var languageService = {
+  getList: async (userID = "") => {
+    try {
+      const result = await languageModel.find(
+        { deleted: false },
+        "name notation"
+      );
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.GET_200(Constants.String.Language._),
+        data: result,
+      };
+    } catch (error) {
+      return showError(error);
+    }
+  },
   /**
    * @param {number} size
    * @param {number} page

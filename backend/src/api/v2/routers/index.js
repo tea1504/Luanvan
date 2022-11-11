@@ -31,19 +31,16 @@ route.use(
 route.use(
   Constants.ApiPath.Security.ROOT,
   authMiddleware,
-  adminMiddleware,
   securityRouter
 );
 route.use(
   Constants.ApiPath.Priority.ROOT,
   authMiddleware,
-  adminMiddleware,
   priorityRouter
 );
 route.use(
   Constants.ApiPath.Language.ROOT,
   authMiddleware,
-  adminMiddleware,
   languageRouter
 );
 route.use(

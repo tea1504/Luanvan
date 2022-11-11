@@ -2,8 +2,21 @@ require("dotenv").config();
 const Constants = require("../constants");
 const priorityModel = require("../models/priority.model");
 const { parse } = require("csv-parse/sync");
+const showError = require("./error.service");
 
 var priorityService = {
+  getList: async (userID = "") => {
+    try {
+      const result = await priorityModel.find({ deleted: false }, "name");
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.GET_200(Constants.String.Priority._),
+        data: result,
+      };
+    } catch (error) {
+      return showError(error);
+    }
+  },
   /**
    * @param {number} size
    * @param {number} page

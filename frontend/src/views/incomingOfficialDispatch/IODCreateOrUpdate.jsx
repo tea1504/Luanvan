@@ -311,8 +311,8 @@ export default function IODCreateOrUpdate() {
     try {
       dispatch(setLoading(true))
       setLang([])
-      const result = await languageService.getMany(10000, 1)
-      result.data.data.data.map((el) => {
+      const result = await languageService.getList()
+      result.data.data.map((el) => {
         var item = { value: el._id, label: `${el.name} - ${el.notation}` }
         setLang((prevState) => [...prevState, item])
       })
@@ -327,8 +327,8 @@ export default function IODCreateOrUpdate() {
     try {
       dispatch(setLoading(true))
       setPriority([])
-      const result = await priorityService.getMany(10000, 1)
-      result.data.data.data.map((el) => {
+      const result = await priorityService.getList()
+      result.data.data.map((el) => {
         var item = { value: el._id, label: `${el.name}` }
         setPriority((prevState) => [...prevState, item])
       })
@@ -343,8 +343,8 @@ export default function IODCreateOrUpdate() {
     try {
       dispatch(setLoading(true))
       setSecurity([])
-      const result = await securityService.getMany(10000, 1)
-      result.data.data.data.map((el) => {
+      const result = await securityService.getList()
+      result.data.data.map((el) => {
         var item = { value: el._id, label: `${el.name}` }
         setSecurity((prevState) => [...prevState, item])
       })
@@ -383,7 +383,10 @@ export default function IODCreateOrUpdate() {
       flag = false
       updateError({ organ: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
     }
-    if (state.code == 0) {
+    if (Helpers.isNullOrEmpty(state.code)) {
+      flag = false
+      updateError({ organ: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
+    } else if (state.code == 0) {
       flag = false
       updateError({ code: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
     }
