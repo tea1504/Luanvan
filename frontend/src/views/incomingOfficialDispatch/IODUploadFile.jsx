@@ -100,7 +100,7 @@ function IODUploadFile({
           },
         },
       })
-      updateData(JSON.parse(result.data.split('#')[1]).data)
+      updateData(JSON.parse(result.data.substring(result.data.indexOf('#') + 1)).data)
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))

@@ -61,7 +61,7 @@ function IODProgress({ data, dataTemp, updateData }) {
             },
           },
         })
-        const response = JSON.parse(result.data.split('#')[1])
+        const response = JSON.parse(result.data.substring(result.data.indexOf('#') + 1))
         console.log('response', response.data)
         dispatch(setLoading(false))
         if (response.status !== 200) {

@@ -48,6 +48,18 @@ var officialDispatch = {
         8: "",
         9: "",
       };
+      const linkImage = {
+        0: [],
+        1: [],
+        2: [],
+        3: [],
+        4: [],
+        5: [],
+        6: [],
+        7: [],
+        8: [],
+        9: [],
+      };
 
       // let result = { status: 0, data: null, message: "" };
 
@@ -233,6 +245,10 @@ var officialDispatch = {
               checkError = true;
               break;
             }
+            linkImage[predict].push({
+              link: link.substring(link.indexOf("temp")),
+              ocr: result.data,
+            });
             resultPredict[predict] =
               result.data + "\n" + resultPredict[predict];
           }
@@ -247,12 +263,18 @@ var officialDispatch = {
       }
 
       if (result.status === 200 || true) {
-        result = await service.processOD(req.userID, resultPredict);
+        result = await service.processOD(
+          req.userID,
+          resultPredict,
+          totalPage,
+          linkImage,
+          savePath
+        );
         res.write(`|${count++}/${max}`);
       }
 
       fs.unlinkSync(file.path);
-      fs.rmdirSync(savePath, { recursive: true, force: true });
+      // fs.rmdirSync(savePath, { recursive: true, force: true });
       res.write("#");
 
       return res.status(result.status).end(JSON.stringify(result));

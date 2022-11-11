@@ -36,10 +36,11 @@ export default [
     name: Strings.Form.FieldName.ARRIVAL_NUMBER,
     selector: (row) => row.arrivalNumber,
     sortable: true,
+    maxWidth: '50px',
   },
   {
     name: Strings.Form.FieldName.CODE(),
-    selector: (row) =>
+    cell: (row) =>
       Helpers.getMaVanBan(
         row.code,
         row.organ.code,
@@ -51,14 +52,13 @@ export default [
   },
   {
     name: Strings.Form.FieldName.SUBJECT(),
-    cell: (row) => (
-      <div title={row.subject}>{Helpers.trimString(Helpers.htmlDecode(row.subject), 80)}</div>
-    ),
+    cell: (row) => row.subject,
     sortable: true,
+    minWidth: '400px',
   },
   {
     name: Strings.Form.FieldName.ORGANIZATION_IOD,
-    selector: (row) => row.organ.name,
+    cell: (row) => row.organ.name,
     sortable: true,
   },
   {

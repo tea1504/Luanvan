@@ -218,7 +218,7 @@ const ActionButton = ({ data }) => {
           </CButton>
         </CTooltip>
       )}
-      {loggedUser.right[Strings.Common.UPDATE_OD] && ['PENDING'].includes(data.status.name) && (
+      {loggedUser.right[Strings.Common.UPDATE_OD] && ['PENDING'].includes(data.status.name) ? (
         <CTooltip content={Strings.Common.EDIT}>
           <CButton
             size="sm"
@@ -243,15 +243,23 @@ const ActionButton = ({ data }) => {
             <FaPenSquare style={{ color: 'whitesmoke' }} />
           </CButton>
         </CTooltip>
+      ) : (
+        <CButton size="sm" color="dark" className="m-1" disabled>
+          <FaPenSquare style={{ color: 'whitesmoke' }} />
+        </CButton>
       )}
       {loggedUser.right[Strings.Common.DELETE_OD] &&
-        ['PENDING', 'REFUSE', 'LATE'].includes(data.status.name) && (
-          <CTooltip content={Strings.Common.DELETE}>
-            <CButton size="sm" color="danger" className="m-1" onClick={handleDeleteButton}>
-              <FaTrash style={{ color: 'whitesmoke' }} />
-            </CButton>
-          </CTooltip>
-        )}
+      ['PENDING', 'REFUSE', 'LATE'].includes(data.status.name) ? (
+        <CTooltip content={Strings.Common.DELETE}>
+          <CButton size="sm" color="danger" className="m-1" onClick={handleDeleteButton}>
+            <FaTrash style={{ color: 'whitesmoke' }} />
+          </CButton>
+        </CTooltip>
+      ) : (
+        <CButton size="sm" color="dark" className="m-1" disabled>
+          <FaTrash style={{ color: 'whitesmoke' }} />
+        </CButton>
+      )}
       {loggedUser.right[Strings.Common.APPROVE_OD] &&
         ['PENDING'].includes(data.status.name) &&
         data.approver.code === loggedUser.code && (

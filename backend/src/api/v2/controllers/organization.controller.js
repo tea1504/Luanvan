@@ -61,6 +61,7 @@ var organizationController = {
       const { pageNumber, limit, filter } = req.query;
       list = id.split(".");
       const result = await service.getManyByOrganId(
+        req.userID,
         list[list.length - 1],
         parseInt(limit),
         parseInt(pageNumber),

@@ -17,6 +17,7 @@ import {
   CModalHeader,
   CRow,
   CSpinner,
+  CTooltip,
   CWidgetStatsF,
 } from '@coreui/react'
 import React, { useEffect, useState } from 'react'
@@ -51,6 +52,7 @@ import {
   FaFileWord,
   FaImage,
   FaMinusSquare,
+  FaPlusCircle,
   FaRegFilePdf,
   FaTrash,
   FaVectorSquare,
@@ -59,6 +61,8 @@ import IODProgress from './IODProgress'
 import IODUploadFile from './IODUploadFile'
 import { Resizable } from 're-resizable'
 import ODPreview from '../officialDispatch/ODPreview'
+import OrganizationCreateFromIOD from './OrganizationCreateFromIOD'
+import IODChoose from './IODChoose'
 
 const service = new IODService()
 const organizationService = new OrganizationService()
@@ -146,10 +150,13 @@ export default function IODCreateOrUpdate() {
   const [priority, setPriority] = useState([])
   const [security, setSecurity] = useState([])
   const [officer, setOfficer] = useState([])
+  const [predict, setPredict] = useState({})
   const [link, setLink] = useState('')
   const [visible, setVisible] = useState({
     process: false,
     init: Helpers.isNullOrEmpty(id),
+    addOrgan: false,
+    choose: false,
   })
   const updateVisible = (newState) => {
     setVisible((prevState) => ({
@@ -222,8 +229,8 @@ export default function IODCreateOrUpdate() {
   }
 
   const update = async (dataFormServer) => {
-    updateState(dataFormServer)
-    setVisible({ init: false, process: false })
+    setPredict(dataFormServer)
+    setVisible({ init: false, process: false, choose: true })
   }
 
   const showError = (error) => {
@@ -739,29 +746,43 @@ export default function IODCreateOrUpdate() {
                     {Strings.Form.FieldName.ORGANIZATION_IOD}{' '}
                     <Required mes={Strings.Form.Validation.REQUIRED()} />
                   </CFormLabel>
-                  <Select
-                    id={Helpers.makeID(Strings.Officer.CODE, Strings.Organization.CODE)}
-                    value={
-                      organ.filter((el) => el.value === state.organ).length > 0
-                        ? organ.filter((el) => el.value === state.organ)[0]
-                        : null
-                    }
-                    options={organ}
-                    placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_ORGANIZATION}
-                    onChange={(selectedItem) => {
-                      if (selectedItem) updateState({ organ: selectedItem.value })
-                      else updateState({ organ: null })
-                    }}
-                    styles={{
-                      control: (provided) => ({
-                        ...provided,
-                        borderColor: error.organ
-                          ? Constants.Styles.ERROR_COLOR
-                          : Constants.Styles.BORDER_COLOR,
-                      }),
-                    }}
-                    isClearable={Helpers.isNullOrEmpty(id)}
-                  />
+                  <CRow>
+                    <CCol xs={12} sm={11}>
+                      <Select
+                        id={Helpers.makeID(Strings.Officer.CODE, Strings.Organization.CODE)}
+                        value={
+                          organ.filter((el) => el.value === state.organ).length > 0
+                            ? organ.filter((el) => el.value === state.organ)[0]
+                            : null
+                        }
+                        options={organ}
+                        placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_ORGANIZATION}
+                        onChange={(selectedItem) => {
+                          if (selectedItem) updateState({ organ: selectedItem.value })
+                          else updateState({ organ: null })
+                        }}
+                        styles={{
+                          control: (provided) => ({
+                            ...provided,
+                            borderColor: error.organ
+                              ? Constants.Styles.ERROR_COLOR
+                              : Constants.Styles.BORDER_COLOR,
+                          }),
+                        }}
+                        isClearable={Helpers.isNullOrEmpty(id)}
+                      />
+                    </CCol>
+                    <CCol xs={12} sm={1}>
+                      <CTooltip content={Strings.Organization.Common.ADD}>
+                        <CButton
+                          className="w-100"
+                          onClick={() => updateVisible({ addOrgan: true })}
+                        >
+                          <FaPlusCircle />
+                        </CButton>
+                      </CTooltip>
+                    </CCol>
+                  </CRow>
                   <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
                     {error.organ && Strings.Form.Validation[error.organ](Strings.Organization.NAME)}
                   </CFormFeedback>
@@ -1298,6 +1319,37 @@ export default function IODCreateOrUpdate() {
             handleInputFileOnChange={handleInputFileOnChange}
             updateData={update}
             handleDeleteFile={handleDeleteFile}
+          />
+        </CModalBody>
+      </CModal>
+      <CModal
+        alignment="center"
+        size="xl"
+        visible={visible.choose}
+        onClose={() => {
+          updateVisible({ choose: false })
+        }}
+        // fullscreen
+      >
+        <CModalHeader>Kết quả trích xuất</CModalHeader>
+        <CModalBody>
+          <IODChoose predict={predict} updateData={updateState} />
+        </CModalBody>
+      </CModal>
+      <CModal
+        alignment="center"
+        size="xl"
+        visible={visible.addOrgan}
+        onClose={() => {
+          updateVisible({ addOrgan: false })
+        }}
+      >
+        <CModalHeader>{Strings.Organization.Common.ADD}</CModalHeader>
+        <CModalBody>
+          <OrganizationCreateFromIOD
+            updateVisible={updateVisible}
+            getOrganization={getOrganization}
+            updateOrgan={updateState}
           />
         </CModalBody>
       </CModal>

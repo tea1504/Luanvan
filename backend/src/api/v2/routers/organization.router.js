@@ -33,7 +33,7 @@ route.get(
 );
 route.get(
   Constants.ApiPath.Organization.ORGAN_ID,
-  admin,
+  // admin,
   readCategories,
   organizationController.getManyByOrganId
 );
@@ -45,7 +45,6 @@ route.get(
 );
 route.post(
   Constants.ApiPath.Organization.SLASH,
-  admin,
   createCategories,
   organizationController.postOne
 );
@@ -64,13 +63,11 @@ route.put(
 );
 route.delete(
   Constants.ApiPath.Organization.ID,
-  admin,
   deleteCategories,
   organizationController.deleteOne
 );
 route.delete(
   Constants.ApiPath.Organization.SLASH,
-  admin,
   deleteCategories,
   organizationController.deleteMany
 );

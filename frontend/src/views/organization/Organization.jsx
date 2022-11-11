@@ -283,6 +283,14 @@ export default function Organization() {
                     progressPending={loading}
                     expandableRows={true}
                     expandableRowsComponent={ExpandedComponent}
+                    selectableRowDisabled={(row) =>
+                      !(
+                        loggedUser.right[Strings.Common.DELETE_CATEGORIES] &&
+                        (loggedUser.right.scope === 0
+                          ? row.inside || row.organ == loggedUser.organ
+                          : !row.inside)
+                      )
+                    }
                   />
                 </CCol>
               </CRow>

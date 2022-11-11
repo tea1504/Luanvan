@@ -151,31 +151,39 @@ const ActionButton = ({ data }) => {
         </CTooltip>
       )}
       {loggedUser.right[Strings.Common.UPDATE_CATEGORIES] &&
-        (loggedUser.right.scope === 0
-          ? data.inside || data.organ == loggedUser.organ
-          : !data.inside && data._id != loggedUser.organ) && (
-          <CTooltip content={Strings.Common.EDIT}>
-            <CButton
-              color="warning"
-              className="m-1"
-              onClick={() =>
-                navigate(Screens.ORGANIZATION_UPDATE(`${Helpers.toSlug(data.name)}.${data._id}`))
-              }
-            >
-              <FaPenSquare style={{ color: 'whitesmoke' }} />
-            </CButton>
-          </CTooltip>
-        )}
+      (loggedUser.right.scope === 0
+        ? data.inside || data.organ == loggedUser.organ
+        : !data.inside) ? (
+        <CTooltip content={Strings.Common.EDIT}>
+          <CButton
+            color="warning"
+            className="m-1"
+            onClick={() =>
+              navigate(Screens.ORGANIZATION_UPDATE(`${Helpers.toSlug(data.name)}.${data._id}`))
+            }
+          >
+            <FaPenSquare style={{ color: 'whitesmoke' }} />
+          </CButton>
+        </CTooltip>
+      ) : (
+        <CButton color="dark" className="m-1" disabled>
+          <FaPenSquare style={{ color: 'whitesmoke' }} />
+        </CButton>
+      )}
       {loggedUser.right[Strings.Common.DELETE_CATEGORIES] &&
-        (loggedUser.right.scope === 0
-          ? data.inside || data.organ == loggedUser.organ
-          : !data.inside && data._id != loggedUser.organ) && (
-          <CTooltip content={Strings.Common.DELETE}>
-            <CButton color="danger" className="m-1" onClick={handleDeleteButton}>
-              <FaTrash style={{ color: 'whitesmoke' }} />
-            </CButton>
-          </CTooltip>
-        )}
+      (loggedUser.right.scope === 0
+        ? data.inside || data.organ == loggedUser.organ
+        : !data.inside) ? (
+        <CTooltip content={Strings.Common.DELETE}>
+          <CButton color="danger" className="m-1" onClick={handleDeleteButton}>
+            <FaTrash style={{ color: 'whitesmoke' }} />
+          </CButton>
+        </CTooltip>
+      ) : (
+        <CButton color="dark" className="m-1" disabled>
+          <FaTrash style={{ color: 'whitesmoke' }} />
+        </CButton>
+      )}
     </div>
   )
 }

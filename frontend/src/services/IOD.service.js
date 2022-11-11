@@ -34,6 +34,7 @@ class IODService extends BaseService {
   //   return result
   // }
   async createOne(data) {
+    data.subject = Helpers.htmlDecode(data.subject)
     var formData = new FormData()
     Object.keys(data).forEach((el) => data[el] === null && delete data[el])
     for (const [key, value] of Object.entries(data)) {

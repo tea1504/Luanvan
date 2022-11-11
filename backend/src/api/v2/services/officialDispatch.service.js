@@ -11,6 +11,7 @@ const Tesseract = require("tesseract.js");
 const organizationModel = require("../models/organization.model");
 const officerModel = require("../models/officer.model");
 const typeModel = require("../models/type.model");
+const languageModel = require("../models/language.model");
 
 const worker = Tesseract.createWorker({
   logger: (m) => console.log(m),
@@ -26,9 +27,10 @@ global.HTMLImageElement = Image;
 const mm2px = 12;
 
 var officialDispatchService = {
-  processOD: async (userID, resultPredict) => {
+  processOD: async (userID, resultPredict, pageAmount, linkImage, savePath) => {
     const user = await officerModel.findById(userID);
-    // console.log(resultPredict);
+    const vn = await languageModel.findOne({ notation: "vn" });
+    console.log(resultPredict);
     let _organ = officialDispatchService.getOrgan(resultPredict[2]);
     let _code = officialDispatchService.getCode(resultPredict[3]);
     let _date = officialDispatchService.getDate(resultPredict[4]);
@@ -59,23 +61,34 @@ var officialDispatchService = {
       _signer.data
     );
 
-    console.log(typeFromCode, typeFromName);
-
     return {
       status: Constants.ApiCode.SUCCESS,
       message: Constants.String.Message.GET_200(Constants.String.IOD._),
       data: {
         code: _code.data.code,
         issuedDate: timeFromDate.getTime(),
-        subject: _type.data.subject || _code.data.subject,
-        type: typeFromCode || typeFromName,
-        language: "6c616e677561676530303031",
-        pageAmount: 2,
-        description: "",
+        subject: _type.data.subject,
+        subjectFromCode: _code.data.subject,
+        typeFromCode: typeFromCode,
+        typeFromName: typeFromName,
+        language: vn._id.toString(),
+        pageAmount: pageAmount,
         signerInfoName: signerName,
         signerInfoPosition: signerPosition,
-        organ: organFromCode || organFromName,
-        predict: { _code, _organ, _type, _date, _send, _signer },
+        organFromCode: organFromCode,
+        organFromName: organFromName,
+        predict: {
+          code: linkImage[3],
+          issuedDate: linkImage[4],
+          subject: linkImage[5],
+          subjectFromCode: linkImage[3],
+          typeFromCode: linkImage[3],
+          typeFromName: linkImage[5],
+          signerInfoName: linkImage[7],
+          signerInfoPosition: linkImage[7],
+          organFromCode: linkImage[3],
+          organFromName: linkImage[2],
+        },
       },
     };
   },
@@ -122,13 +135,12 @@ var officialDispatchService = {
     let rand = 0;
     organ.map((el) => {
       const r = officialDispatchService.check(el.name, organName);
-      console.log(r);
       if (r > rand) {
         rand = r;
         organSelectedFromName = el;
       }
     });
-    if (organSelectedFromName) return organSelectedFromName._id.toString();
+    if (organSelectedFromName) return organSelectedFromName;
     else return null;
   },
 
@@ -140,13 +152,12 @@ var officialDispatchService = {
     let rand = 0;
     organ.map((el) => {
       const r = officialDispatchService.check(el.code, organCode);
-      console.log(r);
       if (r > rand) {
         rand = r;
         organSelectedFromCode = el;
       }
     });
-    if (organSelectedFromCode) return organSelectedFromCode._id.toString();
+    if (organSelectedFromCode) return organSelectedFromCode;
     else return null;
   },
 
@@ -156,13 +167,12 @@ var officialDispatchService = {
     let rand = 0;
     type.map((el) => {
       const r = officialDispatchService.check(el.name, typeName);
-      console.log(r);
       if (r > rand) {
         rand = r;
         typeSelectedFromName = el;
       }
     });
-    if (typeSelectedFromName) return typeSelectedFromName._id.toString();
+    if (typeSelectedFromName) return typeSelectedFromName;
     else return null;
   },
 
@@ -172,18 +182,16 @@ var officialDispatchService = {
     let rand = 0;
     type.map((el) => {
       const r = officialDispatchService.check(el.notation, typeCode);
-      console.log(r);
       if (r > rand) {
         rand = r;
         typeSelectedFromCode = el;
       }
     });
-    if (typeSelectedFromCode) return typeSelectedFromCode._id.toString();
+    if (typeSelectedFromCode) return typeSelectedFromCode;
     else return null;
   },
 
   check: (str = "", pattern = "") => {
-    console.log(str, pattern);
     const len = str.length;
     const r = str.length >= pattern.length ? 0 : pattern.length - str.length;
     str = officialDispatchService.toSlug(str);
@@ -285,7 +293,7 @@ var officialDispatchService = {
       if (month) result.month = month[1];
       let date = /ngay(\d{1,2})/.exec(str);
       if (date) result.date = date[1];
-      result.other = str.match(/\d+/g);
+      result.other = str.match(/\d+/g) || [];
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.GET_200(),

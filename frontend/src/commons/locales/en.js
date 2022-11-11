@@ -319,6 +319,7 @@ export default {
     Common: {
       SELECT: '- Chọn tổ chức cấp trên (nếu có) -',
       INSIDE: 'Tổ chức trong hệ thống',
+      ADD: 'Thêm mới tổ chức',
     },
     Form: {
       ID: {

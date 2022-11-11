@@ -63,7 +63,7 @@ var organizationService = {
             { emailAddress: { $regex: new RegExp(filter, "i") } },
             { phoneNumber: { $regex: new RegExp(filter, "i") } },
           ],
-          $or: [{ inside: true }, { organ: user.organ }],
+          organ: user.organ,
         });
       let startIndex = (pageNumber - 1) * limit;
       let endIndex = pageNumber * limit;
@@ -106,7 +106,7 @@ var organizationService = {
               { emailAddress: { $regex: new RegExp(filter, "i") } },
               { phoneNumber: { $regex: new RegExp(filter, "i") } },
             ],
-            $or: [{ inside: true }, { organ: user.organ }],
+            organ: user.organ,
           })
           .skip(startIndex)
           .limit(limit)
@@ -171,7 +171,13 @@ var organizationService = {
    * @param {string} filter
    * @returns {import("./../interfaces").ResponseResult}
    */
-  getManyByOrganId: async (id, limit = 10, pageNumber = 1, filter = "") => {
+  getManyByOrganId: async (
+    userID = "",
+    id,
+    limit = 10,
+    pageNumber = 1,
+    filter = ""
+  ) => {
     try {
       const item = await model.findOne({ _id: id, deleted: false });
       if (!item)
