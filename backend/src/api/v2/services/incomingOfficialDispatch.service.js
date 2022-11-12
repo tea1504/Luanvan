@@ -971,8 +971,11 @@ var incomingOfficialDispatchService = {
       return showError(error);
     }
   },
-  report: async (userID = "") => {
+  report: async (userID = "", start = 0, end = 0) => {
     try {
+      const startDate = new Date(parseInt(start));
+      const endDate = new Date(parseInt(end));
+      console.log(startDate, endDate);
       const user = await officerModel.findById(userID, { deleted: false });
       if (!user)
         return {
@@ -986,14 +989,19 @@ var incomingOfficialDispatchService = {
       const result = await model.aggregate([
         {
           $project: {
-            year: { $year: "$arrivalDate" },
+            arrivalDate: "$arrivalDate",
+            importer: "$importer",
             organ: 1,
             status: 1,
           },
         },
         {
           $match: {
-            year: { $eq: 2022 },
+            importer: { $in: [...listUser].map((el) => el._id) },
+            arrivalDate: {
+              $gte: endDate,
+              $lte: startDate,
+            },
           },
         },
         {
@@ -1021,19 +1029,11 @@ var incomingOfficialDispatchService = {
             as: "organ_",
           },
         },
-        {
-          $lookup: {
-            from: "status",
-            localField: "status",
-            foreignField: "_id",
-            as: "status_",
-          },
-        },
       ]);
       return {
         status: Constants.ApiCode.SUCCESS,
-        message: Constants.String.Message.DELETE_200(Constants.String.IOD._),
-        data: { c: result.length, result },
+        message: Constants.String.Message.GET_200(Constants.String.IOD._),
+        data: result,
       };
     } catch (error) {
       return showError(error);

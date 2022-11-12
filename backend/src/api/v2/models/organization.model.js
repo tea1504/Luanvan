@@ -28,10 +28,10 @@ const organizationSchema = new mongoose.Schema(
         10,
         Constants.String.Message.MAX_LENGTH(Constants.String.Organization.CODE),
       ],
-      unique: [
-        true,
-        Constants.String.Message.UNIQUE(Constants.String.Organization.CODE),
-      ],
+      // unique: [
+      //   true,
+      //   Constants.String.Message.UNIQUE(Constants.String.Organization.CODE),
+      // ],
     },
     emailAddress: {
       type: String,
@@ -41,12 +41,12 @@ const organizationSchema = new mongoose.Schema(
           Constants.String.Organization.EMAIL_ADDRESS
         ),
       ],
-      unique: [
-        true,
-        Constants.String.Message.UNIQUE(
-          Constants.String.Organization.EMAIL_ADDRESS
-        ),
-      ],
+      // unique: [
+      //   true,
+      //   Constants.String.Message.UNIQUE(
+      //     Constants.String.Organization.EMAIL_ADDRESS
+      //   ),
+      // ],
       maxLength: [
         200,
         Constants.String.Message.MAX_LENGTH(
@@ -68,12 +68,12 @@ const organizationSchema = new mongoose.Schema(
           Constants.String.Organization.PHONE_NUMBER
         ),
       ],
-      unique: [
-        true,
-        Constants.String.Message.UNIQUE(
-          Constants.String.Organization.PHONE_NUMBER
-        ),
-      ],
+      // unique: [
+      //   true,
+      //   Constants.String.Message.UNIQUE(
+      //     Constants.String.Organization.PHONE_NUMBER
+      //   ),
+      // ],
       maxLength: [
         10,
         Constants.String.Message.MAX_LENGTH(

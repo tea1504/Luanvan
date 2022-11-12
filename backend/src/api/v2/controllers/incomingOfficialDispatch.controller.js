@@ -367,7 +367,9 @@ var incomingOfficialDispatchController = {
    */
   report: async (req, res, next) => {
     try {
-      const result = await service.report(req.userID);
+      const { end, start } = req.query;
+      console.log(req.query);
+      const result = await service.report(req.userID, start, end);
       return res.status(result.status).json(result);
     } catch (error) {
       return next(error);
