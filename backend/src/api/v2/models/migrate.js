@@ -21,6 +21,7 @@ const officerStatusData = require("./data/officerStatus.data");
 const statusData = require("./data/status.data");
 const officerData = require("./data/officer.data");
 const IODData = require("./data/IOD.data");
+const ODTData = require("./data/ODT.data");
 
 async function start() {
   console.log("Preparing ...");
@@ -63,79 +64,10 @@ async function start() {
   console.log("Migrate Incoming Official Dispatch");
   await _IOD.deleteMany();
   await _IOD.create(IODData);
-  
+
   console.log("Migrate Official Dispatch Travel");
-  {
-    await _ODT.deleteMany();
-    await _ODT.create([
-      {
-        _id: "ODT000000001",
-        code: 1,
-        issuedDate: Date.now(),
-        subject: "Subject",
-        type: "type00000001",
-        language: "language0001",
-        pageAmount: 1,
-        signerInfoName: "Tên Người Ký",
-        signerInfoPosition: "Giám đốc",
-        dueDate: Date.now(),
-        issuedAmount: 1,
-        priority: "priority0001",
-        security: "security0001",
-        organ: "dhct00000000",
-        approver: "officer00001",
-        importer: "officer00001",
-        status: "status000007",
-        file: [
-          {
-            name: "123",
-            path: "123",
-            type: "1234",
-            size: 123456,
-          },
-          {
-            name: "123",
-            path: "123",
-            type: "1234",
-            size: 123456,
-          },
-        ],
-      },
-      {
-        _id: "ODT000000002",
-        code: 2,
-        issuedDate: Date.now(),
-        subject: "Subject",
-        type: "type00000001",
-        language: "language0001",
-        pageAmount: 1,
-        signerInfoName: "Tên Người Ký",
-        signerInfoPosition: "Giám đốc",
-        dueDate: Date.now(),
-        issuedAmount: 1,
-        priority: "priority0001",
-        security: "security0001",
-        organ: "dhct00000000",
-        approver: "officer00001",
-        importer: "officer00001",
-        status: "status000007",
-        file: [
-          {
-            name: "123",
-            path: "123",
-            type: "1234",
-            size: 123456,
-          },
-          {
-            name: "123",
-            path: "123",
-            type: "1234",
-            size: 123456,
-          },
-        ],
-      },
-    ]);
-  }
+  await _ODT.deleteMany();
+  await _ODT.create(ODTData);
 
   console.log("Done");
 }

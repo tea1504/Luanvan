@@ -128,14 +128,16 @@ const officialDispatchTravelSchema = new mongoose.Schema(
         Constants.String.Message.REQUIRED(Constants.String.ODT.SECURITY),
       ],
     },
-    organ: {
-      type: mongoose.ObjectId,
-      ref: "organizations",
-      required: [
-        true,
-        Constants.String.Message.REQUIRED(Constants.String.ODT.ORGAN),
-      ],
-    },
+    organ: [
+      {
+        type: mongoose.ObjectId,
+        ref: "organizations",
+        required: [
+          true,
+          Constants.String.Message.REQUIRED(Constants.String.ODT.ORGAN),
+        ],
+      },
+    ],
     importer: {
       type: mongoose.ObjectId,
       ref: "officers",

@@ -139,9 +139,14 @@ class IODService extends BaseService {
     return result
   }
   async report(start, end) {
-    console.log({ start, end })
     const result = await this.api.get({
       path: Constants.ApiPath.REPORT_IOD(start, end),
+    })
+    return result
+  }
+  async getYearReport() {
+    const result = await this.api.get({
+      path: Constants.ApiPath.REPORT_YEAR_IOD,
     })
     return result
   }

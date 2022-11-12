@@ -32,6 +32,10 @@ route.get(
   controller.report
 );
 route.get(
+  Constants.ApiPath.IncomingOfficialDispatch.REPORT_YEAR,
+  controller.getYearReport
+);
+route.get(
   Constants.ApiPath.IncomingOfficialDispatch.SLASH,
   readOD,
   controller.getManyByUserOrgan

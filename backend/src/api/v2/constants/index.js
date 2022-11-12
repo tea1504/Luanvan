@@ -99,6 +99,7 @@ const Constants = {
       ROOT: "/incoming-official-dispatch",
       SLASH: "/",
       REPORT: "/report",
+      REPORT_YEAR: "/report/year",
     },
     OfficerStatus: {
       ROOT: "/officer-statuses",

@@ -971,6 +971,7 @@ var incomingOfficialDispatchService = {
       return showError(error);
     }
   },
+
   report: async (userID = "", start = 0, end = 0) => {
     try {
       const startDate = new Date(parseInt(start));
@@ -999,8 +1000,8 @@ var incomingOfficialDispatchService = {
           $match: {
             importer: { $in: [...listUser].map((el) => el._id) },
             arrivalDate: {
-              $gte: endDate,
-              $lte: startDate,
+              $lte: endDate,
+              $gte: startDate,
             },
           },
         },
@@ -1027,6 +1028,46 @@ var incomingOfficialDispatchService = {
             localField: "organ",
             foreignField: "_id",
             as: "organ_",
+          },
+        },
+      ]);
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.GET_200(Constants.String.IOD._),
+        data: result,
+      };
+    } catch (error) {
+      return showError(error);
+    }
+  },
+
+  getYearReport: async (userID = "") => {
+    try {
+      const user = await officerModel.findById(userID, { deleted: false });
+      if (!user)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Officer._),
+        };
+      const listUser = await officerModel.find({
+        deleted: false,
+        organ: user.organ,
+      });
+      const result = await model.aggregate([
+        {
+          $project: {
+            year: { $year: "$arrivalDate" },
+            importer: "$importer",
+          },
+        },
+        {
+          $match: {
+            importer: { $in: [...listUser].map((el) => el._id) },
+          },
+        },
+        {
+          $group: {
+            _id: "$year",
           },
         },
       ]);

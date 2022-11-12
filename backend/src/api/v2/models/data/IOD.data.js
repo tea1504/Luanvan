@@ -67,7 +67,7 @@ const createIOD = (
   arrivalNumber,
   priorityIndex,
   securityIndex,
-  organIndex,
+  organID,
   listOfficer,
   statusIndex
 ) => {
@@ -142,7 +142,7 @@ const createIOD = (
     arrivalDate,
     priority: priorityData[priorityIndex]._id,
     security: securityData[securityIndex]._id,
-    organ: organizationData[organIndex]._id,
+    organ: organID,
     approver,
     importer,
     handler,
@@ -154,6 +154,11 @@ const createIOD = (
 
 for (var i = 0; i < organizationData.length; i++) {
   if (organizationData[i].makeData) {
+    const organ = organizationData.filter(
+      (el) =>
+        el._id !== organizationData[i]._id &&
+        (el.inside || el.organ === organizationData[i]._id)
+    );
     const listOfficer = officerData.filter(
       (el) => el.organ === organizationData[i]._id
     );
@@ -165,11 +170,8 @@ for (var i = 0; i < organizationData.length; i++) {
         timeEnd = new Date(
           new Date(year + "-1-1").getTime() + aYear * (j / randomAmount)
         );
-        let oi = Math.floor(Math.random() * organizationData.length);
-        while (oi === i)
-          oi = Math.floor(Math.random() * organizationData.length);
         let signer =
-          listOfficer[Math.floor(Math.random() * listOfficer.length)];
+          officerData[Math.floor(Math.random() * officerData.length)];
         IODData.push(
           createIOD(
             Math.floor(Math.random() * 1000 + 1),
@@ -182,7 +184,7 @@ for (var i = 0; i < organizationData.length; i++) {
             c++,
             Math.floor(Math.random() * priorityData.length),
             Math.floor(Math.random() * securityData.length),
-            oi,
+            organ[Math.floor(Math.random() * organ.length)],
             listOfficer,
             Math.floor(Math.random() * statusData.length)
           )
@@ -197,8 +199,6 @@ for (var i = 0; i < organizationData.length; i++) {
         new Date(now.getFullYear() + "-1-1").getTime() +
           aNow * (j / randomAmount)
       );
-      let oi = Math.floor(Math.random() * organizationData.length);
-      while (oi === i) oi = Math.floor(Math.random() * organizationData.length);
       let signer = listOfficer[Math.floor(Math.random() * listOfficer.length)];
       IODData.push(
         createIOD(
@@ -212,7 +212,7 @@ for (var i = 0; i < organizationData.length; i++) {
           c++,
           Math.floor(Math.random() * priorityData.length),
           Math.floor(Math.random() * securityData.length),
-          oi,
+          organ[Math.floor(Math.random() * organ.length)],
           listOfficer,
           Math.floor(Math.random() * statusData.length)
         )

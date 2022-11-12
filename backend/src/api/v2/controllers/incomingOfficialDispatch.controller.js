@@ -368,8 +368,20 @@ var incomingOfficialDispatchController = {
   report: async (req, res, next) => {
     try {
       const { end, start } = req.query;
-      console.log(req.query);
       const result = await service.report(req.userID, start, end);
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
+  getYearReport: async (req, res, next) => {
+    try {
+      const result = await service.getYearReport(req.userID);
       return res.status(result.status).json(result);
     } catch (error) {
       return next(error);
