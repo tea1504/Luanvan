@@ -27,6 +27,11 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage });
 
 route.get(
+  Constants.ApiPath.IncomingOfficialDispatch.REPORT,
+  createOD,
+  controller.report
+);
+route.get(
   Constants.ApiPath.IncomingOfficialDispatch.SLASH,
   readOD,
   controller.getManyByUserOrgan

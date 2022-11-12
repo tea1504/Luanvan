@@ -44,6 +44,9 @@ const IODCreateOrUpdate = React.lazy(() =>
 const IODDetail = React.lazy(() => import('./views/incomingOfficialDispatch/IODDetail'))
 const IODApproval = React.lazy(() => import('./views/incomingOfficialDispatch/IODApproval'))
 const IODHandle = React.lazy(() => import('./views/incomingOfficialDispatch/IODHandle'))
+const IODReport = React.lazy(() => import('./views/incomingOfficialDispatch/IODReport'))
+const IODStatistic = React.lazy(() => import('./views/incomingOfficialDispatch/IODStatistic'))
+const ODReport = React.lazy(() => import('./views/officialDispatch/ODReport'))
 const User = React.lazy(() => import('./views/user/User'))
 const UserChangePassword = React.lazy(() => import('./views/user/UserChangePassword'))
 
@@ -376,6 +379,27 @@ const routes = [
     path: Screens.IOD_LIST_(),
     name: { vi: vn.IncomingOfficialDispatch.NAME, en: en.IncomingOfficialDispatch.NAME },
     element: IOD,
+    exact: true,
+    role: [0, 1],
+  },
+  {
+    path: Screens.OD_REPORT,
+    name: { vi: vn.Common.REPORT, en: en.Common.REPORT },
+    element: ODReport,
+    exact: true,
+    role: [0, 1],
+  },
+  {
+    path: Screens.OD_REPORT_IOD_REPORT,
+    name: { vi: vn.Common.REPORT, en: en.Common.REPORT },
+    element: IODReport,
+    exact: true,
+    role: [0, 1],
+  },
+  {
+    path: Screens.OD_REPORT_IOD_STATISTIC,
+    name: { vi: vn.Common.REPORT, en: en.Common.REPORT },
+    element: IODStatistic,
     exact: true,
     role: [0, 1],
   },

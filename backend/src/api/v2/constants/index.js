@@ -98,6 +98,7 @@ const Constants = {
       REFUSE: "/refuse/:id",
       ROOT: "/incoming-official-dispatch",
       SLASH: "/",
+      REPORT: "/report",
     },
     OfficerStatus: {
       ROOT: "/officer-statuses",

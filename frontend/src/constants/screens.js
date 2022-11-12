@@ -83,6 +83,11 @@ const Screens = {
   LATE: 'van-ban-da-tre-han-xu-ly',
   REFUSE: 'van-ban-bi-tu-choi',
 
+  // Official Dispatch
+  OD_REPORT: '/bao-cao-thong-ke',
+  OD_REPORT_IOD_STATISTIC: '/bao-cao-thong-ke/thong-ke-van-ban-den',
+  OD_REPORT_IOD_REPORT: '/bao-cao-thong-ke/bao-cao-van-ban-den',
+
   // user
   OFFICER_INFO: '/officer',
   USER_CHANGE_PASSWORD: '/officer/change-password',

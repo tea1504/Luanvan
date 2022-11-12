@@ -18,7 +18,7 @@ export default [
       Helpers.formatDateFromString(row.arrivalDate, {
         year: 'numeric',
         month: '2-digit',
-        day: 'numeric',
+        day: '2-digit',
       }),
     sortable: true,
   },
@@ -28,7 +28,7 @@ export default [
       Helpers.formatDateFromString(row.issuedDate, {
         year: 'numeric',
         month: '2-digit',
-        day: 'numeric',
+        day: '2-digit',
       }),
     sortable: true,
   },

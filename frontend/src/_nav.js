@@ -6,6 +6,7 @@ import Screens from './constants/screens'
 import vn from './commons/locales/vn'
 import en from './commons/locales/en'
 import {
+  FaChartArea,
   FaFile,
   FaFileImport,
   FaHome,
@@ -113,6 +114,17 @@ const _nav = [
     right: Strings.Common.READ_CATEGORIES,
     to: Screens.ORGANIZATION,
     icon: <FaObjectGroup className="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: {
+      vi: vn.Common.REPORT,
+      en: en.Common.REPORT,
+    },
+    role: [0, 1],
+    right: Strings.Common.CREATE_OD,
+    to: Screens.OD_REPORT,
+    icon: <FaChartArea className="nav-icon" />,
   },
   {
     component: CNavTitle,

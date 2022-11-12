@@ -6,10 +6,17 @@ const data = [
     name: "Đại học Cần Thơ",
     code: "ĐHCT",
     inside: true,
+    makeData: true,
     sub: [
       { name: "Phòng Công tác Chính trị", code: "CTCT", inside: true, sub: [] },
       { name: "Phòng Công tác Sinh viên", code: "CTSV", inside: true, sub: [] },
-      { name: "Phòng Đào tạo", code: "ĐT", inside: true, sub: [] },
+      {
+        name: "Phòng Đào tạo",
+        code: "ĐT",
+        inside: true,
+        makeData: true,
+        sub: [],
+      },
       { name: "Phòng Hợp tác Quốc tế", code: "HTQT", sub: [] },
       { name: "Phòng Kế hoạch Tổng hợp", code: "KHTH", sub: [] },
       { name: "Phòng Quản lý Khoa học", code: "QLKH", sub: [] },
@@ -34,6 +41,7 @@ const data = [
         name: "Trường Công nghệ thông tin và Truyền thông",
         code: "CNTT&TT",
         inside: true,
+        makeData: true,
         sub: [
           { name: "Công ty TNHH ABC Chấm Com", code: "ABC", sub: [] },
           { name: "Tập đoàn tin học DEF", code: "DEF", sub: [] },

@@ -264,6 +264,12 @@ var incomingOfficialDispatchController = {
       const list = id.split(".");
       const files = req.files;
       var { newHandler, done, command, sendEmail } = req.body;
+      console.log("newHandler", newHandler);
+      console.log("done", done);
+      console.log("command", command);
+      console.log("sendEmail", sendEmail);
+      console.log("files", files);
+
       const result = await service.handle(
         list[list.length - 1],
         req.userID,
@@ -275,6 +281,8 @@ var incomingOfficialDispatchController = {
         },
         files
       );
+
+      console.log("result", result);
       return res.status(result.status).json(result);
     } catch (error) {
       return next(error);
@@ -342,10 +350,24 @@ var incomingOfficialDispatchController = {
    * @param {import("express").Request} req
    * @param {import("express").Response} res
    * @param {import("express").RequestHandler} next
-   */ deleteMany: async (req, res, next) => {
+   */
+  deleteMany: async (req, res, next) => {
     try {
       const { ids } = req.body;
       const result = await service.deleteMany(ids);
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
+  report: async (req, res, next) => {
+    try {
+      const result = await service.report(req.userID);
       return res.status(result.status).json(result);
     } catch (error) {
       return next(error);

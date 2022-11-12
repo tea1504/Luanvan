@@ -187,7 +187,7 @@ officerData.push(
 );
 
 for (var i = 0; i < organizationData.length; i++) {
-  if (organizationData[i].inside) {
+  if (organizationData[i].makeData) {
     officerData.push(
       createOfficer(
         "0".repeat(6 - (c + "").length) + c++,
@@ -218,7 +218,7 @@ for (var i = 0; i < organizationData.length; i++) {
         Math.floor(Math.random() * avatarData.length)
       )
     );
-    for (var j = 0; j < 20; j++) {
+    for (var j = 0; j < 50; j++) {
       officerData.push(
         createOfficer(
           "0".repeat(6 - (c + "").length) + c++,

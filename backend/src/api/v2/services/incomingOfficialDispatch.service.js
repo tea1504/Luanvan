@@ -657,6 +657,7 @@ var incomingOfficialDispatchService = {
     files = []
   ) => {
     try {
+      data.sendEmail = data.sendEmail.split(",");
       if (!data.command) data.command = "";
       if (!data.newHandler) data.newHandler = [];
       else if (
@@ -699,14 +700,15 @@ var incomingOfficialDispatchService = {
       });
       item.status = status._id.toString();
       item.handler.push(...data.newHandler);
-      files.map((el) => {
-        item.file.push({
-          name: el.originalname,
-          path: "uploads/" + item.security + "/" + el.filename,
-          typeFile: el.mimetype,
-          size: el.size,
+      if (files)
+        files.map((el) => {
+          item.file.push({
+            name: el.originalname,
+            path: "uploads/" + item.security + "/" + el.filename,
+            typeFile: el.mimetype,
+            size: el.size,
+          });
         });
-      });
       item.save();
       const result = await model
         .findOne({ _id: id, deleted: false })
@@ -732,7 +734,7 @@ var incomingOfficialDispatchService = {
       if (listEmail.length !== 0) {
         var mailOptions = {
           from: process.env.MAIL_USER,
-          bcc: listEmail.join(", "),
+          to: listEmail.join(", "),
           subject: "email_title",
           html: `<img src="https://imggroup.com.vn/Content/images/logo-img.png" height="100"/>
           <br/>
@@ -755,7 +757,7 @@ var incomingOfficialDispatchService = {
         data: result,
       };
     } catch (error) {
-      showError(error);
+      return showError(error);
     }
   },
   refuse: async (
@@ -964,6 +966,74 @@ var incomingOfficialDispatchService = {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.DELETE_200(Constants.String.IOD._),
         data: items,
+      };
+    } catch (error) {
+      return showError(error);
+    }
+  },
+  report: async (userID = "") => {
+    try {
+      const user = await officerModel.findById(userID, { deleted: false });
+      if (!user)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Officer._),
+        };
+      const listUser = await officerModel.find({
+        deleted: false,
+        organ: user.organ,
+      });
+      const result = await model.aggregate([
+        {
+          $project: {
+            year: { $year: "$arrivalDate" },
+            organ: 1,
+            status: 1,
+          },
+        },
+        {
+          $match: {
+            year: { $eq: 2022 },
+          },
+        },
+        {
+          $group: {
+            _id: { o: "$organ", s: "$status" },
+            status: { $first: "$status" },
+            organ: { $first: "$organ" },
+            count: { $count: {} },
+          },
+        },
+        {
+          $group: {
+            _id: "$organ",
+            status: { $push: "$status" },
+            statusCount: { $push: "$count" },
+            organ: { $first: "$organ" },
+            count: { $count: {} },
+          },
+        },
+        {
+          $lookup: {
+            from: "organizations",
+            localField: "organ",
+            foreignField: "_id",
+            as: "organ_",
+          },
+        },
+        {
+          $lookup: {
+            from: "status",
+            localField: "status",
+            foreignField: "_id",
+            as: "status_",
+          },
+        },
+      ]);
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.DELETE_200(Constants.String.IOD._),
+        data: { c: result.length, result },
       };
     } catch (error) {
       return showError(error);

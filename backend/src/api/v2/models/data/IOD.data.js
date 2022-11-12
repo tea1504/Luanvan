@@ -50,6 +50,12 @@ let s = [
   " translation by H. Rackham.",
 ];
 
+const addDay = (d, days) => {
+  date = new Date(d.getTime());
+  date.setDate(date.getDate() + days);
+  return date;
+};
+
 const createIOD = (
   code,
   subject,
@@ -65,9 +71,14 @@ const createIOD = (
   listOfficer,
   statusIndex
 ) => {
-  let issuedDate = Helpers.randomDate(timeStart, timeEnd);
-  let dueDate = Helpers.randomDate(issuedDate, timeEnd);
-  let arrivalDate = Helpers.randomDate(issuedDate, dueDate);
+  let s = Math.floor(Math.random() * 14);
+  let e = Math.floor(Math.random() * 14);
+  let issuedDate = Helpers.randomDate(addDay(timeStart, -s), timeEnd);
+  let dueDate = Helpers.randomDate(issuedDate, addDay(timeEnd, e));
+  let arrivalDate = Helpers.randomDate(
+    s < 0 ? timeStart : issuedDate,
+    e > 0 ? timeEnd : dueDate
+  );
   let file = fileData;
   let listOfficerCanApproveOD = listOfficer.filter((el) =>
     rightApproveOD.includes(el.right)
@@ -142,14 +153,14 @@ const createIOD = (
 };
 
 for (var i = 0; i < organizationData.length; i++) {
-  if (organizationData[i].inside) {
+  if (organizationData[i].makeData) {
     const listOfficer = officerData.filter(
       (el) => el.organ === organizationData[i]._id
     );
-    for (var year = 2020; year < now.getFullYear(); year++) {
+    for (var year = 2017; year < now.getFullYear(); year++) {
       let c = 1;
       timeStart = new Date(year + "-1-1");
-      let randomAmount = Math.floor(Math.random() * 10 + 10);
+      let randomAmount = Math.floor(Math.random() * 365 * 7 + 365);
       for (var j = 0; j < randomAmount; j++) {
         timeEnd = new Date(
           new Date(year + "-1-1").getTime() + aYear * (j / randomAmount)
@@ -180,7 +191,7 @@ for (var i = 0; i < organizationData.length; i++) {
     }
     let c = 1;
     timeStart = new Date(now.getFullYear() + "-1-1");
-    let randomAmount = Math.floor(Math.random() * 10 + 10);
+    let randomAmount = Math.floor(Math.random() * 365 * 3 + 365);
     for (var j = 0; j < randomAmount; j++) {
       timeEnd = new Date(
         new Date(now.getFullYear() + "-1-1").getTime() +
