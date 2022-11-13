@@ -292,7 +292,7 @@ var officialDispatchTravelService = {
       }
     }
   },
-  getNewArrivalNumber: async (userID = "") => {
+  getNewCode: async (userID = "") => {
     try {
       const date = new Date();
       const user = await officerModel.findById(userID, { deleted: false });
@@ -301,16 +301,20 @@ var officialDispatchTravelService = {
           status: Constants.ApiCode.NOT_FOUND,
           message: Constants.String.Message.ERR_404(Constants.String.Officer._),
         };
+      const listUser = await officerModel.find({
+        deleted: false,
+        organ: user.organ,
+      });
       const ODT = await model
         .findOne({
-          organ: user.organ,
-          arrivalDate: {
+          importer: { $in: [...listUser].map((el) => el._id) },
+          issuedDate: {
             $gte: new Date(date.getFullYear() + "-1-1"),
             $lte: new Date(date.getFullYear() + "-12-31"),
           },
           deleted: false,
         })
-        .sort({ arrivalNumber: -1 });
+        .sort({ code: -1 });
       if (!ODT)
         return {
           status: Constants.ApiCode.SUCCESS,
@@ -324,7 +328,7 @@ var officialDispatchTravelService = {
         message: Constants.String.Message.GET_200(
           Constants.String.IOD.ARRIVAL_NUMBER
         ),
-        data: ODT.arrivalNumber + 1,
+        data: ODT.code + 1,
       };
     } catch (error) {
       return {
@@ -337,12 +341,11 @@ var officialDispatchTravelService = {
   postOne: async (
     userID = "",
     data = {
-      code: "",
-      issuedDate: 0,
       subject: "",
       type: "",
       language: "",
       pageAmount: 0,
+      issuedAmount: 0,
       description: "",
       signerInfoName: "",
       signerInfoPosition: "",
@@ -351,12 +354,12 @@ var officialDispatchTravelService = {
       security: "",
       organ: "",
       approver: "",
-      handler: [],
       sendEmail: "",
     },
     files = []
   ) => {
     try {
+      data.organ = data.organ.split(",");
       data.importer = userID;
       data.arrivalDate = new Date().getTime();
       const status = await statusModel.findOne({
@@ -430,6 +433,7 @@ var officialDispatchTravelService = {
       type: "",
       language: "",
       pageAmount: 0,
+      issuedAmount: 0,
       description: "",
       signerInfoName: "",
       signerInfoPosition: "",
@@ -438,14 +442,15 @@ var officialDispatchTravelService = {
       security: "",
       organ: "",
       approver: "",
-      handler: [],
-      fileTemp: [],
+      fileTemp: "",
       sendEmail: "",
     },
     files = []
   ) => {
     try {
       if (!data.fileTemp) data.fileTemp = [];
+      else data.fileTemp = data.fileTemp.split(",");
+      console.log(data);
       const user = await officerModel.findById(userID, { deleted: false });
       if (!user)
         return {
@@ -458,9 +463,9 @@ var officialDispatchTravelService = {
           status: Constants.ApiCode.NOT_FOUND,
           message: Constants.String.Message.ERR_404(Constants.String.Officer._),
         };
-      if (data.organ) iod.organ = data.organ;
+      if (data.organ) iod.organ = data.organ.split(",");
       if (data.issuedDate) iod.issuedDate = data.issuedDate;
-      if (data.code) iod.code = data.code;
+      if (data.code && data.code != 0) iod.code = data.code;
       if (data.language) iod.language = data.language;
       if (data.type) iod.type = data.type;
       if (data.priority) iod.priority = data.priority;
@@ -470,6 +475,7 @@ var officialDispatchTravelService = {
       if (data.signerInfoPosition)
         iod.signerInfoPosition = data.signerInfoPosition;
       if (data.pageAmount) iod.pageAmount = data.pageAmount;
+      if (data.issuedAmount) iod.issuedAmount = data.issuedAmount;
       if (data.dueDate) iod.dueDate = data.dueDate;
       if (data.approver) iod.approver = data.approver;
       const file = [...iod.file].filter(
@@ -503,7 +509,7 @@ var officialDispatchTravelService = {
   approval: async (
     id = "",
     userID = "",
-    data = { handler: [], sendEmail: true, description: "", arrivalNumber: 0 }
+    data = { description: "", code: 0 }
   ) => {
     try {
       const item = await model.findOne({
@@ -513,7 +519,7 @@ var officialDispatchTravelService = {
       if (!item)
         return {
           status: Constants.ApiCode.NOT_FOUND,
-          message: Constants.String.Message.ERR_404(Constants.String.IOD._),
+          message: Constants.String.Message.ERR_404(Constants.String.ODT._),
         };
       const user = await officerModel.findById(userID, { deleted: false });
       if (!user)
@@ -525,45 +531,13 @@ var officialDispatchTravelService = {
         name: "APPROVED",
         deleted: false,
       });
-      const PROGRESSING = await statusModel.findOne({
-        name: "PROGRESSING",
-        deleted: false,
-      });
-      item.traceHeaderList.push({
-        date: new Date(),
-        status: APPROVED._id.toString(),
-        officer: user._id.toString(),
-        command: `${user.lastName} ${user.firstName} đã duyệt văn bản`,
-        header: APPROVED.name,
-      });
-      if (data.handler.length === 0) {
-        if (!APPROVED)
-          return {
-            status: Constants.ApiCode.NOT_FOUND,
-            message: Constants.String.Message.ERR_404(
-              Constants.String.Status._
-            ),
-          };
-        item.status = APPROVED._id.toString();
-      } else {
-        if (!PROGRESSING)
-          return {
-            status: Constants.ApiCode.NOT_FOUND,
-            message: Constants.String.Message.ERR_404(
-              Constants.String.Status._
-            ),
-          };
-        item.handler = data.handler;
-        item.status = PROGRESSING._id.toString();
-        item.traceHeaderList.push({
-          date: new Date(),
-          status: PROGRESSING._id.toString(),
-          officer: user._id.toString(),
-          command: `${user.lastName} ${user.firstName} đã phân công xử lý`,
-          header: PROGRESSING.name,
-        });
-      }
-      item.arrivalNumber = data.arrivalNumber;
+      if (!APPROVED)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Status._),
+        };
+      item.status = APPROVED._id.toString();
+      item.code = data.code;
       item.description = data.description;
       item.save();
       return {
@@ -572,7 +546,7 @@ var officialDispatchTravelService = {
         data: item,
       };
     } catch (error) {
-      showError(error);
+      return showError(error);
     }
   },
   cancelApproval: async (
@@ -921,10 +895,10 @@ var officialDispatchTravelService = {
           status: Constants.ApiCode.NOT_FOUND,
           message: Constants.String.Message.ERR_404(Constants.String.IOD._),
         };
-      // item.file.map((el) => {
-      //   const pathFile = path.join(__dirname, "./../../../../public/", el.path);
-      //   if (fs.existsSync(pathFile)) fs.unlinkSync(pathFile);
-      // });
+      item.file.map((el) => {
+        const pathFile = path.join(__dirname, "./../../../../public/", el.path);
+        if (fs.existsSync(pathFile)) fs.unlinkSync(pathFile);
+      });
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.DELETE_200(Constants.String.IOD._),
@@ -946,16 +920,16 @@ var officialDispatchTravelService = {
           message: Constants.String.Message.ERR_404(Constants.String.Officer._),
         };
       const listItems = await model.find({ _id: { $in: ids } });
-      // listItems.map((el) => {
-      //   el.file.map((f) => {
-      //     const pathFile = path.join(
-      //       __dirname,
-      //       "./../../../../public/",
-      //       f.path
-      //     );
-      //     if (fs.existsSync(pathFile)) fs.unlinkSync(pathFile);
-      //   });
-      // });
+      listItems.map((el) => {
+        el.file.map((f) => {
+          const pathFile = path.join(
+            __dirname,
+            "./../../../../public/",
+            f.path
+          );
+          if (fs.existsSync(pathFile)) fs.unlinkSync(pathFile);
+        });
+      });
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.DELETE_200(Constants.String.IOD._),

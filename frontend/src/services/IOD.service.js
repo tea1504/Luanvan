@@ -53,7 +53,6 @@ class IODService extends BaseService {
     return result
   }
   async updateOne(id, data) {
-    data.status = data.status._id
     data.subject = Helpers.htmlDecode(data.subject)
     var formData = new FormData()
     Object.keys(data).forEach((el) => data[el] === null && delete data[el])

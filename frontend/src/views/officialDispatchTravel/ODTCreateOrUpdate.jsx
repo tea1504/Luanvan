@@ -27,7 +27,7 @@ import Helpers from 'src/commons/helpers'
 import Constants from 'src/constants'
 import Screens from 'src/constants/screens'
 import Strings from 'src/constants/strings'
-import IODService from 'src/services/IOD.service'
+import ODTService from 'src/services/ODT.service'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import { useDispatch } from 'react-redux'
@@ -57,14 +57,14 @@ import {
   FaTrash,
   FaVectorSquare,
 } from 'react-icons/fa'
-import IODProgress from './ODTProgress'
-import IODUploadFile from './ODTUploadFile'
+import ODTProgress from './ODTProgress'
+import ODTUploadFile from './ODTUploadFile'
 import { Resizable } from 're-resizable'
 import ODPreview from '../officialDispatch/ODPreview'
-import OrganizationCreateFromIOD from './OrganizationCreateFromODT'
-import IODChoose from './ODTChoose'
+import OrganizationCreateFromODT from './OrganizationCreateFromODT'
+import ODTChoose from './ODTChoose'
 
-const service = new IODService()
+const service = new ODTService()
 const organizationService = new OrganizationService()
 const statusService = new StatusService()
 const typeService = new TypeService()
@@ -87,7 +87,7 @@ export default function ODTCreateOrUpdate() {
   const language = useSelector((state) => state.config.language)
   Strings.setLanguage(language)
 
-  const store = useSelector((state) => state.IOD.data)
+  const store = useSelector((state) => state.ODT.data)
 
   const [state, setState] = useState({
     code: 0,
@@ -96,13 +96,14 @@ export default function ODTCreateOrUpdate() {
     type: null,
     language: null,
     pageAmount: 0,
+    issuedAmount: 0,
     description: '',
     signerInfoName: '',
     signerInfoPosition: '',
     dueDate: 0,
     priority: null,
     security: null,
-    organ: null,
+    organ: [],
     approver: null,
     handler: [],
     file: [],
@@ -118,12 +119,11 @@ export default function ODTCreateOrUpdate() {
   }
 
   const [error, setError] = useState({
-    code: null,
-    issuedDate: null,
     subject: null,
     type: null,
     language: null,
     pageAmount: null,
+    issuedAmount: null,
     description: null,
     signerInfoName: null,
     signerInfoPosition: null,
@@ -132,9 +132,7 @@ export default function ODTCreateOrUpdate() {
     security: null,
     organ: null,
     approver: null,
-    handler: null,
     file: null,
-    traceHeaderList: null,
   })
   const updateError = (newState) => {
     setError((prevState) => ({
@@ -177,13 +175,11 @@ export default function ODTCreateOrUpdate() {
           language: s.language._id,
           priority: s.priority._id,
           security: s.security._id,
-          organ: s.organ._id,
+          organ: s.organ.map((el) => el._id),
           approver: s.approver._id,
           importer: s.importer._id,
           issuedDate: new Date(s.issuedDate).getTime(),
-          arrivalDate: new Date(s.arrivalDate).getTime(),
           dueDate: new Date(s.dueDate).getTime(),
-          handler: s.handler.map((el) => el._id),
           fileTemp: s.file.map((el, ind) => ({
             ...el,
             path: el.path.includes('blob')
@@ -208,13 +204,11 @@ export default function ODTCreateOrUpdate() {
         language: result.data.data.language._id,
         priority: result.data.data.priority._id,
         security: result.data.data.security._id,
-        organ: result.data.data.organ._id,
+        organ: result.data.data.organ.map((el) => el._id),
         approver: result.data.data.approver._id,
         importer: result.data.data.importer._id,
         issuedDate: new Date(result.data.data.issuedDate).getTime(),
-        arrivalDate: new Date(result.data.data.arrivalDate).getTime(),
         dueDate: new Date(result.data.data.dueDate).getTime(),
-        handler: result.data.data.handler.map((el) => el._id),
         fileTemp: result.data.data.file.map((el, ind) => ({
           ...el,
           path: `${process.env.REACT_APP_BASE_URL}/${el.path}?token=${token}#toolbar=0`,
@@ -386,16 +380,9 @@ export default function ODTCreateOrUpdate() {
 
   const validate = () => {
     var flag = true
-    if (Helpers.isNullOrEmpty(state.organ)) {
+    if (state.organ.length === 0) {
       flag = false
       updateError({ organ: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
-    }
-    if (Helpers.isNullOrEmpty(state.code)) {
-      flag = false
-      updateError({ organ: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
-    } else if (state.code == 0) {
-      flag = false
-      updateError({ code: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
     }
     if (Helpers.isNullOrEmpty(state.language)) {
       flag = false
@@ -439,6 +426,10 @@ export default function ODTCreateOrUpdate() {
       flag = false
       updateError({ pageAmount: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
     }
+    if (state.issuedAmount == 0) {
+      flag = false
+      updateError({ issuedAmount: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
+    }
     if (Helpers.isNullOrEmpty(state.approver)) {
       flag = false
       updateError({ approver: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED) })
@@ -453,12 +444,11 @@ export default function ODTCreateOrUpdate() {
   const handleSubmitForm = async (e) => {
     e.preventDefault()
     updateError({
-      code: null,
-      issuedDate: null,
       subject: null,
       type: null,
       language: null,
       pageAmount: null,
+      issuedAmount: null,
       description: null,
       signerInfoName: null,
       signerInfoPosition: null,
@@ -467,9 +457,7 @@ export default function ODTCreateOrUpdate() {
       security: null,
       organ: null,
       approver: null,
-      handler: null,
       file: null,
-      traceHeaderList: null,
     })
     if (validate()) {
       try {
@@ -482,24 +470,21 @@ export default function ODTCreateOrUpdate() {
             text: Strings.Message.Create.SUCCESS,
           })
           updateState({
-            code: 0,
-            issuedDate: 0,
             subject: '',
             type: null,
             language: null,
             pageAmount: 0,
+            issuedAmount: 0,
             description: '',
             signerInfoName: '',
             signerInfoPosition: '',
             dueDate: 0,
             priority: null,
             security: null,
-            organ: null,
+            organ: [],
             approver: null,
-            handler: [],
             file: [],
             fileTemp: [],
-            traceHeaderList: [],
           })
         } else {
           await service.updateOne(id, state)
@@ -528,24 +513,21 @@ export default function ODTCreateOrUpdate() {
         URL.revokeObjectURL(el.path)
       })
       updateState({
-        code: 0,
-        issuedDate: 0,
         subject: '',
         type: null,
         language: null,
         pageAmount: 0,
+        issuedAmount: 0,
         description: '',
         signerInfoName: '',
         signerInfoPosition: '',
         dueDate: 0,
         priority: null,
         security: null,
-        organ: null,
+        organ: [],
         approver: null,
-        handler: [],
         file: [],
         fileTemp: [],
-        traceHeaderList: [],
       })
     }
   }
@@ -734,16 +716,16 @@ export default function ODTCreateOrUpdate() {
             style={{ height: '75vh', paddingBottom: '10px' }}
           >
             <CCardHeader className="text-center py-3" component="h3">
-              {Strings.IncomingOfficialDispatch.NAME}
+              {Strings.OfficialDispatchTravel.NAME}
             </CCardHeader>
             <CCardBody style={{ height: '60vh', overflow: 'auto' }}>
               <CForm noValidate className="row g-3">
-                {/* ORGANIZATION_IOD */}
+                {/* ORGANIZATION_ODT */}
                 <CCol xs={12}>
                   <CFormLabel
                     htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Organization.CODE)}
                   >
-                    {Strings.Form.FieldName.ORGANIZATION_IOD}{' '}
+                    {Strings.Form.FieldName.ORGANIZATION_ODT}{' '}
                     <Required mes={Strings.Form.Validation.REQUIRED()} />
                   </CFormLabel>
                   <CRow>
@@ -751,15 +733,18 @@ export default function ODTCreateOrUpdate() {
                       <Select
                         id={Helpers.makeID(Strings.Officer.CODE, Strings.Organization.CODE)}
                         value={
-                          organ.filter((el) => el.value === state.organ).length > 0
-                            ? organ.filter((el) => el.value === state.organ)[0]
+                          state.organ.length === 0
+                            ? null
+                            : organ.filter((el) => state.organ.includes(el.value)).length > 0
+                            ? organ.filter((el) => state.organ.includes(el.value))
                             : null
                         }
                         options={organ}
-                        placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_ORGANIZATION}
+                        placeholder={Strings.OfficialDispatchTravel.Common.SELECT_ORGANIZATION}
                         onChange={(selectedItem) => {
-                          if (selectedItem) updateState({ organ: selectedItem.value })
-                          else updateState({ organ: null })
+                          if (selectedItem)
+                            updateState({ organ: selectedItem.map((el) => el.value) })
+                          else updateState({ organ: [] })
                         }}
                         styles={{
                           control: (provided) => ({
@@ -770,6 +755,7 @@ export default function ODTCreateOrUpdate() {
                           }),
                         }}
                         isClearable={Helpers.isNullOrEmpty(id)}
+                        isMulti
                       />
                     </CCol>
                     <CCol xs={12} sm={1}>
@@ -787,82 +773,44 @@ export default function ODTCreateOrUpdate() {
                     {error.organ && Strings.Form.Validation[error.organ](Strings.Organization.NAME)}
                   </CFormFeedback>
                 </CCol>
-                {/* ISSUED_DATE */}
-                <CCol xs={12} md={6}>
+                {/* ISSUED_AMOUNT */}
+                <CCol xs={12}>
                   <CFormLabel
                     htmlFor={Helpers.makeID(
-                      Strings.IncomingOfficialDispatch.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.ISSUED_DATE),
+                      Strings.OfficialDispatchTravel.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.ISSUED_AMOUNT),
                     )}
                   >
-                    {Strings.Form.FieldName.ISSUED_DATE(Strings.IncomingOfficialDispatch.NAME)}{' '}
+                    {Strings.Form.FieldName.ISSUED_AMOUNT(Strings.OfficialDispatchTravel.NAME)}{' '}
                     <Required mes={Strings.Form.Validation.REQUIRED()} />
                   </CFormLabel>
                   <CFormInput
-                    invalid={!Helpers.isNullOrEmpty(error.issuedDate)}
-                    type="date"
-                    id={Helpers.makeID(
-                      Strings.IncomingOfficialDispatch.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.ISSUED_DATE),
-                    )}
-                    placeholder={Strings.Form.FieldName.ISSUED_DATE(
-                      Strings.IncomingOfficialDispatch.NAME,
-                    )}
-                    value={Helpers.formatDateForInput(state.issuedDate)}
-                    onChange={(e) =>
-                      updateState({ issuedDate: new Date(e.target.value).getTime() })
-                    }
-                    onKeyPress={handleKeypress}
-                  />
-                  <CFormFeedback invalid>
-                    {error.issuedDate &&
-                      Strings.Form.Validation[error.issuedDate](
-                        Strings.Form.FieldName.ISSUED_DATE(Strings.IncomingOfficialDispatch.NAME),
-                      )}
-                  </CFormFeedback>
-                </CCol>
-                {/* CODE */}
-                <CCol xs={12} md={6}>
-                  <CFormLabel
-                    htmlFor={Helpers.makeID(
-                      Strings.IncomingOfficialDispatch.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.CODE),
-                    )}
-                  >
-                    {Strings.Form.FieldName.CODE(Strings.IncomingOfficialDispatch.NAME)}{' '}
-                    <Required mes={Strings.Form.Validation.REQUIRED()} />
-                  </CFormLabel>
-                  <CFormInput
-                    invalid={!Helpers.isNullOrEmpty(error.code)}
+                    invalid={!Helpers.isNullOrEmpty(error.issuedAmount)}
                     type="number"
                     min={1}
                     id={Helpers.makeID(
-                      Strings.IncomingOfficialDispatch.CODE,
-                      Helpers.propName(Strings, Strings.Form.FieldName.CODE),
+                      Strings.OfficialDispatchTravel.CODE,
+                      Helpers.propName(Strings, Strings.Form.FieldName.ISSUED_AMOUNT),
                     )}
-                    placeholder={Strings.Form.FieldName.CODE(Strings.IncomingOfficialDispatch.NAME)}
-                    value={state.code}
-                    onChange={(e) => updateState({ code: parseInt(e.target.value) })}
+                    placeholder={Strings.Form.FieldName.ISSUED_AMOUNT(
+                      Strings.OfficialDispatchTravel.NAME,
+                    )}
+                    value={state.issuedAmount}
+                    onChange={(e) => updateState({ issuedAmount: parseInt(e.target.value) })}
                     onKeyPress={handleKeypress}
+                    onFocus={(e) => e.target.select()}
                   />
                   <CFormFeedback invalid>
-                    {error.code &&
-                      Strings.Form.Validation[error.code](
-                        Strings.Form.FieldName.CODE(Strings.IncomingOfficialDispatch.NAME),
+                    {error.issuedAmount &&
+                      Strings.Form.Validation[error.issuedAmount](
+                        Strings.Form.FieldName.ISSUED_AMOUNT(Strings.OfficialDispatchTravel.NAME),
                       )}
                   </CFormFeedback>
-                  <CFormText>
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: Strings.IncomingOfficialDispatch.Common.DESCRIPTION_CODE,
-                      }}
-                    ></div>
-                  </CFormText>
                 </CCol>
                 {/* LANGUAGE */}
                 <CCol xs={12} md={6}>
                   <CFormLabel htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Language.CODE)}>
-                    {Strings.Form.FieldName.LANGUAGE(Strings.IncomingOfficialDispatch.NAME)}{' '}
+                    {Strings.Form.FieldName.LANGUAGE(Strings.OfficialDispatchTravel.NAME)}{' '}
                     <Required mes={Strings.Form.Validation.REQUIRED()} />
                   </CFormLabel>
                   <Select
@@ -873,7 +821,7 @@ export default function ODTCreateOrUpdate() {
                         : null
                     }
                     options={lang}
-                    placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_LANGUAGE}
+                    placeholder={Strings.OfficialDispatchTravel.Common.SELECT_LANGUAGE}
                     onChange={(selectedItem) => {
                       if (selectedItem) updateState({ language: selectedItem.value })
                       else updateState({ language: null })
@@ -896,7 +844,7 @@ export default function ODTCreateOrUpdate() {
                 {/* TYPE */}
                 <CCol xs={12} md={6}>
                   <CFormLabel htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Type.CODE)}>
-                    {Strings.Form.FieldName.TYPE(Strings.IncomingOfficialDispatch.NAME)}{' '}
+                    {Strings.Form.FieldName.TYPE(Strings.OfficialDispatchTravel.NAME)}{' '}
                     <Required mes={Strings.Form.Validation.REQUIRED()} />
                   </CFormLabel>
                   <Select
@@ -907,7 +855,7 @@ export default function ODTCreateOrUpdate() {
                         : null
                     }
                     options={type}
-                    placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_TYPE}
+                    placeholder={Strings.OfficialDispatchTravel.Common.SELECT_TYPE}
                     onChange={(selectedItem) => {
                       if (selectedItem) updateState({ type: selectedItem.value })
                       else updateState({ type: null })
@@ -929,7 +877,7 @@ export default function ODTCreateOrUpdate() {
                 {/* PRIORITY */}
                 <CCol xs={12} md={6}>
                   <CFormLabel htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Priority.CODE)}>
-                    {Strings.Form.FieldName.PRIORITY(Strings.IncomingOfficialDispatch.NAME)}{' '}
+                    {Strings.Form.FieldName.PRIORITY(Strings.OfficialDispatchTravel.NAME)}{' '}
                     <Required mes={Strings.Form.Validation.REQUIRED()} />
                   </CFormLabel>
                   <Select
@@ -940,7 +888,7 @@ export default function ODTCreateOrUpdate() {
                         : null
                     }
                     options={priority}
-                    placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_PRIORITY}
+                    placeholder={Strings.OfficialDispatchTravel.Common.SELECT_PRIORITY}
                     onChange={(selectedItem) => {
                       if (selectedItem) updateState({ priority: selectedItem.value })
                       else updateState({ priority: null })
@@ -963,7 +911,7 @@ export default function ODTCreateOrUpdate() {
                 {/* SECURITY */}
                 <CCol xs={12} md={6}>
                   <CFormLabel htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Security.CODE)}>
-                    {Strings.Form.FieldName.SECURITY(Strings.IncomingOfficialDispatch.NAME)}{' '}
+                    {Strings.Form.FieldName.SECURITY(Strings.OfficialDispatchTravel.NAME)}{' '}
                     <Required mes={Strings.Form.Validation.REQUIRED()} />
                   </CFormLabel>
                   <Select
@@ -974,7 +922,7 @@ export default function ODTCreateOrUpdate() {
                         : null
                     }
                     options={security}
-                    placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_SECURITY}
+                    placeholder={Strings.OfficialDispatchTravel.Common.SELECT_SECURITY}
                     onChange={(selectedItem) => {
                       if (selectedItem) updateState({ security: selectedItem.value })
                       else updateState({ security: null })
@@ -1002,12 +950,12 @@ export default function ODTCreateOrUpdate() {
                       Helpers.propName(Strings, Strings.Form.FieldName.SUBJECT),
                     )}
                   >
-                    {Strings.Form.FieldName.SUBJECT(Strings.IncomingOfficialDispatch.NAME)}{' '}
+                    {Strings.Form.FieldName.SUBJECT(Strings.OfficialDispatchTravel.NAME)}{' '}
                     <Required mes={Strings.Form.Validation.REQUIRED()} />
                   </CFormLabel>
                   <CKEditor
                     id={Helpers.makeID(
-                      Strings.IncomingOfficialDispatch.CODE,
+                      Strings.OfficialDispatchTravel.CODE,
                       Helpers.propName(Strings, Strings.Form.FieldName.DESCRIPTION),
                     )}
                     editor={ClassicEditor}
@@ -1021,7 +969,7 @@ export default function ODTCreateOrUpdate() {
                   <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
                     {error.subject &&
                       Strings.Form.Validation[error.subject](
-                        Strings.Form.FieldName.SUBJECT(Strings.IncomingOfficialDispatch.NAME),
+                        Strings.Form.FieldName.SUBJECT(Strings.OfficialDispatchTravel.NAME),
                       )}
                   </CFormFeedback>
                 </CCol>
@@ -1029,32 +977,33 @@ export default function ODTCreateOrUpdate() {
                 <CCol xs={12} md={6}>
                   <CFormLabel
                     htmlFor={Helpers.makeID(
-                      Strings.IncomingOfficialDispatch.CODE,
+                      Strings.OfficialDispatchTravel.CODE,
                       Helpers.propName(Strings, Strings.Form.FieldName.SIGNER_INFO_NAME),
                     )}
                   >
-                    {Strings.Form.FieldName.SIGNER_INFO_NAME(Strings.IncomingOfficialDispatch.NAME)}{' '}
+                    {Strings.Form.FieldName.SIGNER_INFO_NAME(Strings.OfficialDispatchTravel.NAME)}{' '}
                     <Required mes={Strings.Form.Validation.REQUIRED()} />
                   </CFormLabel>
                   <CFormInput
                     invalid={!Helpers.isNullOrEmpty(error.signerInfoName)}
                     type="text"
                     id={Helpers.makeID(
-                      Strings.IncomingOfficialDispatch.CODE,
+                      Strings.OfficialDispatchTravel.CODE,
                       Helpers.propName(Strings, Strings.Form.FieldName.SIGNER_INFO_NAME),
                     )}
                     placeholder={Strings.Form.FieldName.SIGNER_INFO_NAME(
-                      Strings.IncomingOfficialDispatch.NAME,
+                      Strings.OfficialDispatchTravel.NAME,
                     )}
                     value={state.signerInfoName}
                     onChange={(e) => updateState({ signerInfoName: e.target.value })}
                     onKeyPress={handleKeypress}
+                    onFocus={(e) => e.target.select()}
                   />
                   <CFormFeedback invalid>
                     {error.signerInfoName &&
                       Strings.Form.Validation[error.signerInfoName](
                         Strings.Form.FieldName.SIGNER_INFO_NAME(
-                          Strings.IncomingOfficialDispatch.NAME,
+                          Strings.OfficialDispatchTravel.NAME,
                         ),
                       )}
                   </CFormFeedback>
@@ -1063,12 +1012,12 @@ export default function ODTCreateOrUpdate() {
                 <CCol xs={12} md={6}>
                   <CFormLabel
                     htmlFor={Helpers.makeID(
-                      Strings.IncomingOfficialDispatch.CODE,
+                      Strings.OfficialDispatchTravel.CODE,
                       Helpers.propName(Strings, Strings.Form.FieldName.SIGNER_INFO_POSITION),
                     )}
                   >
                     {Strings.Form.FieldName.SIGNER_INFO_POSITION(
-                      Strings.IncomingOfficialDispatch.NAME,
+                      Strings.OfficialDispatchTravel.NAME,
                     )}{' '}
                     <Required mes={Strings.Form.Validation.REQUIRED()} />
                   </CFormLabel>
@@ -1076,21 +1025,22 @@ export default function ODTCreateOrUpdate() {
                     invalid={!Helpers.isNullOrEmpty(error.signerInfoPosition)}
                     type="text"
                     id={Helpers.makeID(
-                      Strings.IncomingOfficialDispatch.CODE,
+                      Strings.OfficialDispatchTravel.CODE,
                       Helpers.propName(Strings, Strings.Form.FieldName.SIGNER_INFO_POSITION),
                     )}
                     placeholder={Strings.Form.FieldName.SIGNER_INFO_POSITION(
-                      Strings.IncomingOfficialDispatch.NAME,
+                      Strings.OfficialDispatchTravel.NAME,
                     )}
                     value={state.signerInfoPosition}
                     onChange={(e) => updateState({ signerInfoPosition: e.target.value })}
                     onKeyPress={handleKeypress}
+                    onFocus={(e) => e.target.select()}
                   />
                   <CFormFeedback invalid>
                     {error.signerInfoPosition &&
                       Strings.Form.Validation[error.signerInfoPosition](
                         Strings.Form.FieldName.SIGNER_INFO_POSITION(
-                          Strings.IncomingOfficialDispatch.NAME,
+                          Strings.OfficialDispatchTravel.NAME,
                         ),
                       )}
                   </CFormFeedback>
@@ -1099,11 +1049,11 @@ export default function ODTCreateOrUpdate() {
                 <CCol xs={12}>
                   <CFormLabel
                     htmlFor={Helpers.makeID(
-                      Strings.IncomingOfficialDispatch.CODE,
+                      Strings.OfficialDispatchTravel.CODE,
                       Helpers.propName(Strings, Strings.Form.FieldName.PAGE_AMOUNT),
                     )}
                   >
-                    {Strings.Form.FieldName.PAGE_AMOUNT(Strings.IncomingOfficialDispatch.NAME)}{' '}
+                    {Strings.Form.FieldName.PAGE_AMOUNT(Strings.OfficialDispatchTravel.NAME)}{' '}
                     <Required mes={Strings.Form.Validation.REQUIRED()} />
                   </CFormLabel>
                   <CFormInput
@@ -1111,20 +1061,21 @@ export default function ODTCreateOrUpdate() {
                     type="number"
                     min={1}
                     id={Helpers.makeID(
-                      Strings.IncomingOfficialDispatch.CODE,
+                      Strings.OfficialDispatchTravel.CODE,
                       Helpers.propName(Strings, Strings.Form.FieldName.PAGE_AMOUNT),
                     )}
                     placeholder={Strings.Form.FieldName.PAGE_AMOUNT(
-                      Strings.IncomingOfficialDispatch.NAME,
+                      Strings.OfficialDispatchTravel.NAME,
                     )}
                     value={state.pageAmount}
                     onChange={(e) => updateState({ pageAmount: parseInt(e.target.value) })}
                     onKeyPress={handleKeypress}
+                    onFocus={(e) => e.target.select()}
                   />
                   <CFormFeedback invalid>
                     {error.pageAmount &&
                       Strings.Form.Validation[error.pageAmount](
-                        Strings.Form.FieldName.PAGE_AMOUNT(Strings.IncomingOfficialDispatch.NAME),
+                        Strings.Form.FieldName.PAGE_AMOUNT(Strings.OfficialDispatchTravel.NAME),
                       )}
                   </CFormFeedback>
                 </CCol>
@@ -1132,22 +1083,22 @@ export default function ODTCreateOrUpdate() {
                 <CCol xs={12}>
                   <CFormLabel
                     htmlFor={Helpers.makeID(
-                      Strings.IncomingOfficialDispatch.CODE,
+                      Strings.OfficialDispatchTravel.CODE,
                       Helpers.propName(Strings, Strings.Form.FieldName.DUE_DATE),
                     )}
                   >
-                    {Strings.Form.FieldName.DUE_DATE(Strings.IncomingOfficialDispatch.NAME)}{' '}
+                    {Strings.Form.FieldName.DUE_DATE(Strings.OfficialDispatchTravel.NAME)}{' '}
                     <Required mes={Strings.Form.Validation.REQUIRED()} />
                   </CFormLabel>
                   <CFormInput
                     invalid={!Helpers.isNullOrEmpty(error.dueDate)}
                     type="date"
                     id={Helpers.makeID(
-                      Strings.IncomingOfficialDispatch.CODE,
+                      Strings.OfficialDispatchTravel.CODE,
                       Helpers.propName(Strings, Strings.Form.FieldName.DUE_DATE),
                     )}
                     placeholder={Strings.Form.FieldName.DUE_DATE(
-                      Strings.IncomingOfficialDispatch.NAME,
+                      Strings.OfficialDispatchTravel.NAME,
                     )}
                     value={Helpers.formatDateForInput(state.dueDate)}
                     onChange={(e) => updateState({ dueDate: new Date(e.target.value).getTime() })}
@@ -1156,7 +1107,7 @@ export default function ODTCreateOrUpdate() {
                   <CFormFeedback invalid>
                     {error.dueDate &&
                       Strings.Form.Validation[error.dueDate](
-                        Strings.Form.FieldName.DUE_DATE(Strings.IncomingOfficialDispatch.NAME),
+                        Strings.Form.FieldName.DUE_DATE(Strings.OfficialDispatchTravel.NAME),
                       )}
                   </CFormFeedback>
                 </CCol>
@@ -1164,7 +1115,7 @@ export default function ODTCreateOrUpdate() {
                 <CCol xs={12}>
                   <CFormLabel
                     htmlFor={Helpers.makeID(
-                      Strings.IncomingOfficialDispatch.CODE,
+                      Strings.OfficialDispatchTravel.CODE,
                       Helpers.propName(Strings, Strings.Form.FieldName.FILE),
                     )}
                   >
@@ -1176,7 +1127,7 @@ export default function ODTCreateOrUpdate() {
                     type="file"
                     multiple
                     id={Helpers.makeID(
-                      Strings.IncomingOfficialDispatch.CODE,
+                      Strings.OfficialDispatchTravel.CODE,
                       Helpers.propName(Strings, Strings.Form.FieldName.FILE),
                     )}
                     onChange={handleInputFileOnChange}
@@ -1185,7 +1136,7 @@ export default function ODTCreateOrUpdate() {
                   <CFormFeedback invalid>
                     {error.file &&
                       Strings.Form.Validation[error.file](
-                        Strings.Form.FieldName.FILE(Strings.IncomingOfficialDispatch.NAME),
+                        Strings.Form.FieldName.FILE(Strings.OfficialDispatchTravel.NAME),
                       )}
                   </CFormFeedback>
                 </CCol>
@@ -1201,7 +1152,7 @@ export default function ODTCreateOrUpdate() {
                 <CCol xs={12}>
                   <CFormLabel
                     htmlFor={Helpers.makeID(
-                      Strings.IncomingOfficialDispatch.CODE,
+                      Strings.OfficialDispatchTravel.CODE,
                       Strings.Officer.CODE,
                     )}
                   >
@@ -1212,7 +1163,7 @@ export default function ODTCreateOrUpdate() {
                     <CCol sx={12} md={8}>
                       <Select
                         id={Helpers.makeID(
-                          Strings.IncomingOfficialDispatch.CODE,
+                          Strings.OfficialDispatchTravel.CODE,
                           Strings.Officer.CODE,
                         )}
                         value={
@@ -1221,7 +1172,7 @@ export default function ODTCreateOrUpdate() {
                             : null
                         }
                         options={officer}
-                        placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_APPROVER}
+                        placeholder={Strings.OfficialDispatchTravel.Common.SELECT_APPROVER}
                         onChange={(selectedItem) => {
                           if (selectedItem) updateState({ approver: selectedItem.value })
                           else updateState({ approver: null })
@@ -1240,7 +1191,7 @@ export default function ODTCreateOrUpdate() {
                     <CCol xs={12} md={4}>
                       <CFormCheck
                         id="EMAIL"
-                        label={Strings.IncomingOfficialDispatch.Common.SEND_EMAIL_APPROVAL}
+                        label={Strings.OfficialDispatchTravel.Common.SEND_EMAIL_APPROVAL}
                         checked={state.sendEmail}
                         onChange={() => updateState({ sendEmail: !state.sendEmail })}
                       />
@@ -1249,7 +1200,7 @@ export default function ODTCreateOrUpdate() {
                   <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
                     {error.approver &&
                       Strings.Form.Validation[error.approver](
-                        Strings.Form.FieldName.APPROVER(Strings.IncomingOfficialDispatch.NAME),
+                        Strings.Form.FieldName.APPROVER(Strings.OfficialDispatchTravel.NAME),
                       )}
                   </CFormFeedback>
                 </CCol>
@@ -1299,7 +1250,7 @@ export default function ODTCreateOrUpdate() {
       >
         <CModalHeader></CModalHeader>
         <CModalBody>
-          <IODProgress data={state.file} dataTemp={state.fileTemp} updateData={update} />
+          <ODTProgress data={state.file} dataTemp={state.fileTemp} updateData={update} />
         </CModalBody>
       </CModal>
       <CModal
@@ -1310,10 +1261,11 @@ export default function ODTCreateOrUpdate() {
           updateVisible({ init: false })
         }}
         fullscreen
+        backdrop="static"
       >
         <CModalHeader></CModalHeader>
         <CModalBody>
-          <IODUploadFile
+          <ODTUploadFile
             state={state}
             extension={extension}
             handleInputFileOnChange={handleInputFileOnChange}
@@ -1329,11 +1281,12 @@ export default function ODTCreateOrUpdate() {
         onClose={() => {
           updateVisible({ choose: false })
         }}
-        // fullscreen
+        fullscreen
+        backdrop="static"
       >
         <CModalHeader>Kết quả trích xuất</CModalHeader>
         <CModalBody>
-          <IODChoose predict={predict} updateData={updateState} />
+          <ODTChoose predict={predict} updateData={updateState} />
         </CModalBody>
       </CModal>
       <CModal
@@ -1343,13 +1296,15 @@ export default function ODTCreateOrUpdate() {
         onClose={() => {
           updateVisible({ addOrgan: false })
         }}
+        backdrop="static"
       >
         <CModalHeader>{Strings.Organization.Common.ADD}</CModalHeader>
         <CModalBody>
-          <OrganizationCreateFromIOD
+          <OrganizationCreateFromODT
             updateVisible={updateVisible}
             getOrganization={getOrganization}
             updateOrgan={updateState}
+            data={state}
           />
         </CModalBody>
       </CModal>

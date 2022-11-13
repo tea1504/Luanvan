@@ -307,9 +307,13 @@ var incomingOfficialDispatchService = {
           status: Constants.ApiCode.NOT_FOUND,
           message: Constants.String.Message.ERR_404(Constants.String.Officer._),
         };
+      const listUser = await officerModel.find({
+        deleted: false,
+        organ: user.organ,
+      });
       const IOD = await incomingOfficialDispatchModel
         .findOne({
-          organ: user.organ,
+          importer: { $in: [...listUser].map((el) => el._id) },
           arrivalDate: {
             $gte: new Date(date.getFullYear() + "-1-1"),
             $lte: new Date(date.getFullYear() + "-12-31"),
@@ -452,6 +456,7 @@ var incomingOfficialDispatchService = {
   ) => {
     try {
       if (!data.fileTemp) data.fileTemp = [];
+      else data.fileTemp = data.fileTemp.split(",");
       const user = await officerModel.findById(userID, { deleted: false });
       if (!user)
         return {

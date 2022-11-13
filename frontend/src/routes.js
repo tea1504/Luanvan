@@ -436,28 +436,28 @@ const routes = [
     role: [0, 1],
     right: Strings.Common.READ_OD,
   },
-  /*{
+  {
     path: Screens.ODT_CREATE,
     name: { vi: vn.Common.CREATE, en: en.Common.CREATE },
-    element: IODCreateOrUpdate,
+    element: ODTCreateOrUpdate,
     role: [0, 1],
     right: Strings.Common.CREATE_OD,
   },
   {
     path: Screens.ODT_UPDATE(),
     name: { vi: vn.Common.UPDATE, en: en.Common.UPDATE },
-    element: IODCreateOrUpdate,
+    element: ODTCreateOrUpdate,
     role: [0, 1],
     right: Strings.Common.UPDATE_OD,
   },
   {
     path: Screens.ODT_APPROVE(),
     name: { vi: vn.Common.APPROVE, en: en.Common.APPROVE },
-    element: IODApproval,
+    element: ODTApproval,
     role: [0, 1],
     right: Strings.Common.APPROVE_OD,
   },
-  {
+  /*{
     path: Screens.ODT_HANDLE(),
     name: {
       vi: vn.IncomingOfficialDispatch.Common.HANDLE,

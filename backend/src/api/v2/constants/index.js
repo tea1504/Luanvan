@@ -110,7 +110,7 @@ const Constants = {
       APPROVAL: "/approval/:id",
       CREATE_MULTI: "/csv",
       FILE: "/file/:id",
-      GET_ARRIVAL_NUMBER: "/new-arrival-number",
+      GET_NEW_CODE: "/new-code",
       HANDLE: "/handle/:id",
       ID: "/:id",
       IMPLEMENT: "/implement/:id",

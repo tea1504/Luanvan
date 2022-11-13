@@ -61,9 +61,9 @@ route.get(
   controller.getFile
 );
 route.get(
-  Constants.ApiPath.OfficialDispatchTravel.GET_ARRIVAL_NUMBER,
+  Constants.ApiPath.OfficialDispatchTravel.GET_NEW_CODE,
   approveOD,
-  controller.getNewArrivalNumber
+  controller.getNewCode
 );
 route.get(
   Constants.ApiPath.OfficialDispatchTravel.ID,

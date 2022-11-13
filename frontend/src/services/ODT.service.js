@@ -27,12 +27,6 @@ class ODTService extends BaseService {
     })
     return result
   }
-  // async getManyByOrganId(id, limit = 10, pageNumber = 1, filter = '') {
-  //   const result = await this.api.get({
-  //     path: Constants.ApiPath.GET_OFFICERS_BY_ORGAN_ID(id, limit, pageNumber, filter),
-  //   })
-  //   return result
-  // }
   async createOne(data) {
     data.subject = Helpers.htmlDecode(data.subject)
     var formData = new FormData()
@@ -47,14 +41,14 @@ class ODTService extends BaseService {
       }
     }
     const result = await this.api.postFormData({
-      path: Constants.ApiPath.CREATE_IOD,
+      path: Constants.ApiPath.CREATE_ODT,
       data: formData,
     })
     return result
   }
   async updateOne(id, data) {
-    data.status = data.status._id
     data.subject = Helpers.htmlDecode(data.subject)
+    if (isNaN(data.issuedDate)) delete data.issuedDate
     var formData = new FormData()
     Object.keys(data).forEach((el) => data[el] === null && delete data[el])
     for (const [key, value] of Object.entries(data)) {
@@ -72,14 +66,20 @@ class ODTService extends BaseService {
       }
     }
     const result = await this.api.putFormData({
-      path: Constants.ApiPath.UPDATE_IOD(id),
+      path: Constants.ApiPath.UPDATE_ODT(id),
       data: formData,
+    })
+    return result
+  }
+  async getNewCode() {
+    const result = await this.api.get({
+      path: Constants.ApiPath.GET_NEW_CODE,
     })
     return result
   }
   async approval(id, data) {
     const result = await this.api.put({
-      path: Constants.ApiPath.APPROVE_IOD(id),
+      path: Constants.ApiPath.APPROVE_ODT(id),
       data: data,
     })
     return result

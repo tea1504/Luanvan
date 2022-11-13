@@ -16,6 +16,7 @@ import {
   CModalHeader,
   CRow,
   CTable,
+  CTableBody,
   CTableDataCell,
   CTableHeaderCell,
   CTableRow,
@@ -39,7 +40,7 @@ import Helpers from 'src/commons/helpers'
 import Constants from 'src/constants'
 import Screens from 'src/constants/screens'
 import Strings from 'src/constants/strings'
-import IODService from 'src/services/IOD.service'
+import ODTService from 'src/services/ODT.service'
 import { setLoading } from 'src/store/slice/config.slice'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
@@ -50,7 +51,7 @@ import ckEditorConfig from 'src/configs/ckEditor.config'
 import OfficerService from 'src/services/officer.service'
 import Select from 'react-select'
 
-const service = new IODService()
+const service = new ODTService()
 const officerService = new OfficerService()
 const MySwal = withReactContent(Swal)
 
@@ -67,7 +68,7 @@ export default function ODTApproval() {
   const language = useSelector((state) => state.config.language)
   Strings.setLanguage(language)
 
-  const store = useSelector((state) => state.IOD.data)
+  const store = useSelector((state) => state.ODT.data)
   const [state, setState] = useState({
     _id: '',
     code: 0,
@@ -80,14 +81,11 @@ export default function ODTApproval() {
     signerInfoName: '',
     signerInfoPosition: '',
     dueDate: '',
-    arrivalNumber: 0,
-    arrivalDate: '',
     priority: {},
     security: {},
-    organ: {},
+    organ: [],
     approver: {},
     importer: {},
-    handler: [],
     file: [],
     traceHeaderList: [],
     deleted: false,
@@ -225,7 +223,7 @@ export default function ODTApproval() {
                 <CRow xs={{ cols: 2 }}>
                   <CCol>
                     <CButton
-                      href={`${process.env.REACT_APP_BASE_URL}/v2${Constants.ApiPath.GET_FILE_IOD(
+                      href={`${process.env.REACT_APP_BASE_URL}/v2${Constants.ApiPath.GET_FILE_ODT(
                         el._id,
                       )}?token=${token}`}
                       variant="ghost"
@@ -281,7 +279,7 @@ export default function ODTApproval() {
   const approval = async () => {
     try {
       dispatch(setLoading(true))
-      const result = await service.approval(id, state)
+      await service.approval(id, state)
       dispatch(setLoading(false))
       await MySwal.fire({
         title: Strings.Message.Approval.TITLE,
@@ -296,16 +294,11 @@ export default function ODTApproval() {
     }
   }
 
-  const handleOnClickApproveButton = () => {
-    updateState({ handler: [] })
-    approval()
-  }
-
-  const getArrivalNumber = async () => {
+  const getNewCode = async () => {
     try {
       dispatch(setLoading(true))
-      const result = await service.getNewArrivalNumber()
-      updateState({ arrivalNumber: result.data.data })
+      const result = await service.getNewCode()
+      updateState({ code: result.data.data })
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
@@ -353,19 +346,11 @@ export default function ODTApproval() {
     }
   }
 
-  const handleOnClickApprovalAndAssignment = async () => {
-    updateError({ handler: null, refuse: null })
-    if (validate('handler')) {
-      updateVisible({ assignment: false })
-      approval()
-    }
-  }
-
   useEffect(() => {
     const list = id.split('.')
     getState(list[list.length - 1])
     getOfficer()
-    getArrivalNumber()
+    getNewCode()
   }, [])
 
   return (
@@ -374,212 +359,199 @@ export default function ODTApproval() {
         <CCol>
           <CCard className="mb-3 border-secondary border-top-5">
             <CCardHeader className="text-center py-3" component="h3">
-              {Strings.IncomingOfficialDispatch.NAME} {state.lastName} {state.firstName}
+              {Strings.OfficialDispatchTravel.NAME} {state.lastName} {state.firstName}
             </CCardHeader>
             <CCardBody>
               <CTable bordered responsive>
-                <CTableRow>
-                  <CTableHeaderCell
-                    colSpan={4}
-                    className="text-center bg-primary bg-gradient bg-opacity-25"
-                  >
-                    <h3>{Strings.Common.OD_INFO}</h3>
-                  </CTableHeaderCell>
-                </CTableRow>
-                <CTableRow>
-                  <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Form.FieldName.ISSUED_DATE(Strings.IncomingOfficialDispatch.NAME)}
-                  </CTableHeaderCell>
-                  <CTableDataCell>
-                    {Helpers.formatDateFromString(state.issuedDate, {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: 'numeric',
-                    })}
-                  </CTableDataCell>
-                  <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Form.FieldName.CODE(Strings.IncomingOfficialDispatch.NAME)}
-                  </CTableHeaderCell>
-                  <CTableDataCell>{`${state.code} (${Helpers.getMaVanBan(
-                    state.code,
-                    state.organ.code,
-                    state.type.notation,
-                    state.issuedDate,
-                    localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
-                  )})`}</CTableDataCell>
-                </CTableRow>
-                <CTableRow>
-                  <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Form.FieldName.ARRIVAL_DATE}
-                  </CTableHeaderCell>
-                  <CTableDataCell>
-                    {Helpers.formatDateFromString(state.arrivalDate, {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: 'numeric',
-                    })}
-                  </CTableDataCell>
-                  <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Form.FieldName.ARRIVAL_NUMBER_APPROVAL}
-                  </CTableHeaderCell>
-                  <CTableDataCell>
-                    {state.arrivalNumber === 0
-                      ? Strings.IncomingOfficialDispatch.Common.NOT_ARRIVAL_NUMBER
-                      : state.arrivalNumber}
-                  </CTableDataCell>
-                </CTableRow>
-                <CTableRow>
-                  <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Type.NAME}
-                  </CTableHeaderCell>
-                  <CTableDataCell>
-                    <CBadge
-                      style={{
-                        background: state.type.color,
-                        color: Helpers.getTextColorByBackgroundColor(state.type.color),
-                      }}
+                <CTableBody>
+                  <CTableRow>
+                    <CTableHeaderCell
+                      colSpan={4}
+                      className="text-center bg-primary bg-gradient bg-opacity-25"
                     >
-                      {state.type.name}
-                    </CBadge>
-                  </CTableDataCell>
-                  <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Language.NAME}
-                  </CTableHeaderCell>
-                  <CTableDataCell>
-                    <CBadge
-                      style={{
-                        background: state.language.color,
-                        color: Helpers.getTextColorByBackgroundColor(state.language.color),
-                      }}
-                    >
-                      {state.language.name}
-                    </CBadge>
-                  </CTableDataCell>
-                </CTableRow>
-                <CTableRow>
-                  <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Form.FieldName.SUBJECT(Strings.IncomingOfficialDispatch.NAME)}
-                  </CTableHeaderCell>
-                  <CTableDataCell colSpan={3}>{Helpers.htmlDecode(state.subject)}</CTableDataCell>
-                </CTableRow>
-                <CTableRow>
-                  <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Form.FieldName.PAGE_AMOUNT(Strings.IncomingOfficialDispatch.NAME)}
-                  </CTableHeaderCell>
-                  <CTableDataCell colSpan={3}>{state.pageAmount}</CTableDataCell>
-                </CTableRow>
-                <CTableRow>
-                  <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Form.FieldName.SIGNER_INFO_NAME(Strings.IncomingOfficialDispatch.NAME)}
-                  </CTableHeaderCell>
-                  <CTableDataCell>{state.signerInfoName}</CTableDataCell>
-                  <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Form.FieldName.SIGNER_INFO_POSITION(
-                      Strings.IncomingOfficialDispatch.NAME,
-                    )}
-                  </CTableHeaderCell>
-                  <CTableDataCell>{state.signerInfoPosition}</CTableDataCell>
-                </CTableRow>
-                <CTableRow>
-                  <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Form.FieldName.DUE_DATE(Strings.IncomingOfficialDispatch.NAME)}
-                  </CTableHeaderCell>
-                  <CTableDataCell colSpan={3}>
-                    {Helpers.formatDateFromString(state.dueDate, {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: 'numeric',
-                    })}
-                  </CTableDataCell>
-                </CTableRow>
-                <CTableRow>
-                  <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Priority.NAME}
-                  </CTableHeaderCell>
-                  <CTableDataCell>
-                    <CBadge
-                      style={{
-                        background: state.priority.color,
-                        color: Helpers.getTextColorByBackgroundColor(state.priority.color),
-                      }}
-                    >
-                      {state.priority.name}
-                    </CBadge>
-                  </CTableDataCell>
-                  <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Security.NAME}
-                  </CTableHeaderCell>
-                  <CTableDataCell>
-                    <CBadge
-                      style={{
-                        background: state.security.color,
-                        color: Helpers.getTextColorByBackgroundColor(state.security.color),
-                      }}
-                    >
-                      {state.security.name}
-                    </CBadge>
-                  </CTableDataCell>
-                </CTableRow>
-                <CTableRow>
-                  <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
-                    {Strings.Form.FieldName.ORGANIZATION_IOD}
-                  </CTableHeaderCell>
-                  <CTableDataCell colSpan={3}>
-                    {state.organ.name} ({state.organ.code})
-                  </CTableDataCell>
-                </CTableRow>
-                <CTableRow>
-                  <CTableHeaderCell
-                    colSpan={4}
-                    className="text-center bg-primary bg-gradient bg-opacity-25"
-                  >
-                    <h3>{Strings.Common.OD_FILE}</h3>
-                  </CTableHeaderCell>
-                </CTableRow>
-                <CTableRow>
-                  <CTableDataCell colSpan={4}>
-                    {state.file.length !== 0 && renderFile()}
-                  </CTableDataCell>
-                </CTableRow>
-                <CTableRow>
-                  <CTableHeaderCell
-                    colSpan={4}
-                    className="text-center bg-primary bg-gradient bg-opacity-25"
-                  >
-                    <h3>{Strings.Common.APPROVE}</h3>
-                  </CTableHeaderCell>
-                </CTableRow>
-                <CTableRow>
-                  <CTableDataCell colSpan={4}>
-                    <CFormLabel
-                      htmlFor={Helpers.makeID(
-                        Strings.IncomingOfficialDispatch.CODE,
-                        Helpers.propName(
-                          Strings,
-                          Strings.IncomingOfficialDispatch.Common.DESCRIPTION,
-                        ),
+                      <h3>{Strings.Common.OD_INFO}</h3>
+                    </CTableHeaderCell>
+                  </CTableRow>
+                  <CTableRow>
+                    <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
+                      {Strings.Form.FieldName.ISSUED_DATE(Strings.OfficialDispatchTravel.NAME)}
+                    </CTableHeaderCell>
+                    <CTableDataCell>
+                      {state.issuedDate
+                        ? Helpers.formatDateFromString(state.issuedDate, {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: 'numeric',
+                          })
+                        : 'Chưa phát hành'}
+                    </CTableDataCell>
+                    <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
+                      {Strings.Form.FieldName.CODE(Strings.OfficialDispatchTravel.NAME)} (mã số sẽ
+                      được cấp khi duyệt)
+                    </CTableHeaderCell>
+                    <CTableDataCell>
+                      {`${state.code} (${Helpers.getMaVanBan(
+                        state.code,
+                        loggedUser.organ.code,
+                        state.type.notation,
+                        state.issuedDate || new Date(),
+                        localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
+                      )})`}
+                    </CTableDataCell>
+                  </CTableRow>
+                  <CTableRow>
+                    <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
+                      {Strings.Type.NAME}
+                    </CTableHeaderCell>
+                    <CTableDataCell>
+                      <CBadge
+                        style={{
+                          background: state.type.color,
+                          color: Helpers.getTextColorByBackgroundColor(state.type.color),
+                        }}
+                      >
+                        {state.type.name}
+                      </CBadge>
+                    </CTableDataCell>
+                    <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
+                      {Strings.Language.NAME}
+                    </CTableHeaderCell>
+                    <CTableDataCell>
+                      <CBadge
+                        style={{
+                          background: state.language.color,
+                          color: Helpers.getTextColorByBackgroundColor(state.language.color),
+                        }}
+                      >
+                        {state.language.name}
+                      </CBadge>
+                    </CTableDataCell>
+                  </CTableRow>
+                  <CTableRow>
+                    <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
+                      {Strings.Form.FieldName.SUBJECT(Strings.OfficialDispatchTravel.NAME)}
+                    </CTableHeaderCell>
+                    <CTableDataCell colSpan={3}>{Helpers.htmlDecode(state.subject)}</CTableDataCell>
+                  </CTableRow>
+                  <CTableRow>
+                    <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
+                      {Strings.Form.FieldName.PAGE_AMOUNT(Strings.OfficialDispatchTravel.NAME)}
+                    </CTableHeaderCell>
+                    <CTableDataCell colSpan={3}>{state.pageAmount}</CTableDataCell>
+                  </CTableRow>
+                  <CTableRow>
+                    <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
+                      {Strings.Form.FieldName.SIGNER_INFO_NAME(Strings.OfficialDispatchTravel.NAME)}
+                    </CTableHeaderCell>
+                    <CTableDataCell>{state.signerInfoName}</CTableDataCell>
+                    <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
+                      {Strings.Form.FieldName.SIGNER_INFO_POSITION(
+                        Strings.OfficialDispatchTravel.NAME,
                       )}
+                    </CTableHeaderCell>
+                    <CTableDataCell>{state.signerInfoPosition}</CTableDataCell>
+                  </CTableRow>
+                  <CTableRow>
+                    <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
+                      {Strings.Form.FieldName.DUE_DATE(Strings.OfficialDispatchTravel.NAME)}
+                    </CTableHeaderCell>
+                    <CTableDataCell colSpan={3}>
+                      {Helpers.formatDateFromString(state.dueDate, {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: 'numeric',
+                      })}
+                    </CTableDataCell>
+                  </CTableRow>
+                  <CTableRow>
+                    <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
+                      {Strings.Priority.NAME}
+                    </CTableHeaderCell>
+                    <CTableDataCell>
+                      <CBadge
+                        style={{
+                          background: state.priority.color,
+                          color: Helpers.getTextColorByBackgroundColor(state.priority.color),
+                        }}
+                      >
+                        {state.priority.name}
+                      </CBadge>
+                    </CTableDataCell>
+                    <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
+                      {Strings.Security.NAME}
+                    </CTableHeaderCell>
+                    <CTableDataCell>
+                      <CBadge
+                        style={{
+                          background: state.security.color,
+                          color: Helpers.getTextColorByBackgroundColor(state.security.color),
+                        }}
+                      >
+                        {state.security.name}
+                      </CBadge>
+                    </CTableDataCell>
+                  </CTableRow>
+                  <CTableRow>
+                    <CTableHeaderCell className="py-2" style={{ minWidth: '150px' }}>
+                      {Strings.Form.FieldName.ORGANIZATION_ODT}
+                    </CTableHeaderCell>
+                    <CTableDataCell colSpan={3}>
+                      {state.organ.name} ({state.organ.code})
+                    </CTableDataCell>
+                  </CTableRow>
+                  <CTableRow>
+                    <CTableHeaderCell
+                      colSpan={4}
+                      className="text-center bg-primary bg-gradient bg-opacity-25"
                     >
-                      {Strings.IncomingOfficialDispatch.Common.DESCRIPTION}
-                    </CFormLabel>
-                    <CKEditor
-                      id={Helpers.makeID(
-                        Strings.IncomingOfficialDispatch.CODE,
-                        Helpers.propName(
-                          Strings,
-                          Strings.IncomingOfficialDispatch.Common.DESCRIPTION,
-                        ),
-                      )}
-                      editor={ClassicEditor}
-                      config={ckEditorConfig}
-                      data={state.description}
-                      onChange={(event, editor) => {
-                        const data = editor.getData()
-                        updateState({ description: data })
-                      }}
-                    />
-                  </CTableDataCell>
-                </CTableRow>
+                      <h3>{Strings.Common.OD_FILE}</h3>
+                    </CTableHeaderCell>
+                  </CTableRow>
+                  <CTableRow>
+                    <CTableDataCell colSpan={4}>
+                      {state.file.length !== 0 && renderFile()}
+                    </CTableDataCell>
+                  </CTableRow>
+                  <CTableRow>
+                    <CTableHeaderCell
+                      colSpan={4}
+                      className="text-center bg-primary bg-gradient bg-opacity-25"
+                    >
+                      <h3>{Strings.Common.APPROVE}</h3>
+                    </CTableHeaderCell>
+                  </CTableRow>
+                  <CTableRow>
+                    <CTableDataCell colSpan={4}>
+                      <CFormLabel
+                        htmlFor={Helpers.makeID(
+                          Strings.OfficialDispatchTravel.CODE,
+                          Helpers.propName(
+                            Strings,
+                            Strings.OfficialDispatchTravel.Common.DESCRIPTION,
+                          ),
+                        )}
+                      >
+                        {Strings.OfficialDispatchTravel.Common.DESCRIPTION}
+                      </CFormLabel>
+                      <CKEditor
+                        id={Helpers.makeID(
+                          Strings.OfficialDispatchTravel.CODE,
+                          Helpers.propName(
+                            Strings,
+                            Strings.OfficialDispatchTravel.Common.DESCRIPTION,
+                          ),
+                        )}
+                        editor={ClassicEditor}
+                        config={ckEditorConfig}
+                        data={state.description}
+                        onChange={(event, editor) => {
+                          const data = editor.getData()
+                          updateState({ description: data })
+                        }}
+                      />
+                    </CTableDataCell>
+                  </CTableRow>
+                </CTableBody>
               </CTable>
             </CCardBody>
             <CCardFooter>
@@ -589,19 +561,9 @@ export default function ODTApproval() {
                     disabled={loading}
                     className="w-100"
                     color="primary"
-                    onClick={handleOnClickApproveButton}
+                    onClick={approval}
                   >
                     {Strings.Common.APPROVE}
-                  </CButton>
-                </CCol>
-                <CCol>
-                  <CButton
-                    disabled={loading}
-                    className="w-100"
-                    color="primary"
-                    onClick={() => updateVisible({ assignment: true })}
-                  >
-                    {Strings.Common.APPROVE_ASSIGNMENT}
                   </CButton>
                 </CCol>
                 <CCol>
@@ -648,55 +610,6 @@ export default function ODTApproval() {
       <CModal
         alignment="center"
         size="xl"
-        visible={visible.assignment}
-        onClose={() => {
-          updateVisible({ assignment: false })
-        }}
-        scrollable
-      >
-        <CModalHeader>{Strings.Common.ASSIGNMENT}</CModalHeader>
-        <CModalBody>
-          <CFormLabel htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Priority.CODE)}>
-            {Strings.Form.FieldName.PRIORITY(Strings.IncomingOfficialDispatch.NAME)}{' '}
-          </CFormLabel>
-          <Select
-            id={Helpers.makeID(Strings.Officer.CODE, Strings.Priority.CODE)}
-            options={officer}
-            placeholder={Strings.IncomingOfficialDispatch.Common.SELECT_PRIORITY}
-            onChange={(selectedItem) => {
-              if (selectedItem) updateState({ handler: selectedItem.map((el) => el.value) })
-              else updateState({ handler: null })
-            }}
-            isMulti
-            styles={{
-              control: (provided) => ({
-                ...provided,
-                borderColor: error.handler
-                  ? Constants.Styles.ERROR_COLOR
-                  : Constants.Styles.BORDER_COLOR,
-              }),
-            }}
-            isClearable={Helpers.isNullOrEmpty(id)}
-          />
-          <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
-            {error.handler &&
-              Strings.Form.Validation[error.handler](Strings.Form.FieldName.HANDLER())}
-          </CFormFeedback>
-        </CModalBody>
-        <CModalFooter>
-          <CButton
-            disabled={loading}
-            className="w-100"
-            color="primary"
-            onClick={handleOnClickApprovalAndAssignment}
-          >
-            {Strings.Common.APPROVE_ASSIGNMENT}
-          </CButton>
-        </CModalFooter>
-      </CModal>
-      <CModal
-        alignment="center"
-        size="xl"
         visible={visible.refuse}
         onClose={() => {
           updateVisible({ refuse: false })
@@ -710,15 +623,15 @@ export default function ODTApproval() {
               <CFormLabel
                 htmlFor={Helpers.makeID(
                   Strings.Officer.CODE,
-                  Helpers.propName(Strings, Strings.IncomingOfficialDispatch.Common.REFUSE_REASON),
+                  Helpers.propName(Strings, Strings.OfficialDispatchTravel.Common.REFUSE_REASON),
                 )}
               >
-                {Strings.IncomingOfficialDispatch.Common.REFUSE_REASON}
+                {Strings.OfficialDispatchTravel.Common.REFUSE_REASON}
               </CFormLabel>
               <CKEditor
                 id={Helpers.makeID(
                   Strings.Officer.CODE,
-                  Helpers.propName(Strings, Strings.IncomingOfficialDispatch.Common.REFUSE_REASON),
+                  Helpers.propName(Strings, Strings.OfficialDispatchTravel.Common.REFUSE_REASON),
                 )}
                 editor={ClassicEditor}
                 config={ckEditorConfig}
@@ -731,7 +644,7 @@ export default function ODTApproval() {
               <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
                 {error.refuse &&
                   Strings.Form.Validation[error.refuse](
-                    Strings.IncomingOfficialDispatch.Common.REFUSE_REASON,
+                    Strings.OfficialDispatchTravel.Common.REFUSE_REASON,
                   )}
               </CFormFeedback>
             </CCol>
@@ -741,7 +654,7 @@ export default function ODTApproval() {
               <CFormCheck
                 id="sendEmailImporter"
                 checked={state.sendEmailImporter}
-                label={Strings.IncomingOfficialDispatch.Common.SEND_EMAIL_IMPORTER}
+                label={Strings.OfficialDispatchTravel.Common.SEND_EMAIL_IMPORTER}
                 onChange={() => updateState({ sendEmailImporter: !state.sendEmailImporter })}
               />
             </CCol>
@@ -749,7 +662,7 @@ export default function ODTApproval() {
               <CFormCheck
                 id="sendEmailOrgan"
                 checked={state.sendEmailOrgan}
-                label={Strings.IncomingOfficialDispatch.Common.SEND_EMAIL_ORGAN}
+                label={Strings.OfficialDispatchTravel.Common.SEND_EMAIL_ORGAN}
                 onChange={() => updateState({ sendEmailOrgan: !state.sendEmailOrgan })}
               />
             </CCol>

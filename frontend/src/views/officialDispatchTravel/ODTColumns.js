@@ -15,11 +15,13 @@ export default [
   {
     name: Strings.Form.FieldName.ISSUED_DATE(),
     selector: (row) =>
-      Helpers.formatDateFromString(row.issuedDate, {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      }),
+      row.issuedDate
+        ? Helpers.formatDateFromString(row.issuedDate, {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          })
+        : 'Chưa phát hành',
     sortable: true,
   },
   {

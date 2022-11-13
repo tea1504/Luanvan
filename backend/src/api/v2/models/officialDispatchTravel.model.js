@@ -16,10 +16,6 @@ const officialDispatchTravelSchema = new mongoose.Schema(
   {
     code: {
       type: Number,
-      required: [
-        true,
-        Constants.String.Message.REQUIRED(Constants.String.ODT.CODE),
-      ],
       maxLength: [
         11,
         Constants.String.Message.MAX_LENGTH(Constants.String.ODT.CODE),
@@ -27,10 +23,6 @@ const officialDispatchTravelSchema = new mongoose.Schema(
     },
     issuedDate: {
       type: Date,
-      required: [
-        true,
-        Constants.String.Message.REQUIRED(Constants.String.ODT.ISSUED_DATE),
-      ],
     },
     subject: {
       type: String,
@@ -194,10 +186,6 @@ const officialDispatchTravelSchema = new mongoose.Schema(
         typeFile: {
           type: String,
           required: false,
-          maxLength: [
-            10,
-            Constants.String.Message.MAX_LENGTH(Constants.String.ODT.FILE.TYPE),
-          ],
         },
         size: {
           type: Number,

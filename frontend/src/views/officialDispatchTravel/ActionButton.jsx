@@ -210,7 +210,7 @@ const ActionButton = ({ data }) => {
                 Screens.ODT_UPDATE(
                   `${Helpers.toSlug(
                     Helpers.getMaVanBan(
-                      data.code,
+                      data.code || 0,
                       loggedUser.organ.code,
                       data.type.notation,
                       data.issuedDate,

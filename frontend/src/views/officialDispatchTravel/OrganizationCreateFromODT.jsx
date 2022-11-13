@@ -33,7 +33,12 @@ import Select from 'react-select'
 const service = new OrganizationService()
 const MySwal = withReactContent(Swal)
 
-export default function OrganizationCreateFromODT({ updateVisible, getOrganization, updateOrgan }) {
+export default function OrganizationCreateFromODT({
+  updateVisible,
+  getOrganization,
+  updateOrgan,
+  data,
+}) {
   const dispatch = useDispatch()
   let loggedUser = useSelector((state) => state.user.user)
   if (Helpers.isObjectEmpty(loggedUser))
@@ -159,8 +164,32 @@ export default function OrganizationCreateFromODT({ updateVisible, getOrganizati
         dispatch(setLoading(true))
         const result = await service.createOne(state)
         await getOrganization()
-        updateOrgan({ organ: result.data.data._id })
+        updateOrgan({ organ: [...data.organ, result.data.data._id] })
         updateVisible({ addOrgan: false })
+        dispatch(setLoading(false))
+      } catch (error) {
+        dispatch(setLoading(false))
+        showError(error)
+      }
+    }
+  }
+
+  const handleSubmitNextForm = async (e) => {
+    e.preventDefault()
+    updateError({
+      name: null,
+      code: null,
+      emailAddress: null,
+      phoneNumber: null,
+      organ: null,
+    })
+    if (validate()) {
+      try {
+        dispatch(setLoading(true))
+        const result = await service.createOne(state)
+        await getOrganization()
+        updateOrgan({ organ: [...data.organ, result.data.data._id] })
+        updateState({ name: '', code: '', emailAddress: '', phoneNumber: '' })
         dispatch(setLoading(false))
       } catch (error) {
         dispatch(setLoading(false))
@@ -301,9 +330,18 @@ export default function OrganizationCreateFromODT({ updateVisible, getOrganizati
               </CFormFeedback>
             </CCol>
             <CCol>
-              <CButton className="w-100" onClick={handleSubmitForm}>
-                {Strings.Common.SUBMIT}
-              </CButton>
+              <CRow>
+                <CCol>
+                  <CButton className="w-100" onClick={handleSubmitForm}>
+                    {Strings.Common.SUBMIT}
+                  </CButton>
+                </CCol>
+                <CCol>
+                  <CButton className="w-100" variant="outline" onClick={handleSubmitNextForm}>
+                    {Strings.Common.SUBMIT_NEXT}
+                  </CButton>
+                </CCol>
+              </CRow>
             </CCol>
           </CForm>
         </CCol>

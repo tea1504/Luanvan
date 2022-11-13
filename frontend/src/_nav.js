@@ -8,6 +8,7 @@ import en from './commons/locales/en'
 import {
   FaChartArea,
   FaFile,
+  FaFileExport,
   FaFileImport,
   FaHome,
   FaInfoCircle,
@@ -101,6 +102,29 @@ const _nav = [
         role: [0, 1],
         right: Strings.Common.CREATE_OD,
         to: Screens.IOD_LIST_(Screens.REFUSE),
+      },
+    ],
+  },
+  {
+    component: CNavGroup,
+    name: {
+      vi: vn.OfficialDispatchTravel.NAME,
+      en: en.OfficialDispatchTravel.NAME,
+    },
+    role: [0, 1],
+    right: Strings.Common.READ_OD,
+    to: Screens.IOD,
+    icon: <FaFileExport className="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: {
+          vi: vn.Common.LIST,
+          en: en.Common.LIST,
+        },
+        role: [0, 1],
+        right: Strings.Common.READ_OD,
+        to: Screens.ODT_LIST,
       },
     ],
   },

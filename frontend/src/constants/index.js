@@ -158,7 +158,7 @@ const Constants = {
       `/official-dispatch-travel/organ/${id}?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
     GET_ODT: (id = '') => `/official-dispatch-travel/` + id,
     GET_FILE_ODT: (id = '') => `/official-dispatch-travel/file/` + id,
-    GET_NEW_ARRIVAL_NUMBER: '/official-dispatch-travel/new-arrival-number/',
+    GET_NEW_CODE: '/official-dispatch-travel/new-code/',
     CREATE_ODT: '/official-dispatch-travel',
     CREATE_ODTS: '/official-dispatch-travel/csv',
     UPDATE_ODT: (id = '') => '/official-dispatch-travel/' + id,

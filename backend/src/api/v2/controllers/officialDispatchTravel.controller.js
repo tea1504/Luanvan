@@ -60,9 +60,9 @@ var officialDispatchTravelController = {
    * @param {import("express").Response} res
    * @param {import("express").RequestHandler} next
    */
-  getNewArrivalNumber: async (req, res, next) => {
+  getNewCode: async (req, res, next) => {
     try {
-      const result = await service.getNewArrivalNumber(req.userID);
+      const result = await service.getNewCode(req.userID);
       return res.status(result.status).json(result);
     } catch (error) {
       return next(error);
@@ -77,12 +77,11 @@ var officialDispatchTravelController = {
     try {
       const files = req.files;
       var {
-        code,
-        issuedDate,
         subject,
         type,
         language,
         pageAmount,
+        issuedAmount,
         description,
         signerInfoName,
         signerInfoPosition,
@@ -91,7 +90,6 @@ var officialDispatchTravelController = {
         security,
         organ,
         approver,
-        handler,
         sendEmail,
       } = req.body;
       if (!language)
@@ -125,16 +123,14 @@ var officialDispatchTravelController = {
           status: Constants.ApiCode.BAD_REQUEST,
           message: Constants.String.Message.ERR_400(Constants.String.IOD.TYPE),
         });
-      if (!handler) handler = [];
       const result = await service.postOne(
         req.userID,
         {
-          code,
-          issuedDate,
           subject,
           type,
           language,
           pageAmount,
+          issuedAmount,
           description,
           signerInfoName,
           signerInfoPosition,
@@ -143,7 +139,6 @@ var officialDispatchTravelController = {
           security,
           organ,
           approver,
-          handler,
           sendEmail,
         },
         files
@@ -172,6 +167,7 @@ var officialDispatchTravelController = {
         type,
         language,
         pageAmount,
+        issuedAmount,
         description,
         signerInfoName,
         signerInfoPosition,
@@ -179,7 +175,6 @@ var officialDispatchTravelController = {
         security,
         organ,
         approver,
-        handler,
         sendEmail,
       } = req.body;
       const result = await service.putOne(
@@ -194,6 +189,7 @@ var officialDispatchTravelController = {
           type,
           language,
           pageAmount,
+          issuedAmount,
           description,
           signerInfoName,
           signerInfoPosition,
@@ -201,7 +197,6 @@ var officialDispatchTravelController = {
           security,
           organ,
           approver,
-          handler,
           sendEmail,
         },
         files
@@ -220,13 +215,10 @@ var officialDispatchTravelController = {
     try {
       const { id } = req.params;
       const list = id.split(".");
-      var { handler, sendEmail, arrivalNumber, description } = req.body;
-      if (!handler) handler = [];
+      var { code, description } = req.body;
       const result = await service.approval(list[list.length - 1], req.userID, {
-        handler,
         description,
-        sendEmail,
-        arrivalNumber,
+        code,
       });
       return res.status(result.status).json(result);
     } catch (error) {
