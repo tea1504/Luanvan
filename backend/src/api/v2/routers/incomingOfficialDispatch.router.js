@@ -27,6 +27,21 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage });
 
 route.get(
+  Constants.ApiPath.IncomingOfficialDispatch.STATISTIC_YEAR_MONTH_TYPE,
+  createOD,
+  controller.getStatisticTypeYear
+);
+route.get(
+  Constants.ApiPath.IncomingOfficialDispatch.STATISTIC_YEAR_MONTH,
+  createOD,
+  controller.getStatisticYearPerMonth
+);
+route.get(
+  Constants.ApiPath.IncomingOfficialDispatch.STATISTIC_MONTH_DATE,
+  createOD,
+  controller.getStatisticMonth
+);
+route.get(
   Constants.ApiPath.IncomingOfficialDispatch.REPORT,
   createOD,
   controller.report

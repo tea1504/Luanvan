@@ -146,6 +146,10 @@ const Constants = {
     DELETE_IODS: '/incoming-official-dispatch',
     REPORT_IOD: (start, end) => `/incoming-official-dispatch/report?start=${start}&end=${end}`,
     REPORT_YEAR_IOD: `/incoming-official-dispatch/report/year`,
+    STATISTIC_IOD_YEAR_MONTH: (year) =>
+      `/incoming-official-dispatch/statistic/year-month?year=${year}`,
+    STATISTIC_IOD_MONTH_DATE: (year, month) =>
+      `/incoming-official-dispatch/statistic/month-date?year=${year}&month=${month}`,
 
     // official-dispatch
     POST_PROCESS_OD: `/official-dispatch/process/`,

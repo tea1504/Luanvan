@@ -1080,6 +1080,145 @@ var incomingOfficialDispatchService = {
       return showError(error);
     }
   },
+
+  getStatisticYearPerMonth: async (userID = "", year = 2022) => {
+    try {
+      const user = await officerModel.findById(userID, { deleted: false });
+      if (!user)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Officer._),
+        };
+      const listUser = await officerModel.find({
+        deleted: false,
+        organ: user.organ,
+      });
+      const result = await model.aggregate([
+        {
+          $project: {
+            importer: "$importer",
+            year: { $year: "$arrivalDate" },
+            month: { $month: "$arrivalDate" },
+          },
+        },
+        {
+          $match: {
+            importer: { $in: [...listUser].map((el) => el._id) },
+            year: year,
+          },
+        },
+        {
+          $group: {
+            _id: "$month",
+            count: { $count: {} },
+          },
+        },
+      ]);
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.GET_200(Constants.String.IOD._),
+        data: result,
+      };
+    } catch (error) {
+      return showError(error);
+    }
+  },
+
+  getStatisticMonth: async (userID = "", year = 2022, month = 1) => {
+    try {
+      const user = await officerModel.findById(userID, { deleted: false });
+      if (!user)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Officer._),
+        };
+      const listUser = await officerModel.find({
+        deleted: false,
+        organ: user.organ,
+      });
+      const result = await model.aggregate([
+        {
+          $project: {
+            importer: "$importer",
+            year: { $year: "$arrivalDate" },
+            month: { $month: "$arrivalDate" },
+            day: { $dayOfMonth: "$arrivalDate" },
+          },
+        },
+        {
+          $match: {
+            importer: { $in: [...listUser].map((el) => el._id) },
+            year: year,
+            month: month,
+          },
+        },
+        {
+          $group: {
+            _id: "$day",
+            count: { $count: {} },
+          },
+        },
+      ]);
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.GET_200(Constants.String.IOD._),
+        data: result,
+      };
+    } catch (error) {
+      return showError(error);
+    }
+  },
+
+  getStatisticTypeYear: async (userID = "", year = 2022) => {
+    try {
+      const user = await officerModel.findById(userID, { deleted: false });
+      if (!user)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Officer._),
+        };
+      const listUser = await officerModel.find({
+        deleted: false,
+        organ: user.organ,
+      });
+      const result = await model.aggregate([
+        {
+          $project: {
+            importer: "$importer",
+            year: { $year: "$arrivalDate" },
+            type: 1,
+          },
+        },
+        {
+          $match: {
+            importer: { $in: [...listUser].map((el) => el._id) },
+            year: year,
+          },
+        },
+        {
+          $group: {
+            _id: "$type",
+            count: { $count: {} },
+          },
+        },
+        // {
+        //   $lookup: {
+        //     from: "types",
+        //     localField: "_id",
+        //     foreignField: "_id",
+        //     as: "type",
+        //   },
+        // },
+      ]);
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.GET_200(Constants.String.IOD._),
+        data: result,
+      };
+    } catch (error) {
+      return showError(error);
+    }
+  },
 };
 
 module.exports = incomingOfficialDispatchService;

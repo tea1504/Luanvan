@@ -387,6 +387,58 @@ var incomingOfficialDispatchController = {
       return next(error);
     }
   },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
+  getStatisticYearPerMonth: async (req, res, next) => {
+    try {
+      const { year } = req.query;
+      const result = await service.getStatisticYearPerMonth(
+        req.userID,
+        parseInt(year)
+      );
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
+  getStatisticMonth: async (req, res, next) => {
+    try {
+      const { year, month } = req.query;
+      const result = await service.getStatisticMonth(
+        req.userID,
+        parseInt(year),
+        parseInt(month)
+      );
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
+  getStatisticTypeYear: async (req, res, next) => {
+    try {
+      const { year } = req.query;
+      const result = await service.getStatisticTypeYear(
+        req.userID,
+        parseInt(year)
+      );
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  },
 };
 
 module.exports = incomingOfficialDispatchController;

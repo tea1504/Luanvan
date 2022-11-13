@@ -100,6 +100,10 @@ const Constants = {
       SLASH: "/",
       REPORT: "/report",
       REPORT_YEAR: "/report/year",
+      STATISTIC_YEAR_MONTH: "/statistic/year-month",
+      STATISTIC_MONTH_DATE: "/statistic/month-date",
+      STATISTIC_YEAR_MONTH_TYPE: "/statistic/type/year-month",
+      STATISTIC_MONTH_DATE_TYPE: "/statistic/type/month-date",
     },
     OfficerStatus: {
       ROOT: "/officer-statuses",
