@@ -46,6 +46,15 @@ const IODApproval = React.lazy(() => import('./views/incomingOfficialDispatch/IO
 const IODHandle = React.lazy(() => import('./views/incomingOfficialDispatch/IODHandle'))
 const IODReport = React.lazy(() => import('./views/incomingOfficialDispatch/IODReport'))
 const IODStatistic = React.lazy(() => import('./views/incomingOfficialDispatch/IODStatistic'))
+const ODT = React.lazy(() => import('./views/officialDispatchTravel/ODT'))
+const ODTCreateOrUpdate = React.lazy(() =>
+  import('./views/officialDispatchTravel/ODTCreateOrUpdate'),
+)
+const ODTDetail = React.lazy(() => import('./views/officialDispatchTravel/ODTDetail'))
+const ODTApproval = React.lazy(() => import('./views/officialDispatchTravel/ODTApproval'))
+const ODTHandle = React.lazy(() => import('./views/officialDispatchTravel/ODTHandle'))
+const ODTReport = React.lazy(() => import('./views/officialDispatchTravel/ODTReport'))
+const ODTStatistic = React.lazy(() => import('./views/officialDispatchTravel/ODTStatistic'))
 const ODReport = React.lazy(() => import('./views/officialDispatch/ODReport'))
 const User = React.lazy(() => import('./views/user/User'))
 const UserChangePassword = React.lazy(() => import('./views/user/UserChangePassword'))
@@ -403,6 +412,68 @@ const routes = [
     exact: true,
     role: [0, 1],
   },
+  {
+    path: Screens.ODT,
+    name: { vi: vn.OfficialDispatchTravel.NAME, en: en.OfficialDispatchTravel.NAME },
+    element: ODT,
+    role: [0, 1],
+    right: Strings.Common.READ_OD,
+  },
+  {
+    path: Screens.ODT_LIST,
+    name: {
+      vi: vn.OfficialDispatchTravel.Title.LIST,
+      en: en.OfficialDispatchTravel.Title.LIST,
+    },
+    element: ODT,
+    role: [0, 1],
+    right: Strings.Common.READ_OD,
+  },
+  {
+    path: Screens.ODT_DETAIL(),
+    name: { vi: vn.Common.DETAIL, en: en.Common.DETAIL },
+    element: ODTDetail,
+    role: [0, 1],
+    right: Strings.Common.READ_OD,
+  },
+  /*{
+    path: Screens.ODT_CREATE,
+    name: { vi: vn.Common.CREATE, en: en.Common.CREATE },
+    element: IODCreateOrUpdate,
+    role: [0, 1],
+    right: Strings.Common.CREATE_OD,
+  },
+  {
+    path: Screens.ODT_UPDATE(),
+    name: { vi: vn.Common.UPDATE, en: en.Common.UPDATE },
+    element: IODCreateOrUpdate,
+    role: [0, 1],
+    right: Strings.Common.UPDATE_OD,
+  },
+  {
+    path: Screens.ODT_APPROVE(),
+    name: { vi: vn.Common.APPROVE, en: en.Common.APPROVE },
+    element: IODApproval,
+    role: [0, 1],
+    right: Strings.Common.APPROVE_OD,
+  },
+  {
+    path: Screens.ODT_HANDLE(),
+    name: {
+      vi: vn.IncomingOfficialDispatch.Common.HANDLE,
+      en: en.IncomingOfficialDispatch.Common.HANDLE,
+    },
+    element: IODHandle,
+    role: [0, 1],
+  },
+  {
+    path: Screens.ODT_LIST_(),
+    name: { vi: vn.IncomingOfficialDispatch.NAME, en: en.IncomingOfficialDispatch.NAME },
+    element: IOD,
+    exact: true,
+    role: [0, 1],
+  },
+  */
 ]
 
 export default routes

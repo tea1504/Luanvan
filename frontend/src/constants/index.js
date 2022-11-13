@@ -151,6 +151,28 @@ const Constants = {
     STATISTIC_IOD_MONTH_DATE: (year, month) =>
       `/incoming-official-dispatch/statistic/month-date?year=${year}&month=${month}`,
 
+    // Official Dispatch Travel
+    GET_ODTS: (limit = 5, pageNumber = 1, filter = '', params = '') =>
+      `/official-dispatch-travel?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}&${params}`,
+    GET_ODTS_BY_ORGAN_ID: (id = '', limit = 10, pageNumber = 1, filter = '') =>
+      `/official-dispatch-travel/organ/${id}?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
+    GET_ODT: (id = '') => `/official-dispatch-travel/` + id,
+    GET_FILE_ODT: (id = '') => `/official-dispatch-travel/file/` + id,
+    GET_NEW_ARRIVAL_NUMBER: '/official-dispatch-travel/new-arrival-number/',
+    CREATE_ODT: '/official-dispatch-travel',
+    CREATE_ODTS: '/official-dispatch-travel/csv',
+    UPDATE_ODT: (id = '') => '/official-dispatch-travel/' + id,
+    APPROVE_ODT: (id = '') => '/official-dispatch-travel/approval/' + id,
+    APPROVE_CANCEL_ODT: (id = '') => '/official-dispatch-travel/cancel-approval/' + id,
+    DELETE_ODT: (id = '') => '/official-dispatch-travel/' + id,
+    DELETE_ODTS: '/official-dispatch-travel',
+    REPORT_ODT: (start, end) => `/official-dispatch-travel/report?start=${start}&end=${end}`,
+    REPORT_YEAR_ODT: `/official-dispatch-travel/report/year`,
+    STATISTIC_ODT_YEAR_MONTH: (year) =>
+      `/official-dispatch-travel/statistic/year-month?year=${year}`,
+    STATISTIC_ODT_MONTH_DATE: (year, month) =>
+      `/official-dispatch-travel/statistic/month-date?year=${year}&month=${month}`,
+
     // official-dispatch
     POST_PROCESS_OD: `/official-dispatch/process/`,
 

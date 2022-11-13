@@ -1,9 +1,9 @@
 const Constants = require("../constants");
-const service = require("./../services/incomingOfficialDispatch.service");
+const service = require("../services/officialDispatchTravel.service");
 var fs = require("fs");
 const path = require("path");
 
-var incomingOfficialDispatchController = {
+var officialDispatchTravelController = {
   /**
    * @param {import("express").Request} req
    * @param {import("express").Response} res
@@ -441,4 +441,4 @@ var incomingOfficialDispatchController = {
   },
 };
 
-module.exports = incomingOfficialDispatchController;
+module.exports = officialDispatchTravelController;

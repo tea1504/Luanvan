@@ -51,7 +51,7 @@ export default function OrganizationCreateOrUpdate() {
     code: '',
     emailAddress: '',
     phoneNumber: '',
-    organ: loggedUser.right.scope === 0 ? '' : loggedUser.organ,
+    organ: loggedUser.right.scope === 0 ? '' : loggedUser.organ._id,
     inside: false,
   })
   const updateState = (newState) => {

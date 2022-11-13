@@ -129,7 +129,8 @@ var authService = {
       const officer = await officerModel
         .findById(id, "-password -deleted -createdAt -updatedAt -__v")
         .populate("right")
-        .populate("status");
+        .populate("status")
+        .populate("organ");
       if (!officer) return { status: 404, message: "không tìm thấy thông tin" };
       return { status: 200, message: "thành công", data: officer };
     } catch (error) {

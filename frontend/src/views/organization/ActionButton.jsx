@@ -152,7 +152,7 @@ const ActionButton = ({ data }) => {
       )}
       {loggedUser.right[Strings.Common.UPDATE_CATEGORIES] &&
       (loggedUser.right.scope === 0
-        ? data.inside || data.organ == loggedUser.organ
+        ? data.inside || data.organ == loggedUser.organ._id
         : !data.inside) ? (
         <CTooltip content={Strings.Common.EDIT}>
           <CButton
@@ -172,7 +172,7 @@ const ActionButton = ({ data }) => {
       )}
       {loggedUser.right[Strings.Common.DELETE_CATEGORIES] &&
       (loggedUser.right.scope === 0
-        ? data.inside || data.organ == loggedUser.organ
+        ? data.inside || data.organ == loggedUser.organ._id
         : !data.inside) ? (
         <CTooltip content={Strings.Common.DELETE}>
           <CButton color="danger" className="m-1" onClick={handleDeleteButton}>

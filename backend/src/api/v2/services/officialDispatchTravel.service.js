@@ -1,8 +1,7 @@
 const Constants = require("../constants");
 const officerModel = require("../models/officer.model");
 const statusModel = require("../models/status.model");
-const incomingOfficialDispatchModel = require("./../models/incomingOfficialDispatch.model");
-const model = require("./../models/incomingOfficialDispatch.model");
+const model = require("../models/officialDispatchTravel.model");
 const path = require("path");
 var fs = require("fs");
 var nodemailer = require("nodemailer");
@@ -18,7 +17,7 @@ var transporter = nodemailer.createTransport({
   },
 });
 
-var incomingOfficialDispatchService = {
+var officialDispatchTravelService = {
   getManyByUserOrgan: async (
     userID = "",
     limit = 10,
@@ -69,13 +68,13 @@ var incomingOfficialDispatchService = {
         (el) => params[el] === "" && delete params[el]
       );
       var between = {};
-      if (params.arrivalNumberStart) {
-        between.arrivalNumber = {
-          $gte: parseInt(params.arrivalNumberStart),
-          $lte: parseInt(params.arrivalNumberEnd),
+      if (params.codeStart) {
+        between.code = {
+          $gte: parseInt(params.codeStart),
+          $lte: parseInt(params.codeEnd),
         };
-        delete params.arrivalNumberStart;
-        delete params.arrivalNumberEnd;
+        delete params.codeStart;
+        delete params.codeEnd;
       }
       if (params.issuedStartDate) {
         between.issuedDate = {
@@ -85,7 +84,7 @@ var incomingOfficialDispatchService = {
         delete params.issuedStartDate;
         delete params.issuedEndDate;
       }
-      if (params.arrivalNumber < 1) params.arrivalNumber = null;
+      if (params.code < 1) params.code = null;
       if (params.typeMulti) {
         between.type = { $in: params.typeMulti.split(",") };
         delete params.type;
@@ -97,7 +96,7 @@ var incomingOfficialDispatchService = {
         delete params.statusMulti;
       }
       if (params.organMulti) {
-        between.organ = { $in: params.organMulti.split(",") };
+        between.organ = { $all: params.organMulti.split(",") };
         delete params.organMulti;
       }
       if (params.handler) {
@@ -119,6 +118,7 @@ var incomingOfficialDispatchService = {
         between.importer = { $in: params.importer.split(",") };
         delete params.importer;
       }
+      console.log(between);
       const khongMat = await securityModel.findOne({ name: "Không" });
       const result = {};
       const total = await model.countDocuments({
@@ -177,16 +177,13 @@ var incomingOfficialDispatchService = {
         .populate("organ")
         .populate("approver")
         .populate("importer")
-        .populate("handler")
         .populate("status")
-        .populate("traceHeaderList.officer")
-        .populate("traceHeaderList.status")
         .skip(startIndex)
         .limit(limit)
-        .sort({ arrivalDate: -1, arrivalNumber: -1 });
+        .sort({ issuedDate: -1, code: -1 });
       return {
         status: Constants.ApiCode.SUCCESS,
-        message: Constants.String.Message.GET_200(Constants.String.Language._),
+        message: Constants.String.Message.GET_200(Constants.String.ODT._),
         data: result,
       };
     } catch (error) {
@@ -233,10 +230,7 @@ var incomingOfficialDispatchService = {
         .populate("organ")
         .populate("approver")
         .populate("importer")
-        .populate("handler")
-        .populate("status")
-        .populate("traceHeaderList.officer")
-        .populate("traceHeaderList.status");
+        .populate("status");
       if (!item)
         return {
           status: Constants.ApiCode.NOT_FOUND,
@@ -307,7 +301,7 @@ var incomingOfficialDispatchService = {
           status: Constants.ApiCode.NOT_FOUND,
           message: Constants.String.Message.ERR_404(Constants.String.Officer._),
         };
-      const IOD = await incomingOfficialDispatchModel
+      const ODT = await model
         .findOne({
           organ: user.organ,
           arrivalDate: {
@@ -317,7 +311,7 @@ var incomingOfficialDispatchService = {
           deleted: false,
         })
         .sort({ arrivalNumber: -1 });
-      if (!IOD)
+      if (!ODT)
         return {
           status: Constants.ApiCode.SUCCESS,
           message: Constants.String.Message.GET_200(
@@ -330,7 +324,7 @@ var incomingOfficialDispatchService = {
         message: Constants.String.Message.GET_200(
           Constants.String.IOD.ARRIVAL_NUMBER
         ),
-        data: IOD.arrivalNumber + 1,
+        data: ODT.arrivalNumber + 1,
       };
     } catch (error) {
       return {
@@ -927,10 +921,10 @@ var incomingOfficialDispatchService = {
           status: Constants.ApiCode.NOT_FOUND,
           message: Constants.String.Message.ERR_404(Constants.String.IOD._),
         };
-      item.file.map((el) => {
-        const pathFile = path.join(__dirname, "./../../../../public/", el.path);
-        if (fs.existsSync(pathFile)) fs.unlinkSync(pathFile);
-      });
+      // item.file.map((el) => {
+      //   const pathFile = path.join(__dirname, "./../../../../public/", el.path);
+      //   if (fs.existsSync(pathFile)) fs.unlinkSync(pathFile);
+      // });
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.DELETE_200(Constants.String.IOD._),
@@ -952,16 +946,16 @@ var incomingOfficialDispatchService = {
           message: Constants.String.Message.ERR_404(Constants.String.Officer._),
         };
       const listItems = await model.find({ _id: { $in: ids } });
-      listItems.map((el) => {
-        el.file.map((f) => {
-          const pathFile = path.join(
-            __dirname,
-            "./../../../../public/",
-            f.path
-          );
-          if (fs.existsSync(pathFile)) fs.unlinkSync(pathFile);
-        });
-      });
+      // listItems.map((el) => {
+      //   el.file.map((f) => {
+      //     const pathFile = path.join(
+      //       __dirname,
+      //       "./../../../../public/",
+      //       f.path
+      //     );
+      //     if (fs.existsSync(pathFile)) fs.unlinkSync(pathFile);
+      //   });
+      // });
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.DELETE_200(Constants.String.IOD._),
@@ -1221,4 +1215,4 @@ var incomingOfficialDispatchService = {
   },
 };
 
-module.exports = incomingOfficialDispatchService;
+module.exports = officialDispatchTravelService;

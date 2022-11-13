@@ -2,7 +2,13 @@ require("dotenv").config();
 var mongoose = require("mongoose");
 var databaseConfig = require("../../../config/database.config");
 const Constants = require("../constants");
+const languageModel = require("./language.model");
+const officerModel = require("./officer.model");
+const organizationModel = require("./organization.model");
+const priorityModel = require("./priority.model");
+const securityModel = require("./security.model");
 const statusModel = require("./status.model");
+const typeModel = require("./type.model");
 
 mongoose.connect(databaseConfig.v2.path);
 
@@ -39,7 +45,7 @@ const officialDispatchTravelSchema = new mongoose.Schema(
     },
     type: {
       type: mongoose.ObjectId,
-      ref: "types",
+      ref: typeModel,
       required: [
         true,
         Constants.String.Message.REQUIRED(Constants.String.ODT.TYPE),
@@ -47,7 +53,7 @@ const officialDispatchTravelSchema = new mongoose.Schema(
     },
     language: {
       type: mongoose.ObjectId,
-      ref: "language",
+      ref: languageModel,
       required: [
         true,
         Constants.String.Message.REQUIRED(Constants.String.ODT.LANGUAGE),
@@ -114,7 +120,7 @@ const officialDispatchTravelSchema = new mongoose.Schema(
     },
     priority: {
       type: mongoose.ObjectId,
-      ref: "priorities",
+      ref: priorityModel,
       required: [
         true,
         Constants.String.Message.REQUIRED(Constants.String.ODT.PRIORITY),
@@ -122,7 +128,7 @@ const officialDispatchTravelSchema = new mongoose.Schema(
     },
     security: {
       type: mongoose.ObjectId,
-      ref: "securities",
+      ref: securityModel,
       required: [
         true,
         Constants.String.Message.REQUIRED(Constants.String.ODT.SECURITY),
@@ -131,16 +137,21 @@ const officialDispatchTravelSchema = new mongoose.Schema(
     organ: [
       {
         type: mongoose.ObjectId,
-        ref: "organizations",
+        ref: organizationModel,
         required: [
           true,
           Constants.String.Message.REQUIRED(Constants.String.ODT.ORGAN),
         ],
       },
     ],
+    approver: {
+      type: mongoose.ObjectId,
+      ref: officerModel,
+      required: false,
+    },
     importer: {
       type: mongoose.ObjectId,
-      ref: "officers",
+      ref: officerModel,
       required: [
         true,
         Constants.String.Message.REQUIRED(Constants.String.ODT.IMPORTER),

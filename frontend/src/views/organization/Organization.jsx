@@ -287,7 +287,7 @@ export default function Organization() {
                       !(
                         loggedUser.right[Strings.Common.DELETE_CATEGORIES] &&
                         (loggedUser.right.scope === 0
-                          ? row.inside || row.organ == loggedUser.organ
+                          ? row.inside || row.organ == loggedUser.organ._id
                           : !row.inside)
                       )
                     }

@@ -104,7 +104,7 @@ const createODT = (
     issuedAmount,
     organ: organ
       .sort(() => 0.5 - Math.random())
-      .slice(0, Math.floor(Math.random() * organ.length)),
+      .slice(0, Math.floor(Math.random() * 3 + 1)),
     approver,
     importer,
     status: statusData[statusIndex]._id,
@@ -122,10 +122,10 @@ for (var i = 0; i < organizationData.length; i++) {
     const listOfficer = officerData.filter(
       (el) => el.organ === organizationData[i]._id
     );
-    for (var year = 2017; year < now.getFullYear(); year++) {
+    for (var year = 2021; year < now.getFullYear(); year++) {
       let c = 1;
       timeStart = new Date(year + "-1-1");
-      let randomAmount = Math.floor(Math.random() * 365 * 7 + 365);
+      let randomAmount = Math.floor(Math.random() * 1 * 7 + 10);
       for (var j = 0; j < randomAmount; j++) {
         timeEnd = new Date(
           new Date(year + "-1-1").getTime() + aYear * (j / randomAmount)
@@ -150,6 +150,32 @@ for (var i = 0; i < organizationData.length; i++) {
           )
         );
       }
+    }
+    let c = 1;
+    timeStart = new Date(new Date().getFullYear() + "-1-1");
+    let randomAmount = Math.floor(Math.random() * 1 * 3 + 10);
+    for (var j = 0; j < randomAmount; j++) {
+      timeEnd = new Date(
+        new Date(year + "-1-1").getTime() + aYear * (j / randomAmount)
+      );
+      let signer = listOfficer[Math.floor(Math.random() * listOfficer.length)];
+      ODTData.push(
+        createODT(
+          c++,
+          s[Math.floor(Math.random() * s.length)],
+          Math.floor(Math.random() * typeData.length),
+          Math.floor(Math.random() * languageData.length),
+          Math.floor(Math.random() * 10 + 1),
+          `${signer.lastName} ${signer.firstName}`,
+          signer.position,
+          Math.floor(Math.random() * 1000 + 1),
+          Math.floor(Math.random() * priorityData.length),
+          Math.floor(Math.random() * securityData.length),
+          organ,
+          listOfficer,
+          Math.floor(Math.random() * statusData.length)
+        )
+      );
     }
   }
 }

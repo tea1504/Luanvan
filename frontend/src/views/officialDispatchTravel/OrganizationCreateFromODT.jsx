@@ -33,7 +33,7 @@ import Select from 'react-select'
 const service = new OrganizationService()
 const MySwal = withReactContent(Swal)
 
-export default function OrganizationCreateFromIOD({ updateVisible, getOrganization, updateOrgan }) {
+export default function OrganizationCreateFromODT({ updateVisible, getOrganization, updateOrgan }) {
   const dispatch = useDispatch()
   let loggedUser = useSelector((state) => state.user.user)
   if (Helpers.isObjectEmpty(loggedUser))
