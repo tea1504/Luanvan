@@ -83,7 +83,7 @@ const incomingOfficialDispatchSchema = new mongoose.Schema(
         ),
       ],
       maxLength: [
-        500,
+        50,
         Constants.String.Message.MAX_LENGTH(
           Constants.String.IOD.SIGNER_INFO_NAME
         ),

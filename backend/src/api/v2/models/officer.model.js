@@ -153,6 +153,12 @@ const officerSchema = new mongoose.Schema(
       typeFile: {
         type: String,
         required: false,
+        maxLength: [
+          200,
+          Constants.String.Message.MAX_LENGTH(
+            Constants.String.Officer.FILE.TYPE
+          ),
+        ],
       },
       size: {
         type: Number,

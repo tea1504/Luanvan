@@ -9,19 +9,29 @@ const prioritySchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
-      maxLength: 100,
-    },
-    description: {
-      type: String,
-      required: false,
-      maxLength: 1000,
+      required: [
+        true,
+        Constants.String.Message.REQUIRED(Constants.String.Priority.NAME),
+      ],
+      maxLength: [
+        100,
+        Constants.String.Message.MAX_LENGTH(Constants.String.Priority.NAME),
+      ],
     },
     color: {
       type: String,
-      required: true,
-      minLength: 7,
-      maxLength: 7,
+      required: [
+        true,
+        Constants.String.Message.REQUIRED(Constants.String.Priority.COLOR),
+      ],
+      minLength: [
+        7,
+        Constants.String.Message.MIN_LENGTH(Constants.String.Priority.COLOR),
+      ],
+      maxLength: [
+        7,
+        Constants.String.Message.MIN_LENGTH(Constants.String.Priority.COLOR),
+      ],
       default: Constants.Styles.LIGHT_BLUE_COLOR,
     },
     deleted: {

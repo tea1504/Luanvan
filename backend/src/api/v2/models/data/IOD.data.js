@@ -162,10 +162,10 @@ for (var i = 0; i < organizationData.length; i++) {
     const listOfficer = officerData.filter(
       (el) => el.organ === organizationData[i]._id
     );
-    for (var year = 2021; year < now.getFullYear(); year++) {
+    for (var year = 2022; year < now.getFullYear(); year++) {
       let c = 1;
       timeStart = new Date(year + "-1-1");
-      let randomAmount = Math.floor(Math.random() * 1 * 7 + 10);
+      let randomAmount = Math.floor(Math.random() * 1 * 3 + 10);
       for (var j = 0; j < randomAmount; j++) {
         timeEnd = new Date(
           new Date(year + "-1-1").getTime() + aYear * (j / randomAmount)

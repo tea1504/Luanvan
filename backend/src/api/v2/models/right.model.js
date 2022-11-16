@@ -13,7 +13,10 @@ const rightSchema = new mongoose.Schema(
         true,
         Constants.String.Message.REQUIRED(Constants.String.Right.NAME),
       ],
-      maxLength: 20,
+      maxLength: [
+        100,
+        Constants.String.Message.MAX_LENGTH(Constants.String.Right.NAME),
+      ],
     },
     readOD: {
       type: Boolean,
@@ -147,9 +150,7 @@ const rightSchema = new mongoose.Schema(
       type: Boolean,
       required: [
         true,
-        Constants.String.Message.REQUIRED(
-          Constants.String.Right.CREATE_RIGHT
-        ),
+        Constants.String.Message.REQUIRED(Constants.String.Right.CREATE_RIGHT),
       ],
       default: false,
     },
@@ -157,9 +158,7 @@ const rightSchema = new mongoose.Schema(
       type: Boolean,
       required: [
         true,
-        Constants.String.Message.REQUIRED(
-          Constants.String.Right.READ_RIGHT
-        ),
+        Constants.String.Message.REQUIRED(Constants.String.Right.READ_RIGHT),
       ],
       default: false,
     },
@@ -167,9 +166,7 @@ const rightSchema = new mongoose.Schema(
       type: Boolean,
       required: [
         true,
-        Constants.String.Message.REQUIRED(
-          Constants.String.Right.UPDATE_RIGHT
-        ),
+        Constants.String.Message.REQUIRED(Constants.String.Right.UPDATE_RIGHT),
       ],
       default: false,
     },
@@ -177,9 +174,7 @@ const rightSchema = new mongoose.Schema(
       type: Boolean,
       required: [
         true,
-        Constants.String.Message.REQUIRED(
-          Constants.String.Right.DELETE_RIGHT
-        ),
+        Constants.String.Message.REQUIRED(Constants.String.Right.DELETE_RIGHT),
       ],
       default: false,
     },
