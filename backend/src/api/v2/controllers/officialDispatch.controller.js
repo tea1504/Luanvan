@@ -273,7 +273,7 @@ var officialDispatch = {
         res.write(`|${count++}/${max}`);
       }
 
-      fs.unlinkSync(file.path);
+      // fs.unlinkSync(file.path);
       // fs.rmdirSync(savePath, { recursive: true, force: true });
       res.write("#");
 
