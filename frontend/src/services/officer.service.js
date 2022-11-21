@@ -32,6 +32,12 @@ class OfficerService extends BaseService {
     })
     return result
   }
+  async getNewCode() {
+    const result = await this.api.get({
+      path: Constants.ApiPath.GET_OFFICER_NEW_CODE,
+    })
+    return result
+  }
   async createOne(type) {
     const result = await this.api.postFormData({
       path: Constants.ApiPath.CREATE_OFFICER,

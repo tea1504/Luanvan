@@ -12,6 +12,7 @@ import {
   CFormInput,
   CFormLabel,
   CFormSelect,
+  CFormText,
   CImage,
   CRow,
   CSpinner,
@@ -55,7 +56,7 @@ export default function OfficerCreateOrUpdate() {
   const store = useSelector((state) => state.officer.data)
 
   const [state, setState] = useState({
-    code: '',
+    code: '000000',
     firstName: '',
     lastName: '',
     emailAddress: '',
@@ -77,7 +78,6 @@ export default function OfficerCreateOrUpdate() {
   }
 
   const [error, setError] = useState({
-    code: null,
     firstName: null,
     lastName: null,
     emailAddress: null,
@@ -99,6 +99,39 @@ export default function OfficerCreateOrUpdate() {
   const [organ, setOrgan] = useState([])
   const [right, setRight] = useState([])
   const [status, setStatus] = useState([])
+
+  const showError = (error) => {
+    if (error.status) {
+      switch (error.status) {
+        case 401:
+          MySwal.fire({
+            title: Strings.Message.COMMON_ERROR,
+            icon: 'error',
+            text: error.message,
+          }).then(() => {
+            localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
+            localStorage.clear(Constants.StorageKeys.USER_INFO)
+            navigate(Screens.LOGIN)
+          })
+          break
+        case 406:
+          const message = Object.values(error.data.error).map((el) => el.message)
+          MySwal.fire({
+            title: Strings.Message.COMMON_ERROR,
+            icon: 'error',
+            html: message.join('<br/>'),
+          })
+          break
+        default:
+          MySwal.fire({
+            title: Strings.Message.COMMON_ERROR,
+            icon: 'error',
+            text: error.message,
+          })
+          break
+      }
+    } else console.log(error)
+  }
 
   const getState = async (id = '') => {
     if (store.length > 0) {
@@ -144,6 +177,18 @@ export default function OfficerCreateOrUpdate() {
           })
           break
       }
+    }
+  }
+
+  const getNewCode = async () => {
+    try {
+      dispatch(setLoading(true))
+      const result = await service.getNewCode()
+      updateState({ code: result.data.data })
+      dispatch(setLoading(false))
+    } catch (error) {
+      dispatch(setLoading(false))
+      showError(error)
     }
   }
 
@@ -276,17 +321,6 @@ export default function OfficerCreateOrUpdate() {
       })
       flag = false
     }
-    if (Helpers.isNullOrEmpty(state.code)) {
-      updateError({
-        code: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED),
-      })
-      flag = false
-    } else if (state.code.length > 10) {
-      updateError({
-        code: Helpers.propName(Strings, Strings.Form.Validation.MAX_LENGTH),
-      })
-      flag = false
-    }
     if (Helpers.isNullOrEmpty(state.lastName)) {
       updateError({
         lastName: Helpers.propName(Strings, Strings.Form.Validation.REQUIRED),
@@ -339,7 +373,6 @@ export default function OfficerCreateOrUpdate() {
   const handleSubmitForm = async (e) => {
     e.preventDefault()
     updateError({
-      code: null,
       firstName: null,
       lastName: null,
       emailAddress: null,
@@ -362,7 +395,6 @@ export default function OfficerCreateOrUpdate() {
             text: Strings.Officer.Common.ALERT_PASSWORD(result.data.data.password),
           })
           updateState({
-            code: '',
             firstName: '',
             lastName: '',
             emailAddress: '',
@@ -375,8 +407,9 @@ export default function OfficerCreateOrUpdate() {
             right: null,
             status: null,
           })
+          await getNewCode()
         } else {
-          const result = await service.updateOne(id, state)
+          await service.updateOne(id, state)
           MySwal.fire({
             title: Strings.Common.SUCCESS,
             icon: 'success',
@@ -416,7 +449,6 @@ export default function OfficerCreateOrUpdate() {
       await getState(list[list.length - 1])
     } else
       updateState({
-        code: '',
         firstName: '',
         lastName: '',
         emailAddress: '',
@@ -453,6 +485,7 @@ export default function OfficerCreateOrUpdate() {
       getOrganization()
       getRight()
       getStatus()
+      getNewCode()
     }
     return () => {
       URL.revokeObjectURL(state.avatarTemp)
@@ -476,8 +509,7 @@ export default function OfficerCreateOrUpdate() {
                       Helpers.propName(Strings, Strings.Form.FieldName.CODE),
                     )}
                   >
-                    {Strings.Form.FieldName.CODE(Strings.Officer.NAME)}{' '}
-                    <Required mes={Strings.Form.Validation.REQUIRED()} />
+                    {Strings.Form.FieldName.CODE(Strings.Officer.NAME)}
                   </CFormLabel>
                   <CFormInput
                     invalid={!Helpers.isNullOrEmpty(error.code)}
@@ -488,15 +520,9 @@ export default function OfficerCreateOrUpdate() {
                     )}
                     placeholder={Strings.Form.FieldName.CODE(Strings.Officer.NAME)}
                     value={state.code}
-                    onChange={(e) => updateState({ code: e.target.value })}
-                    onKeyPress={handleKeypress}
+                    disabled
                   />
-                  <CFormFeedback invalid>
-                    {error.code &&
-                      Strings.Form.Validation[error.code](
-                        Strings.Form.FieldName.CODE(Strings.Officer.NAME),
-                      )}
-                  </CFormFeedback>
+                  <CFormText>Mã số được gán tự động</CFormText>
                 </CCol>
                 <CCol xs={12} md={6}>
                   <CFormLabel

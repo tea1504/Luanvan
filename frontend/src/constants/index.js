@@ -120,6 +120,7 @@ const Constants = {
     GET_OFFICERS_BY_USER: (limit = 10, pageNumber = 1, filter = '') =>
       `/officers/user?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
     GET_OFFICER: (id = '') => `/officers/` + id,
+    GET_OFFICER_NEW_CODE: '/officers/new-code',
     CREATE_OFFICER: '/officers',
     CREATE_OFFICERS: '/officers/csv',
     UPDATE_OFFICER: (id = '') => '/officers/' + id,

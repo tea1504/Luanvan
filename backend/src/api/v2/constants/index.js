@@ -32,6 +32,7 @@ const Constants = {
       ORGAN_ID: "/organ/:id",
       USER_ID: "/user",
       LIST: "/list",
+      NEW_CODE: "/new-code",
     },
     Type: {
       ROOT: "/types",

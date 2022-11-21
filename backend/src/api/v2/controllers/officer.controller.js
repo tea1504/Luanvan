@@ -93,6 +93,19 @@ const officerController = {
    * @param {import("express").Response} res
    * @param {import("express").RequestHandler} next
    */
+  getNewCode: async (req, res, next) => {
+    try {
+      const result = await service.getNewCode();
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
   postOne: async (req, res, next) => {
     try {
       const file = req.file;

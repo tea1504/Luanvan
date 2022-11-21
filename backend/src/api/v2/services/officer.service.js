@@ -10,6 +10,7 @@ require("dotenv").config();
 var nodemailer = require("nodemailer");
 const rightModel = require("../models/right.model");
 const officerModel = require("../models/officer.model");
+const showError = require("./error.service");
 
 var transporter = nodemailer.createTransport({
   service: "gmail",
@@ -64,12 +65,6 @@ var officerService = {
       }
     }
   },
-  /**
-   * @param {number} limit
-   * @param {number} pageNumber
-   * @param {string} filter
-   * @returns {import("./../interfaces").ResponseResult}
-   */
   getMany: async (limit = 10, pageNumber = 1, filter = "") => {
     try {
       const result = {};
@@ -131,10 +126,6 @@ var officerService = {
       };
     }
   },
-  /**
-   * @param {string} id
-   * @returns {import("./../interfaces").ResponseResult}
-   */
   getOne: async (id) => {
     try {
       const item = await model
@@ -169,13 +160,6 @@ var officerService = {
       }
     }
   },
-  /**
-   * @param {string} id
-   * @param {number} limit
-   * @param {number} pageNumber
-   * @param {string} filter
-   * @returns {import("./../interfaces").ResponseResult}
-   */
   getManyByOrganId: async (id, limit = 10, pageNumber = 1, filter = "") => {
     try {
       const item = await organizationModel.findOne({ _id: id, deleted: false });
@@ -256,13 +240,6 @@ var officerService = {
       }
     }
   },
-  /**
-   * @param {string} id
-   * @param {number} limit
-   * @param {number} pageNumber
-   * @param {string} filter
-   * @returns {import("./../interfaces").ResponseResult}
-   */
   getManyByUser: async (id, limit = 10, pageNumber = 1, filter = "") => {
     try {
       const user = await model.findById(id);
@@ -289,10 +266,22 @@ var officerService = {
       }
     }
   },
-  /**
-   * @param {import("./../interfaces").OfficerModel} data
-   * @returns {import("./../interfaces").ResponseResult}
-   */
+  getNewCode: async () => {
+    try {
+      const officer = await model
+        .findOne({ deleted: false })
+        .sort({ code: -1 });
+      const newCode = parseInt(officer.code) + 1;
+      const result = "0".repeat(6 - (newCode + "").length) + newCode;
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.GET_200(Constants.String.Officer._),
+        data: result,
+      };
+    } catch (error) {
+      return showError(error);
+    }
+  },
   postOne: async (data, file) => {
     try {
       const code = await model.findOne({

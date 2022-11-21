@@ -24,6 +24,10 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage });
 
 route.get(
+  Constants.ApiPath.Officers.NEW_CODE,
+  controller.getNewCode
+);
+route.get(
   Constants.ApiPath.Officers.LIST,
   controller.getList
 );
