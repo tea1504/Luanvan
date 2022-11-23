@@ -33,6 +33,23 @@ const Helpers = {
     Array.from(crypto.randomFillSync(new Uint32Array(length)))
       .map((x) => wishList[x % wishList.length])
       .join(""),
+  formatDateFromString: (
+    dateString = "",
+    options = {
+      weekday: "long",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }
+  ) => {
+    var date = new Date(dateString);
+    const language = localStorage.getItem(Constants.StorageKeys.LANGUAGE);
+    if (language) return date.toLocaleDateString(language, options);
+    return date.toLocaleDateString(Constants.DefaultLanguage, options);
+  },
 };
 
 module.exports = Helpers;

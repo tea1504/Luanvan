@@ -13,6 +13,7 @@ import {
   CDropdownMenu,
   CDropdownToggle,
   CRow,
+  CWidgetStatsA,
 } from '@coreui/react'
 import React, { useRef } from 'react'
 import Chart from 'chart.js/auto'
@@ -29,6 +30,8 @@ import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import Screens from 'src/constants/screens'
 import { setLoading } from 'src/store/slice/config.slice'
+import { CChartLine } from '@coreui/react-chartjs'
+import { FaArrowDown, FaArrowUp, FaUps } from 'react-icons/fa'
 
 const service = new IODService()
 const MySwal = withReactContent(Swal)
@@ -61,6 +64,60 @@ export default function IODStatistic() {
     ],
   })
   const updateState = (newState) => setState((prevState) => ({ ...prevState, ...newState }))
+  const [IODWeek, setIODWeek] = useState({
+    data: {
+      labels: ['', '', '', '', '', '', ''],
+      datasets: [
+        {
+          label: 'My First dataset',
+          backgroundColor: 'transparent',
+          borderColor: 'rgba(255,255,255,.55)',
+          data: [1, 1, 1, 1, 1, 1, 1],
+        },
+      ],
+    },
+    options: {
+      plugins: {
+        legend: {
+          display: false,
+        },
+      },
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          grid: {
+            display: false,
+            drawBorder: false,
+          },
+          ticks: {
+            display: false,
+          },
+        },
+        y: {
+          display: false,
+          grid: {
+            display: false,
+          },
+          ticks: {
+            display: false,
+          },
+        },
+      },
+      elements: {
+        line: {
+          borderWidth: 1,
+          tension: 0.4,
+        },
+        point: {
+          radius: 4,
+          hitRadius: 10,
+          hoverRadius: 4,
+        },
+      },
+    },
+    now: 0,
+    percent: 0,
+  })
 
   const showError = (error) => {
     switch (error.status) {
@@ -145,6 +202,33 @@ export default function IODStatistic() {
     }
   }
 
+  const getIODCurrentWeek = async (mode = 'year', year = 0, month = 0, week = 0) => {
+    try {
+      dispatch(setLoading(true))
+      const result = await service.getIODCurrentWeek()
+      setIODWeek((prevState) => ({
+        ...prevState,
+        data: {
+          labels: result.data.data.labels,
+          datasets: [
+            {
+              label: 'Số công văn',
+              backgroundColor: 'transparent',
+              borderColor: 'rgba(255,255,255,.55)',
+              data: result.data.data.data,
+            },
+          ],
+        },
+        now: result.data.data.now,
+        percent: Math.round(result.data.data.percent * 10000) / 100,
+      }))
+      dispatch(setLoading(false))
+    } catch (error) {
+      dispatch(setLoading(false))
+      showError(error)
+    }
+  }
+
   const getYearReport = async () => {
     try {
       dispatch(setLoading(true))
@@ -165,12 +249,36 @@ export default function IODStatistic() {
   useEffect(() => {
     getStatistic('year', selectedYear)
     getYearReport()
+    getIODCurrentWeek()
   }, [])
 
   return (
     <CContainer>
       <CRow>
-        <CCol>
+        <CCol xs={12}>
+          <CWidgetStatsA
+            className="mb-4"
+            color="primary"
+            value={
+              <>
+                {IODWeek.now}{' '}
+                <span className="fs-6 fw-normal">
+                  ({IODWeek.percent}% {IODWeek.percent > 0 ? <FaArrowDown /> : <FaArrowUp />})
+                </span>
+              </>
+            }
+            title="Users"
+            chart={
+              <CChartLine
+                className="mt-3 mx-3"
+                style={{ height: '70px' }}
+                data={IODWeek.data}
+                options={IODWeek.options}
+              />
+            }
+          />
+        </CCol>
+        <CCol xs={12}>
           <CCard>
             <CCardBody>
               <CCardTitle>

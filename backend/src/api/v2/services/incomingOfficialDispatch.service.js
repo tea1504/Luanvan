@@ -981,7 +981,6 @@ var incomingOfficialDispatchService = {
     try {
       const startDate = new Date(parseInt(start));
       const endDate = new Date(parseInt(end));
-      console.log(startDate, endDate);
       const user = await officerModel.findById(userID, { deleted: false });
       if (!user)
         return {
@@ -992,54 +991,57 @@ var incomingOfficialDispatchService = {
         deleted: false,
         organ: user.organ,
       });
-      const result = await model.aggregate([
-        {
-          $project: {
-            arrivalDate: "$arrivalDate",
-            importer: "$importer",
-            organ: 1,
-            status: 1,
-          },
-        },
-        {
-          $match: {
-            importer: { $in: [...listUser].map((el) => el._id) },
-            arrivalDate: {
-              $lte: endDate,
-              $gte: startDate,
+      const listOrgan = await organizationModel.find({
+        $or: [{ inside: true }, { organ: user.organ }],
+        _id: { $ne: user.organ },
+        deleted: false,
+      });
+      const listStatus = await statusModel.find({
+        deleted: false,
+      });
+      let r = [];
+      for (var i = 0; i < listOrgan.length; i++) {
+        let temp = await model.aggregate([
+          {
+            $project: {
+              arrivalDate: "$arrivalDate",
+              importer: "$importer",
+              organ: 1,
+              status: 1,
             },
           },
-        },
-        {
-          $group: {
-            _id: { o: "$organ", s: "$status" },
-            status: { $first: "$status" },
-            organ: { $first: "$organ" },
-            count: { $count: {} },
+          {
+            $match: {
+              importer: { $in: [...listUser].map((el) => el._id) },
+              arrivalDate: {
+                $lte: endDate,
+                $gte: startDate,
+              },
+              organ: listOrgan[i]._id,
+            },
           },
-        },
-        {
-          $group: {
-            _id: "$organ",
-            status: { $push: "$status" },
-            statusCount: { $push: "$count" },
-            organ: { $first: "$organ" },
-            count: { $count: {} },
+          {
+            $group: {
+              _id: "$status",
+              count: { $count: {} },
+            },
           },
-        },
-        {
-          $lookup: {
-            from: "organizations",
-            localField: "organ",
-            foreignField: "_id",
-            as: "organ_",
+        ]);
+        temp.reduce((ac, a) => ({ ...ac, [a._id]: a.count }), {});
+        let status = listStatus.map((el) => ({ _id: el._id, count: 0 }));
+        r.push({
+          _id: listOrgan[i]._id,
+          name: listOrgan[i].name,
+          status: {
+            ...status.reduce((ac, a) => ({ ...ac, [a._id]: a.count }), {}),
+            ...temp.reduce((ac, a) => ({ ...ac, [a._id]: a.count }), {}),
           },
-        },
-      ]);
+        });
+      }
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.GET_200(Constants.String.IOD._),
-        data: result,
+        data: r,
       };
     } catch (error) {
       return showError(error);
@@ -1206,19 +1208,112 @@ var incomingOfficialDispatchService = {
             count: { $count: {} },
           },
         },
-        // {
-        //   $lookup: {
-        //     from: "types",
-        //     localField: "_id",
-        //     foreignField: "_id",
-        //     as: "type",
-        //   },
-        // },
       ]);
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.GET_200(Constants.String.IOD._),
         data: result,
+      };
+    } catch (error) {
+      return showError(error);
+    }
+  },
+
+  getStatisticCurrentWeek: async (userID = "") => {
+    try {
+      const user = await officerModel.findById(userID, { deleted: false });
+      if (!user)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Officer._),
+        };
+      const listUser = await officerModel.find({
+        deleted: false,
+        organ: user.organ,
+      });
+      let labels = [];
+      let data = [];
+      for (var i = 6; i >= 0; i--) {
+        var date = new Date();
+        var last = new Date(date.getTime() - i * 24 * 60 * 60 * 1000);
+        var day = last.getDate();
+        var month = last.getMonth() + 1;
+        labels.push(day + "/" + month);
+        const temp = await model.aggregate([
+          {
+            $project: {
+              importer: "$importer",
+              day: { $dayOfMonth: "$arrivalDate" },
+              month: { $month: "$arrivalDate" },
+            },
+          },
+          {
+            $match: {
+              importer: { $in: [...listUser].map((el) => el._id) },
+              day: day,
+              month: month,
+            },
+          },
+          {
+            $group: {
+              _id: { day: "$day", month: "$month" },
+              count: { $count: {} },
+            },
+          },
+          {
+            $sort: {
+              "_id.month": 1,
+              "_id.day": 1,
+            },
+          },
+        ]);
+        if (temp.length === 0) data.push(0);
+        else {
+          data.push(temp[0].count);
+        }
+      }
+      // const temp = await model.aggregate([
+      //   {
+      //     $project: {
+      //       importer: "$importer",
+      //       arrivalDate: 1,
+      //       day: { $dayOfMonth: "$arrivalDate" },
+      //       month: { $month: "$arrivalDate" },
+      //     },
+      //   },
+      //   {
+      //     $match: {
+      //       importer: { $in: [...listUser].map((el) => el._id) },
+      //       arrivalDate: {
+      //         $lte: endDate,
+      //         $gte: startDate,
+      //       },
+      //     },
+      //   },
+      //   {
+      //     $group: {
+      //       _id: { day: "$day", month: "$month" },
+      //       count: { $count: {} },
+      //     },
+      //   },
+      //   {
+      //     $sort: {
+      //       "_id.month": 1,
+      //       "_id.day": 1,
+      //     },
+      //   },
+      // ]);
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.GET_200(Constants.String.IOD._),
+        data: {
+          data,
+          now: data[data.length - 1],
+          percent:
+            (data[data.length - 1] - data[data.length - 2]) /
+            (data[data.length - 2] + (data[data.length - 2] !== 0 ? 0 : 1)),
+          labels,
+        },
       };
     } catch (error) {
       return showError(error);

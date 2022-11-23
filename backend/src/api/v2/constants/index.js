@@ -105,6 +105,7 @@ const Constants = {
       STATISTIC_MONTH_DATE: "/statistic/month-date",
       STATISTIC_YEAR_MONTH_TYPE: "/statistic/type/year-month",
       STATISTIC_MONTH_DATE_TYPE: "/statistic/type/month-date",
+      STATISTIC_CURRENT_WEEK: "/statistic/current-week",
     },
     OfficialDispatchTravel: {
       APPROVAL_CANCEL: "/cancel-approval/:id",

@@ -43,6 +43,9 @@ import StatusService from 'src/services/status.service'
 import { setLoading } from 'src/store/slice/config.slice'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
+import { useReactToPrint } from 'react-to-print'
+import { useRef } from 'react'
+import { IODReportPrint } from './IODReportPrint'
 
 const service = new IODService()
 const statusService = new StatusService()
@@ -72,6 +75,11 @@ export default function IODReport() {
   const updateVisible = (newState) => setVisible((prevState) => ({ ...prevState, ...newState }))
   const [activeKey, setActiveKey] = useState(1)
   const [year, setYear] = useState([])
+  const printRef = useRef()
+
+  const handleOnClickPrintButton = useReactToPrint({
+    content: () => printRef.current,
+  })
 
   const showError = (error) => {
     switch (error.status) {
@@ -111,13 +119,7 @@ export default function IODReport() {
       var e = new Date(time.end)
       e.setDate(e.getDate() + 1)
       const result = await service.report(new Date(time.start).getTime(), e.getTime())
-      result.data.data.map((el) => {
-        let status = {}
-        el.status.map((e, ind) => {
-          status[e] = el.statusCount[ind]
-        })
-        setState((prevState) => [...prevState, { organ: el.organ_[0], status: status }])
-      })
+      setState(result.data.data)
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
@@ -251,6 +253,15 @@ export default function IODReport() {
 
   return (
     <CContainer fluid>
+      <div className="d-none">
+        <IODReportPrint
+          ref={printRef}
+          state={state}
+          status={status}
+          start={time.start}
+          end={time.end}
+        />
+      </div>
       <CRow>
         <CCol>
           <CCard className="mb-3 border-secondary border-top-5">
@@ -275,7 +286,7 @@ export default function IODReport() {
                     <CButton onClick={() => updateVisible({ date: true })}>
                       <FaCalendar /> Chọn ngày
                     </CButton>
-                    <CButton variant="outline">
+                    <CButton variant="outline" onClick={handleOnClickPrintButton}>
                       <FaPrint /> In báo cáo
                     </CButton>
                   </CButtonGroup>
@@ -342,14 +353,14 @@ export default function IODReport() {
                         state.map((el, ind) => (
                           <CTableRow key={ind}>
                             <CTableDataCell>{ind + 1}</CTableDataCell>
-                            <CTableDataCell>{el?.organ?.name}</CTableDataCell>
+                            <CTableDataCell>{el?.name}</CTableDataCell>
                             <CTableDataCell
                               className="text-end"
                               onClick={() =>
                                 navigate({
                                   pathname: Screens.IOD_LIST,
                                   search: `?issuedStartDate=${time.start.getTime()}&issuedEndDate=${time.end.getTime()}&organMulti=${
-                                    el.organ._id
+                                    el._id
                                   }`,
                                 })
                               }
@@ -366,7 +377,7 @@ export default function IODReport() {
                                     pathname: Screens.IOD_LIST,
                                     search: `?issuedStartDate=${time.start.getTime()}&issuedEndDate=${time.end.getTime()}&statusMulti=${
                                       e._id
-                                    }&organMulti=${el.organ._id}`,
+                                    }&organMulti=${el._id}`,
                                   })
                                 }
                                 style={{ cursor: 'pointer' }}

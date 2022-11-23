@@ -190,6 +190,42 @@ const Dashboard = () => {
     <CContainer fluid>
       <CRow>
         <CCol sm={9} className="mt-1">
+          <CRow className="mt-1">
+            <CCol xs={12}>
+              <CCard className="shadow-lg">
+                <CCardBody>
+                  <CRow xs={{ cols: 1 }} md={{ cols: 3 }} lg={{ cols: 5 }}>
+                    {func.map((el, ind) => {
+                      return (
+                        <CCol key={ind}>
+                          <CWidgetStatsD
+                            onMouseEnter={handleMouseEnter}
+                            onMouseLeave={handleMouseLeave}
+                            onClick={() => navigate(el.to, { replace: true })}
+                            className={'mb-3 ' + el.color}
+                            style={{ cursor: 'pointer' }}
+                            {...el}
+                            values={[{ value: el.value }]}
+                          />
+                        </CCol>
+                      )
+                    })}
+                  </CRow>
+                </CCardBody>
+              </CCard>
+            </CCol>
+          </CRow>
+          <CRow className="mt-1">
+            <CCol xs={12}>
+              <Calendar
+                value={new Date()}
+                locale={language}
+                className="shadow-lg border-0 p-3 w-100"
+              />
+            </CCol>
+          </CRow>
+        </CCol>
+        <CCol sm={3} className="mt-5 mt-sm-1">
           <CRow>
             <CCol xs={12}>
               <CCard className="shadow-lg">
@@ -255,34 +291,6 @@ const Dashboard = () => {
               </CCard>
             </CCol>
           </CRow>
-          <CRow className="mt-1">
-            <CCol xs={12}>
-              <CCard className="shadow-lg">
-                <CCardBody>
-                  <CRow xs={{ cols: 1 }} md={{ cols: 3 }} lg={{ cols: 5 }}>
-                    {func.map((el, ind) => {
-                      return (
-                        <CCol key={ind}>
-                          <CWidgetStatsD
-                            onMouseEnter={handleMouseEnter}
-                            onMouseLeave={handleMouseLeave}
-                            onClick={() => navigate(el.to, { replace: true })}
-                            className={'mb-3 ' + el.color}
-                            style={{ cursor: 'pointer' }}
-                            {...el}
-                            values={[{ value: el.value }]}
-                          />
-                        </CCol>
-                      )
-                    })}
-                  </CRow>
-                </CCardBody>
-              </CCard>
-            </CCol>
-          </CRow>
-        </CCol>
-        <CCol sm={3} className="mt-5 mt-sm-1">
-          <Calendar value={new Date()} locale={language} className="shadow-lg border-0 p-3 w-100" />
         </CCol>
       </CRow>
     </CContainer>

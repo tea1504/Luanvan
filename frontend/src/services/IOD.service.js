@@ -161,6 +161,12 @@ class IODService extends BaseService {
     })
     return result
   }
+  async getIODCurrentWeek() {
+    const result = await this.api.get({
+      path: Constants.ApiPath.STATISTIC_IOD_CURRENT_WEEK,
+    })
+    return result
+  }
 }
 
 export default IODService

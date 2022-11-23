@@ -17,6 +17,9 @@ let aNow = new Date().getTime() - new Date("2022-1-1").getTime();
 let aYear = 31536000000;
 let rightApproveOD = rightData.filter((el) => el.approveOD).map((el) => el._id);
 let rightImporterOD = rightData.filter((el) => el.createOD).map((el) => el._id);
+let max = 5000,
+  min = 2500,
+  y = 0;
 let s = [
   "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem ",
   "Ipsum has been the industry's standard dummy text ever since the 1500s, when an ",
@@ -127,6 +130,13 @@ const createIOD = (
     header: statusData[3].name,
     status: statusData[3]._id,
   });
+  traceHeaderList.push({
+    officer: handler[0],
+    command: statusData[statusIndex].description,
+    date: arrivalDate,
+    header: statusData[statusIndex].name,
+    status: statusData[statusIndex]._id,
+  });
   timeStart = issuedDate;
   return {
     code,
@@ -162,10 +172,10 @@ for (var i = 0; i < organizationData.length; i++) {
     const listOfficer = officerData.filter(
       (el) => el.organ === organizationData[i]._id
     );
-    for (var year = 2022; year < now.getFullYear(); year++) {
+    for (var year = now.getFullYear() - y; year < now.getFullYear(); year++) {
       let c = 1;
       timeStart = new Date(year + "-1-1");
-      let randomAmount = Math.floor(Math.random() * 1 * 3 + 10);
+      let randomAmount = Math.floor(Math.random() * (max - min) + min);
       for (var j = 0; j < randomAmount; j++) {
         timeEnd = new Date(
           new Date(year + "-1-1").getTime() + aYear * (j / randomAmount)
@@ -193,7 +203,7 @@ for (var i = 0; i < organizationData.length; i++) {
     }
     let c = 1;
     timeStart = new Date(now.getFullYear() + "-1-1");
-    let randomAmount = Math.floor(Math.random() * 1 * 3 + 10);
+    let randomAmount = Math.floor(Math.random() * (max - min) + min);
     for (var j = 0; j < randomAmount; j++) {
       timeEnd = new Date(
         new Date(now.getFullYear() + "-1-1").getTime() +
