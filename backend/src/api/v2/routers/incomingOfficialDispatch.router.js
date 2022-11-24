@@ -32,6 +32,11 @@ route.get(
   controller.getStatisticTypeYear
 );
 route.get(
+  Constants.ApiPath.IncomingOfficialDispatch.STATISTIC_STATUS_CURRENT_WEEK,
+  createOD,
+  controller.getStatisticStatusCurrentWeek
+);
+route.get(
   Constants.ApiPath.IncomingOfficialDispatch.STATISTIC_CURRENT_WEEK,
   createOD,
   controller.getStatisticCurrentWeek

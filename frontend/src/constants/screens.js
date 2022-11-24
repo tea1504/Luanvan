@@ -104,6 +104,7 @@ const Screens = {
   OD_REPORT: '/bao-cao-thong-ke',
   OD_REPORT_IOD_STATISTIC: '/bao-cao-thong-ke/thong-ke-van-ban-den',
   OD_REPORT_IOD_REPORT: '/bao-cao-thong-ke/bao-cao-van-ban-den',
+  OD_REPORT_IOD_REPORT_PROCESSING: '/bao-cao-thong-ke/theo-doi-van-ban-dang-xu-ly',
 
   // user
   OFFICER_INFO: '/nguoi-dung',

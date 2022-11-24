@@ -1272,37 +1272,86 @@ var incomingOfficialDispatchService = {
           data.push(temp[0].count);
         }
       }
-      // const temp = await model.aggregate([
-      //   {
-      //     $project: {
-      //       importer: "$importer",
-      //       arrivalDate: 1,
-      //       day: { $dayOfMonth: "$arrivalDate" },
-      //       month: { $month: "$arrivalDate" },
-      //     },
-      //   },
-      //   {
-      //     $match: {
-      //       importer: { $in: [...listUser].map((el) => el._id) },
-      //       arrivalDate: {
-      //         $lte: endDate,
-      //         $gte: startDate,
-      //       },
-      //     },
-      //   },
-      //   {
-      //     $group: {
-      //       _id: { day: "$day", month: "$month" },
-      //       count: { $count: {} },
-      //     },
-      //   },
-      //   {
-      //     $sort: {
-      //       "_id.month": 1,
-      //       "_id.day": 1,
-      //     },
-      //   },
-      // ]);
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.GET_200(Constants.String.IOD._),
+        data: {
+          data,
+          now: data[data.length - 1],
+          percent:
+            (data[data.length - 1] - data[data.length - 2]) /
+            (data[data.length - 2] + (data[data.length - 2] !== 0 ? 0 : 1)),
+          labels,
+        },
+      };
+    } catch (error) {
+      return showError(error);
+    }
+  },
+
+  getStatisticStatusCurrentWeek: async (userID = "", statusName = "") => {
+    try {
+      const user = await officerModel.findById(userID, { deleted: false });
+      if (!user)
+        return {
+          status: Constants.ApiCode.NOT_FOUND,
+          message: Constants.String.Message.ERR_404(Constants.String.Officer._),
+        };
+      const listUser = await officerModel.find({
+        deleted: false,
+        organ: user.organ,
+      });
+      const status = await statusModel.findOne({ name: statusName });
+      let labels = [];
+      let data = [];
+      for (var i = 6; i >= 0; i--) {
+        var date = new Date();
+        var last = new Date(date.getTime() - i * 24 * 60 * 60 * 1000);
+        var day = last.getDate();
+        var month = last.getMonth() + 1;
+        labels.push(day + "/" + month);
+        const temp = await model.aggregate([
+          {
+            $project: {
+              importer: 1,
+              status: 1,
+              lastElem: { $last: "$traceHeaderList" },
+            },
+          },
+          {
+            $project: {
+              importer: 1,
+              status: 1,
+              day: { $dayOfMonth: "$lastElem.date" },
+              month: { $month: "$lastElem.date" },
+            },
+          },
+          {
+            $match: {
+              importer: { $in: [...listUser].map((el) => el._id) },
+              status: status._id,
+              day: day,
+              month: month,
+            },
+          },
+          {
+            $group: {
+              _id: { day: "$day", month: "$month" },
+              count: { $count: {} },
+            },
+          },
+          {
+            $sort: {
+              "_id.month": 1,
+              "_id.day": 1,
+            },
+          },
+        ]);
+        if (temp.length === 0) data.push(0);
+        else {
+          data.push(temp[0].count);
+        }
+      }
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.GET_200(Constants.String.IOD._),

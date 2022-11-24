@@ -152,6 +152,8 @@ const Constants = {
     STATISTIC_IOD_MONTH_DATE: (year, month) =>
       `/incoming-official-dispatch/statistic/month-date?year=${year}&month=${month}`,
     STATISTIC_IOD_CURRENT_WEEK: `/incoming-official-dispatch/statistic/current-week`,
+    STATISTIC_IOD_STATUS_CURRENT_WEEK: (name) =>
+      `/incoming-official-dispatch/statistic/status/current-week/${name}`,
 
     // Official Dispatch Travel
     GET_ODTS: (limit = 5, pageNumber = 1, filter = '', params = '') =>

@@ -46,6 +46,7 @@ const IODApproval = React.lazy(() => import('./views/incomingOfficialDispatch/IO
 const IODHandle = React.lazy(() => import('./views/incomingOfficialDispatch/IODHandle'))
 const IODReport = React.lazy(() => import('./views/incomingOfficialDispatch/IODReport'))
 const IODStatistic = React.lazy(() => import('./views/incomingOfficialDispatch/IODStatistic'))
+const IODProgressing = React.lazy(() => import('./views/incomingOfficialDispatch/IODProgressing'))
 const ODT = React.lazy(() => import('./views/officialDispatchTravel/ODT'))
 const ODTCreateOrUpdate = React.lazy(() =>
   import('./views/officialDispatchTravel/ODTCreateOrUpdate'),
@@ -409,6 +410,13 @@ const routes = [
     path: Screens.OD_REPORT_IOD_STATISTIC,
     name: { vi: vn.Common.REPORT, en: en.Common.REPORT },
     element: IODStatistic,
+    exact: true,
+    role: [0, 1],
+  },
+  {
+    path: Screens.OD_REPORT_IOD_REPORT_PROCESSING,
+    name: { vi: vn.Common.REPORT, en: en.Common.REPORT },
+    element: IODProgressing,
     exact: true,
     role: [0, 1],
   },

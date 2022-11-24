@@ -452,6 +452,23 @@ var incomingOfficialDispatchController = {
       return next(error);
     }
   },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
+  getStatisticStatusCurrentWeek: async (req, res, next) => {
+    try {
+      const statusName = req.params.id;
+      const result = await service.getStatisticStatusCurrentWeek(
+        req.userID,
+        statusName
+      );
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  },
 };
 
 module.exports = incomingOfficialDispatchController;

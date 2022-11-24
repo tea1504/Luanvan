@@ -12,6 +12,7 @@ import {
   CDropdownItem,
   CDropdownMenu,
   CDropdownToggle,
+  CPlaceholder,
   CRow,
   CWidgetStatsA,
 } from '@coreui/react'
@@ -30,7 +31,7 @@ import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import Screens from 'src/constants/screens'
 import { setLoading } from 'src/store/slice/config.slice'
-import { CChartLine } from '@coreui/react-chartjs'
+import { CChartBar, CChartLine } from '@coreui/react-chartjs'
 import { FaArrowDown, FaArrowUp, FaUps } from 'react-icons/fa'
 
 const service = new IODService()
@@ -112,6 +113,148 @@ export default function IODStatistic() {
           radius: 4,
           hitRadius: 10,
           hoverRadius: 4,
+        },
+      },
+    },
+    now: 0,
+    percent: 0,
+  })
+  const [IODImplementWeek, setIODImplementWeek] = useState({
+    data: {
+      labels: ['', '', '', '', '', '', ''],
+      datasets: [
+        {
+          label: 'My First dataset',
+          backgroundColor: 'transparent',
+          borderColor: 'rgba(255,255,255,.55)',
+          data: [1, 1, 1, 1, 1, 1, 1],
+        },
+      ],
+    },
+    options: {
+      plugins: {
+        legend: {
+          display: false,
+        },
+      },
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          grid: {
+            display: false,
+            drawBorder: false,
+          },
+          ticks: {
+            display: false,
+          },
+        },
+        y: {
+          display: false,
+          grid: {
+            display: false,
+          },
+          ticks: {
+            display: false,
+          },
+        },
+      },
+      elements: {
+        line: {
+          borderWidth: 1,
+          tension: 0.4,
+        },
+        point: {
+          radius: 4,
+          hitRadius: 10,
+          hoverRadius: 4,
+        },
+      },
+    },
+    now: 0,
+    percent: 0,
+  })
+  const [IODRefuseWeek, setIODRefuseWeek] = useState({
+    data: {
+      labels: ['', '', '', '', '', '', ''],
+      datasets: [
+        {
+          label: 'My First dataset',
+          backgroundColor: 'rgba(255,255,255,.2)',
+          borderColor: 'rgba(255,255,255,.55)',
+          data: [0, 0, 0, 0, 0, 0, 0],
+          fill: true,
+        },
+      ],
+    },
+    options: {
+      plugins: {
+        legend: {
+          display: false,
+        },
+      },
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          display: false,
+        },
+        y: {
+          display: false,
+        },
+      },
+      elements: {
+        line: {
+          borderWidth: 2,
+          tension: 0.4,
+        },
+        point: {
+          radius: 0,
+          hitRadius: 10,
+          hoverRadius: 4,
+        },
+      },
+    },
+    now: 0,
+    percent: 0,
+  })
+  const [IODLateWeek, setIODLateWeek] = useState({
+    data: {
+      labels: ['', '', '', '', '', '', ''],
+      datasets: [
+        {
+          label: 'My First dataset',
+          backgroundColor: 'rgba(255,255,255,.2)',
+          borderColor: 'rgba(255,255,255,.55)',
+          data: [0, 0, 0, 0, 0, 0, 0],
+          barPercentage: 0.6,
+        },
+      ],
+    },
+    options: {
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        },
+      },
+      scales: {
+        x: {
+          grid: {
+            display: false,
+            drawTicks: false,
+          },
+          ticks: {
+            display: false,
+          },
+        },
+        y: {
+          grid: {
+            display: false,
+            drawBorder: false,
+            drawTicks: false,
+          },
+          ticks: {
+            display: false,
+          },
         },
       },
     },
@@ -212,10 +355,74 @@ export default function IODStatistic() {
           labels: result.data.data.labels,
           datasets: [
             {
-              label: 'Số công văn',
+              label: 'Số văn bản đến',
               backgroundColor: 'transparent',
               borderColor: 'rgba(255,255,255,.55)',
               data: result.data.data.data,
+            },
+          ],
+        },
+        now: result.data.data.now,
+        percent: Math.round(result.data.data.percent * 10000) / 100,
+      }))
+      dispatch(setLoading(false))
+    } catch (error) {
+      dispatch(setLoading(false))
+      showError(error)
+    }
+  }
+
+  const getIODStatusCurrentWeek = async () => {
+    try {
+      dispatch(setLoading(true))
+      let result = await service.getIODStatusCurrentWeek('IMPLEMENT')
+      setIODImplementWeek((prevState) => ({
+        ...prevState,
+        data: {
+          labels: result.data.data.labels,
+          datasets: [
+            {
+              label: 'Số văn bản đến được ban hành',
+              backgroundColor: 'transparent',
+              borderColor: 'rgba(255,255,255,.55)',
+              data: result.data.data.data,
+              fill: true,
+            },
+          ],
+        },
+        now: result.data.data.now,
+        percent: Math.round(result.data.data.percent * 10000) / 100,
+      }))
+      result = await service.getIODStatusCurrentWeek('REFUSE')
+      setIODRefuseWeek((prevState) => ({
+        ...prevState,
+        data: {
+          labels: result.data.data.labels,
+          datasets: [
+            {
+              label: 'Số văn bản đến bị từ chối',
+              backgroundColor: 'rgba(255,255,255,.2)',
+              borderColor: 'rgba(255,255,255,.55)',
+              data: result.data.data.data,
+              fill: true,
+            },
+          ],
+        },
+        now: result.data.data.now,
+        percent: Math.round(result.data.data.percent * 10000) / 100,
+      }))
+      result = await service.getIODStatusCurrentWeek('LATE')
+      setIODLateWeek((prevState) => ({
+        ...prevState,
+        data: {
+          labels: result.data.data.labels,
+          datasets: [
+            {
+              label: 'Số văn bản đến bị trễ hạn xử lý',
+              backgroundColor: 'rgba(255,255,255,.2)',
+              borderColor: 'rgba(255,255,255,.55)',
+              data: result.data.data.data,
+              barPercentage: 1.2,
             },
           ],
         },
@@ -246,125 +453,284 @@ export default function IODStatistic() {
     }
   }
 
+  const init = async () => {
+    await getStatistic('year', selectedYear)
+    await getYearReport()
+    await getIODCurrentWeek()
+    await getIODStatusCurrentWeek()
+  }
+
   useEffect(() => {
-    getStatistic('year', selectedYear)
-    getYearReport()
-    getIODCurrentWeek()
+    init()
   }, [])
 
   return (
     <CContainer>
       <CRow>
-        <CCol xs={12}>
-          <CWidgetStatsA
-            className="mb-4"
-            color="primary"
-            value={
-              <>
-                {IODWeek.now}{' '}
-                <span className="fs-6 fw-normal">
-                  ({IODWeek.percent}% {IODWeek.percent > 0 ? <FaArrowDown /> : <FaArrowUp />})
-                </span>
-              </>
-            }
-            title="Users"
-            chart={
-              <CChartLine
-                className="mt-3 mx-3"
-                style={{ height: '70px' }}
-                data={IODWeek.data}
-                options={IODWeek.options}
-              />
-            }
-          />
+        <CCol xs={12} sm={6} lg={3}>
+          {!loading && (
+            <CWidgetStatsA
+              className="mb-4"
+              color="info"
+              value={
+                <>
+                  {IODWeek.now}{' '}
+                  <span className="fs-6 fw-normal">
+                    ({IODWeek.percent}% {IODWeek.percent <= 0 ? <FaArrowDown /> : <FaArrowUp />})
+                  </span>
+                </>
+              }
+              title="Số văn bản đến hôm nay"
+              chart={
+                <CChartLine
+                  className="mt-3 mx-3"
+                  style={{ height: '70px' }}
+                  data={IODWeek.data}
+                  options={IODWeek.options}
+                />
+              }
+            />
+          )}
+          {loading && (
+            <CPlaceholder
+              component={CWidgetStatsA}
+              xs={12}
+              className="mb-4"
+              color="secondary"
+              style={{ height: '170px' }}
+              animation="wave"
+            ></CPlaceholder>
+          )}
+        </CCol>
+        <CCol xs={12} sm={6} lg={3}>
+          {!loading && (
+            <CWidgetStatsA
+              className="mb-4"
+              color="success"
+              value={
+                <>
+                  {IODImplementWeek.now}{' '}
+                  <span className="fs-6 fw-normal">
+                    ({IODImplementWeek.percent}%{' '}
+                    {IODImplementWeek.percent <= 0 ? <FaArrowDown /> : <FaArrowUp />})
+                  </span>
+                </>
+              }
+              title="Số văn bản được ban hành hôm nay"
+              chart={
+                <CChartLine
+                  className="mt-3 mx-3"
+                  style={{ height: '70px' }}
+                  data={IODImplementWeek.data}
+                  options={IODImplementWeek.options}
+                />
+              }
+            />
+          )}
+          {loading && (
+            <CPlaceholder
+              component={CWidgetStatsA}
+              xs={12}
+              className="mb-4"
+              color="secondary"
+              style={{ height: '170px' }}
+              animation="wave"
+            ></CPlaceholder>
+          )}
+        </CCol>
+        <CCol xs={12} sm={6} lg={3}>
+          {!loading && (
+            <CWidgetStatsA
+              className="mb-4"
+              color="warning"
+              value={
+                <>
+                  {IODRefuseWeek.now}{' '}
+                  <span className="fs-6 fw-normal">
+                    ({IODRefuseWeek.percent}%{' '}
+                    {IODRefuseWeek.percent <= 0 ? <FaArrowDown /> : <FaArrowUp />})
+                  </span>
+                </>
+              }
+              title="Số văn bản bị từ chối hôm nay"
+              chart={
+                <CChartLine
+                  className="mt-3"
+                  style={{ height: '70px' }}
+                  data={IODRefuseWeek.data}
+                  options={IODRefuseWeek.options}
+                />
+              }
+            />
+          )}
+          {loading && (
+            <CPlaceholder
+              component={CWidgetStatsA}
+              xs={12}
+              className="mb-4"
+              color="secondary"
+              style={{ height: '170px' }}
+              animation="wave"
+            ></CPlaceholder>
+          )}
+        </CCol>
+        <CCol xs={12} sm={6} lg={3}>
+          {!loading && (
+            <CWidgetStatsA
+              className="mb-4"
+              color="danger"
+              value={
+                <>
+                  {IODLateWeek.now}{' '}
+                  <span className="fs-6 fw-normal">
+                    ({IODLateWeek.percent}%{' '}
+                    {IODLateWeek.percent <= 0 ? <FaArrowDown /> : <FaArrowUp />})
+                  </span>
+                </>
+              }
+              title="Số văn bản đến bị từ chối hôm nay"
+              chart={
+                <CChartBar
+                  className="mt-3 mx-3"
+                  style={{ height: '70px' }}
+                  data={IODLateWeek.data}
+                  options={IODLateWeek.options}
+                />
+              }
+            />
+          )}
+          {loading && (
+            <CPlaceholder
+              component={CWidgetStatsA}
+              xs={12}
+              className="mb-4"
+              color="secondary"
+              style={{ height: '170px' }}
+              animation="wave"
+            ></CPlaceholder>
+          )}
         </CCol>
         <CCol xs={12}>
-          <CCard>
-            <CCardBody>
-              <CCardTitle>
-                <CRow>
-                  <CCol>
-                    <h3>Thống kê số văn bản nhận tổng số {total} văn bản</h3>
-                    {active.year && <CCardSubtitle>Trong năm {selectedYear}</CCardSubtitle>}
-                    {active.month && (
-                      <CCardSubtitle>
-                        Trong tháng {month} năm {selectedYear}
-                      </CCardSubtitle>
-                    )}
-                  </CCol>
-                  <CCol className="text-end">
-                    <CButtonGroup>
-                      <CButton
-                        variant={active.date ? '' : 'outline'}
-                        onClick={() => {
-                          setActive({ month: false, year: false })
-                        }}
-                      >
-                        Tuần
-                      </CButton>
-                      <CDropdown>
-                        <CDropdownToggle variant={active.month ? '' : 'outline'}>
-                          Tháng
-                        </CDropdownToggle>
-                        <CDropdownMenu>
-                          {new Array(12).fill(0).map((el, ind) => (
-                            <CDropdownItem
-                              active={ind + 1 === month}
-                              key={ind}
-                              style={{ cursor: 'pointer' }}
-                              onClick={() => {
-                                setActive({ month: true, year: false })
-                                setMonth(ind + 1)
-                                getStatistic('month', selectedYear, ind + 1)
-                              }}
-                            >
-                              {ind + 1}
-                            </CDropdownItem>
-                          ))}
-                        </CDropdownMenu>
-                      </CDropdown>
-                      <CDropdown>
-                        <CDropdownToggle variant={active.year ? '' : 'outline'}>
-                          Năm
-                        </CDropdownToggle>
-                        <CDropdownMenu>
-                          {year.map((el, ind) => (
-                            <CDropdownItem
-                              active={el.value === selectedYear}
-                              key={ind}
-                              style={{ cursor: 'pointer' }}
-                              onClick={() => {
-                                setActive({ month: false, year: true })
-                                setSelectedYear(el.value)
-                                getStatistic('year', el.value)
-                              }}
-                            >
-                              {el.label}
-                            </CDropdownItem>
-                          ))}
-                        </CDropdownMenu>
-                      </CDropdown>
-                    </CButtonGroup>
-                  </CCol>
-                </CRow>
-              </CCardTitle>
-              <Bar
-                ref={chartRef}
-                height={80}
-                data={state}
-                options={{
-                  scales: {
-                    y: {
-                      beginAtZero: true,
+          {!loading && (
+            <CCard>
+              <CCardBody>
+                <CCardTitle>
+                  <CRow>
+                    <CCol>
+                      <h3>Thống kê số văn bản nhận tổng số {total} văn bản</h3>
+                      {active.year && <CCardSubtitle>Trong năm {selectedYear}</CCardSubtitle>}
+                      {active.month && (
+                        <CCardSubtitle>
+                          Trong tháng {month} năm {selectedYear}
+                        </CCardSubtitle>
+                      )}
+                    </CCol>
+                    <CCol className="text-end">
+                      <CButtonGroup>
+                        <CButton
+                          variant={active.date ? '' : 'outline'}
+                          onClick={() => {
+                            setActive({ month: false, year: false })
+                          }}
+                        >
+                          Tuần
+                        </CButton>
+                        <CDropdown>
+                          <CDropdownToggle variant={active.month ? '' : 'outline'}>
+                            Tháng
+                          </CDropdownToggle>
+                          <CDropdownMenu>
+                            {new Array(12).fill(0).map((el, ind) => (
+                              <CDropdownItem
+                                active={ind + 1 === month}
+                                key={ind}
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => {
+                                  setActive({ month: true, year: false })
+                                  setMonth(ind + 1)
+                                  getStatistic('month', selectedYear, ind + 1)
+                                }}
+                              >
+                                {ind + 1}
+                              </CDropdownItem>
+                            ))}
+                          </CDropdownMenu>
+                        </CDropdown>
+                        <CDropdown>
+                          <CDropdownToggle variant={active.year ? '' : 'outline'}>
+                            Năm
+                          </CDropdownToggle>
+                          <CDropdownMenu>
+                            {year.map((el, ind) => (
+                              <CDropdownItem
+                                active={el.value === selectedYear}
+                                key={ind}
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => {
+                                  setActive({ month: false, year: true })
+                                  setSelectedYear(el.value)
+                                  getStatistic('year', el.value)
+                                }}
+                              >
+                                {el.label}
+                              </CDropdownItem>
+                            ))}
+                          </CDropdownMenu>
+                        </CDropdown>
+                      </CButtonGroup>
+                    </CCol>
+                  </CRow>
+                </CCardTitle>
+                <Bar
+                  ref={chartRef}
+                  height={80}
+                  data={state}
+                  options={{
+                    scales: {
+                      y: {
+                        beginAtZero: true,
+                      },
                     },
-                  },
-                }}
-                onClick={(event) => {
-                  console.log(getElementsAtEvent(chartRef.current, event))
-                }}
-              />
-            </CCardBody>
-          </CCard>
+                  }}
+                  onClick={(event) => {
+                    console.log(getElementsAtEvent(chartRef.current, event))
+                  }}
+                />
+              </CCardBody>
+            </CCard>
+          )}
+          {loading && (
+            <CCard>
+              <CCardBody>
+                <CCardTitle>
+                  <CRow>
+                    <CCol>
+                      <CPlaceholder xs={12}></CPlaceholder>
+                      <CPlaceholder xs={5}></CPlaceholder>
+                    </CCol>
+                    <CCol className="text-end">
+                      <CPlaceholder
+                        component={CButton}
+                        disabled
+                        href="#"
+                        tabIndex={-1}
+                        xs={6}
+                        style={{ height: '40px' }}
+                        animation="wave"
+                      ></CPlaceholder>
+                    </CCol>
+                  </CRow>
+                </CCardTitle>
+                <CPlaceholder
+                  component={CChartBar}
+                  xs={12}
+                  color="secondary"
+                  style={{ height: '170px' }}
+                  animation="wave"
+                ></CPlaceholder>
+              </CCardBody>
+            </CCard>
+          )}
         </CCol>
       </CRow>
     </CContainer>
