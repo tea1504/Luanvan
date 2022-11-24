@@ -33,7 +33,6 @@ route.get(
 );
 route.get(
   Constants.ApiPath.Officers.SLASH,
-  adminMiddleware,
   readCategories,
   controller.getMany
 );
@@ -46,13 +45,11 @@ route.get(
 route.get(Constants.ApiPath.Officers.USER_ID, controller.getManyByUser);
 route.get(
   Constants.ApiPath.Officers.ID,
-  adminMiddleware,
   readCategories,
   controller.getOne
 );
 route.post(
   Constants.ApiPath.Officers.SLASH,
-  adminMiddleware,
   createCategories,
   upload.single("avatar"),
   controller.postOne

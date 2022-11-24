@@ -130,16 +130,26 @@ const ActionButton = ({ data }) => {
             color="warning"
             className="m-1"
             onClick={() =>
-              navigate(Screens.OFFICER_UPDATE(`${Helpers.toSlug(data.lastName + ' ' + data.firstName)}.${data._id}`))
+              navigate(
+                Screens.OFFICER_UPDATE(
+                  `${Helpers.toSlug(data.lastName + ' ' + data.firstName)}.${data._id}`,
+                ),
+              )
             }
           >
             <FaPenSquare style={{ color: 'whitesmoke' }} />
           </CButton>
         </CTooltip>
       )}
-      {loggedUser.right[Strings.Common.DELETE_CATEGORIES] && (
+      {loggedUser.right[Strings.Common.DELETE_CATEGORIES] && loggedUser._id !== data._id ? (
         <CTooltip content={Strings.Common.DELETE}>
           <CButton color="danger" className="m-1" onClick={handleDeleteButton}>
+            <FaTrash style={{ color: 'whitesmoke' }} />
+          </CButton>
+        </CTooltip>
+      ) : (
+        <CTooltip content={Strings.Common.DELETE}>
+          <CButton color="dark" className="m-1" disabled>
             <FaTrash style={{ color: 'whitesmoke' }} />
           </CButton>
         </CTooltip>

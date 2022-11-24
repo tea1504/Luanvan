@@ -65,10 +65,17 @@ var officerService = {
       }
     }
   },
-  getMany: async (limit = 10, pageNumber = 1, filter = "") => {
+  getMany: async (
+    userID = "",
+    limit = 10,
+    pageNumber = 1,
+    filter = "",
+    params = {}
+  ) => {
     try {
-      const result = {};
-      const total = await model.countDocuments({
+      console.log(params);
+      const user = await officerModel.findById(userID).populate("right");
+      const condition = {
         deleted: false,
         $or: [
           { code: { $regex: new RegExp(filter, "i") } },
@@ -78,7 +85,15 @@ var officerService = {
           { emailAddress: { $regex: new RegExp(filter, "i") } },
           { phoneNumber: { $regex: new RegExp(filter, "i") } },
         ],
-      });
+      };
+      if (user.right.scope === 1) condition["organ"] = user.organ;
+      if (params.organMulti) {
+        condition.organ = { $in: params.organMulti.split(",") };
+        delete params.organMulti;
+      }
+      console.log(condition);
+      const result = {};
+      const total = await model.countDocuments(condition);
       let startIndex = (pageNumber - 1) * limit;
       let endIndex = pageNumber * limit;
       result.total = total;
@@ -96,17 +111,7 @@ var officerService = {
       }
       result.rowsPerPage = limit;
       result.data = await model
-        .find({
-          deleted: false,
-          $or: [
-            { code: { $regex: new RegExp(filter, "i") } },
-            { position: { $regex: new RegExp(filter, "i") } },
-            { firstName: { $regex: new RegExp(filter, "i") } },
-            { lastName: { $regex: new RegExp(filter, "i") } },
-            { emailAddress: { $regex: new RegExp(filter, "i") } },
-            { phoneNumber: { $regex: new RegExp(filter, "i") } },
-          ],
-        })
+        .find(condition)
         .populate("organ")
         .populate("status")
         .populate("right")

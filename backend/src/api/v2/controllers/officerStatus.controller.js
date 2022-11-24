@@ -1,5 +1,5 @@
 const Constants = require("../constants");
-const officerStatusService = require("./../services/officerStatus.service");
+const service = require("./../services/officerStatus.service");
 var fs = require("fs");
 
 var officerStatusController = {
@@ -8,10 +8,23 @@ var officerStatusController = {
    * @param {import("express").Response} res
    * @param {import("express").RequestHandler} next
    */
+  getList: async (req, res, next) => {
+    try {
+      const result = await service.getList(req.userID);
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
   getOfficerStatuses: async (req, res, next) => {
     try {
       const { pageNumber, limit, filter } = req.query;
-      const result = await officerStatusService.getOfficerStatuses(
+      const result = await service.getOfficerStatuses(
         parseInt(limit),
         parseInt(pageNumber),
         filter
@@ -30,7 +43,7 @@ var officerStatusController = {
     try {
       const { id } = req.params;
       list = id.split(".");
-      const result = await officerStatusService.getOfficerStatus(
+      const result = await service.getOfficerStatus(
         list[list.length - 1]
       );
       return res.status(result.status).json(result);
@@ -53,7 +66,7 @@ var officerStatusController = {
             Constants.String.OfficerStatus.NAME
           ),
         });
-      const result = await officerStatusService.post({
+      const result = await service.post({
         name,
         description,
         color,
@@ -77,11 +90,11 @@ var officerStatusController = {
         const index = data.toString().indexOf("\n");
         var t = data.toString();
         if (title === "true") t = t.slice(index + 1);
-        const result = await officerStatusService.postOfficerStatuses(t);
+        const result = await service.postOfficerStatuses(t);
         fs.unlinkSync(file.path);
         return res.status(result.status).json(result);
       } else {
-        const result = await officerStatusService.postOfficerStatuses(text);
+        const result = await service.postOfficerStatuses(text);
         return res.status(result.status).json(result);
       }
     } catch (error) {
@@ -105,7 +118,7 @@ var officerStatusController = {
             Constants.String.OfficerStatus.NAME
           ),
         });
-      const result = await officerStatusService.putOfficerStatus(
+      const result = await service.putOfficerStatus(
         list[list.length - 1],
         {
           name,
@@ -127,7 +140,7 @@ var officerStatusController = {
     try {
       const { id } = req.params;
       list = id.split(".");
-      const result = await officerStatusService.deleteOfficerStatus(
+      const result = await service.deleteOfficerStatus(
         list[list.length - 1]
       );
       return res.status(result.status).json(result);
@@ -144,7 +157,7 @@ var officerStatusController = {
     try {
       const { ids } = req.body;
       console.log(ids);
-      const result = await officerStatusService.deleteOfficerStatuses(ids);
+      const result = await service.deleteOfficerStatuses(ids);
       return res.status(result.status).json(result);
     } catch (error) {
       return next(error);

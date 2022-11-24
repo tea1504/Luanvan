@@ -1,7 +1,7 @@
 const express = require("express");
 const Constants = require("../constants");
 const route = express.Router();
-const officerStatusController = require("../controllers/officerStatus.controller");
+const controller = require("../controllers/officerStatus.controller");
 
 const multer = require("multer");
 const path = require("path");
@@ -24,38 +24,43 @@ var upload = multer({ storage: storage });
 route.get(
   Constants.ApiPath.OfficerStatus.SLASH,
   readCategories,
-  officerStatusController.getOfficerStatuses
+  controller.getOfficerStatuses
+);
+route.get(
+  Constants.ApiPath.OfficerStatus.LIST,
+  readCategories,
+  controller.getList
 );
 route.get(
   Constants.ApiPath.OfficerStatus.ID,
   readCategories,
-  officerStatusController.getOfficerStatus
+  controller.getOfficerStatus
 );
 route.post(
   Constants.ApiPath.OfficerStatus.SLASH,
   createCategories,
-  officerStatusController.postOfficerStatus
+  controller.postOfficerStatus
 );
 route.post(
   Constants.ApiPath.OfficerStatus.CREATE_MULTI,
   createCategories,
   upload.single("file"),
-  officerStatusController.postOfficerStatuses
+  controller.postOfficerStatuses
 );
 route.put(
   Constants.ApiPath.OfficerStatus.ID,
   updateCategories,
-  officerStatusController.putOfficerStatus
+  controller.putOfficerStatus
 );
 route.delete(
   Constants.ApiPath.OfficerStatus.ID,
   deleteCategories,
-  officerStatusController.deleteOfficerStatus
+  controller.deleteOfficerStatus
 );
 route.delete(
   Constants.ApiPath.OfficerStatus.SLASH,
   deleteCategories,
-  officerStatusController.deleteOfficerStatuses
+  controller.deleteOfficerStatuses
 );
 
 module.exports = route;

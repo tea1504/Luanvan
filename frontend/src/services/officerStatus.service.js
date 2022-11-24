@@ -2,6 +2,12 @@ import Constants from 'src/constants'
 import BaseService from './base.service'
 
 class OfficerStatusService extends BaseService {
+  async getList() {
+    const result = await this.api.get({
+      path: Constants.ApiPath.GET_LIST_OFFICER_STATUSES,
+    })
+    return result
+  }
   async getMany(limit = 10, pageNumber = 1, filter = '') {
     const result = await this.api.get({
       path: Constants.ApiPath.GET_OFFICER_STATUSES(limit, pageNumber, filter),
@@ -37,7 +43,7 @@ class OfficerStatusService extends BaseService {
   async deleteMany(ids) {
     const result = await this.api.delete({
       path: Constants.ApiPath.DELETE_OFFICER_STATUSES,
-      data: {ids}
+      data: { ids },
     })
     return result
   }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import {
   CAlert,
   CButton,
@@ -36,6 +36,7 @@ const Login = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   let loading = useSelector((state) => state.config.loading)
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const [loginInfo, setLoginInfo] = useState({
     code: '',
@@ -112,8 +113,12 @@ const Login = () => {
           await getUser()
           const user = JSON.parse(localStorage.getItem(Constants.StorageKeys.USER_INFO))
           dispatch(setLoading(false))
-          if (user?.status.name == 'ACTIVATED') navigate(Screens.HOME, { replace: true })
-          else navigate(Screens.USER_CHANGE_PASSWORD, { replace: true })
+          if (user?.status.name == 'ACTIVATED') {
+            const b = searchParams.get('back') || ''
+            console.log(b)
+            if (b) navigate(b, { replace: true })
+            else navigate(Screens.HOME, { replace: true })
+          } else navigate(Screens.USER_CHANGE_PASSWORD, { replace: true })
         }
       }
       dispatch(setLoading(false))

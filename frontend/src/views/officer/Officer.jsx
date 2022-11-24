@@ -28,13 +28,15 @@ import React, { useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEraser, FaFileCsv, FaPlusSquare } from 'react-icons/fa'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { createSearchParams, useNavigate, useSearchParams } from 'react-router-dom'
+import ReactSelect from 'react-select'
 import Helpers from 'src/commons/helpers'
 import configs from 'src/configs'
 import Constants from 'src/constants'
 import Screens from 'src/constants/screens'
 import Strings from 'src/constants/strings'
 import OfficerService from 'src/services/officer.service'
+import OrganizationService from 'src/services/organization.service'
 import { setLoading } from 'src/store/slice/config.slice'
 import { setData, setPage, setRowPerPage, setTotal } from 'src/store/slice/officer.slide'
 import Swal from 'sweetalert2'
@@ -42,6 +44,7 @@ import withReactContent from 'sweetalert2-react-content'
 import officerColumns from './officerColumns'
 
 const service = new OfficerService()
+const organizationService = new OrganizationService()
 const MySwal = withReactContent(Swal)
 
 export default function Officer() {
@@ -53,6 +56,7 @@ export default function Officer() {
   const language = useSelector((state) => state.config.language)
   Strings.setLanguage(language)
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const store = useSelector((state) => state.officer)
 
@@ -67,53 +71,112 @@ export default function Officer() {
       ...newState,
     }))
   }
+  const [organ, setOrgan] = useState([])
+  const [findParams, setFindParams] = useState({})
+  const updateFindParams = (newState) =>
+    setFindParams((prevState) => ({ ...prevState, ...newState }))
 
-  const getState = async (limit = 10, pageNumber = 1, filter = '') => {
+  const showError = (error) => {
+    switch (error.status) {
+      case 401:
+        MySwal.fire({
+          title: Strings.Message.COMMON_ERROR,
+          icon: 'error',
+          text: error.message,
+        }).then(() => {
+          localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
+          localStorage.clear(Constants.StorageKeys.USER_INFO)
+          navigate(Screens.LOGIN)
+        })
+        break
+      case 406:
+        const message = Object.values(error.data.error).map((el) => el.message)
+        MySwal.fire({
+          title: Strings.Message.COMMON_ERROR,
+          icon: 'error',
+          html: message.join('<br/>'),
+        })
+        break
+      default:
+        MySwal.fire({
+          title: Strings.Message.COMMON_ERROR,
+          icon: 'error',
+          text: error.message,
+        })
+        break
+    }
+  }
+
+  const getOrganization = async () => {
     try {
       dispatch(setLoading(true))
-      const result = await service.getMany(limit, pageNumber, filter)
+      setOrgan([])
+      const result = await organizationService.getList()
+      result.data.data.map((el) => {
+        var item = { value: el._id, label: `${el.name} (${el.code})` }
+        setOrgan((prevState) => [...prevState, item])
+      })
+      dispatch(setLoading(false))
+    } catch (error) {
+      dispatch(setLoading(false))
+      showError(error)
+    }
+  }
+
+  const getState = async (limit = 10, pageNumber = 1, filter = '', params = '') => {
+    try {
+      dispatch(setLoading(true))
+      const result = await service.getMany(limit, pageNumber, filter, params)
       dispatch(setData(result.data.data.data))
       dispatch(setTotal(result.data.data.total))
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
-      switch (error.status) {
-        case 401:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          }).then(() => {
-            localStorage.clear(Constants.StorageKeys.ACCESS_TOKEN)
-            localStorage.clear(Constants.StorageKeys.USER_INFO)
-            navigate(Screens.LOGIN)
-          })
-          break
-        default:
-          MySwal.fire({
-            title: Strings.Message.COMMON_ERROR,
-            icon: 'error',
-            text: error.message,
-          })
-          break
-      }
+      showError(error)
     }
   }
 
   const handlePerRowsChange = (newPerPage, page) => {
-    getState(newPerPage, page)
+    getState(newPerPage, page, filter, createSearchParams(findParams).toString())
     dispatch(setRowPerPage(newPerPage))
     dispatch(setPage(page))
+    navigate({
+      pathname: Screens.OFFICER,
+      search: `?${createSearchParams({
+        page: page,
+        rowsPerPage: newPerPage,
+        filter: filter,
+        ...findParams,
+      })}`,
+    })
   }
 
   const handlePageChange = (page) => {
     dispatch(setPage(page))
-    getState(store.rowsPerPage, page)
+    getState(store.rowsPerPage, page, filter, createSearchParams(findParams).toString())
+    navigate({
+      pathname: Screens.OFFICER,
+      search: `?${createSearchParams({
+        page: page,
+        rowsPerPage: store.rowsPerPage,
+        filter: filter,
+        ...findParams,
+      })}`,
+    })
   }
 
   const handleOnChangeFilter = (str) => {
     setFilter(str)
-    getState(store.rowsPerPage, store.page, str)
+    getState(store.rowsPerPage, store.page, str, createSearchParams(findParams).toString())
+    navigate({
+      pathname: Screens.OFFICER,
+      search: `?${createSearchParams({
+        page: store.page,
+        rowsPerPage: store.rowsPerPage,
+        filter: str,
+        ...findParams,
+      })}`,
+    })
   }
 
   const handleRowSelected = (state) => {
@@ -206,8 +269,70 @@ export default function Officer() {
     dispatch(setLoading(false))
   }
 
+  const handleOnChangeSelectOrgan = (selectedItem) => {
+    if (selectedItem.length !== 0) {
+      navigate({
+        pathname: Screens.OFFICER,
+        search: `?${createSearchParams({
+          page: store.page,
+          rowsPerPage: store.rowsPerPage,
+          filter: filter,
+          ...findParams,
+          organMulti: selectedItem.map((el) => el.value).join(','),
+        })}`,
+      })
+      updateFindParams({ organMulti: selectedItem.map((el) => el.value).join(',') })
+      getState(
+        store.rowsPerPage,
+        store.page,
+        filter,
+        createSearchParams({
+          ...findParams,
+          organMulti: selectedItem.map((el) => el.value).join(','),
+        }).toString(),
+      )
+    } else {
+      updateFindParams({ organMulti: '' })
+      delete findParams.organMulti
+      navigate({
+        pathname: Screens.OFFICER,
+        search: `?${createSearchParams({
+          page: store.page,
+          rowsPerPage: store.rowsPerPage,
+          filter: filter,
+          ...findParams,
+        })}`,
+      })
+      getState(
+        store.rowsPerPage,
+        store.page,
+        filter,
+        createSearchParams({
+          ...findParams,
+        }).toString(),
+      )
+    }
+  }
+
+  const init = async () => {
+    const p = parseInt(searchParams.get('page')) || store.page
+    const r = parseInt(searchParams.get('rowsPerPage')) || store.rowsPerPage
+    const f = searchParams.get('filter') || ''
+    const organMulti = searchParams.get('organMulti') || ''
+    setFilter(f)
+    dispatch(setPage(p))
+    dispatch(setRowPerPage(r))
+    if (organMulti) {
+      updateFindParams({ organMulti })
+      await getState(r, p, f, createSearchParams({ organMulti }).toString())
+    } else {
+      await getState(r, p, f)
+    }
+    await getOrganization()
+  }
+
   useEffect(() => {
-    getState(store.rowsPerPage, store.page, filter)
+    init()
   }, [])
 
   return (
@@ -220,7 +345,7 @@ export default function Officer() {
             </CCardHeader>
             <CCardBody>
               <CRow className="py-1">
-                <CCol xs={12} sm={6} className="mt-1">
+                <CCol xs={12} sm={4} className="mt-1">
                   <CInputGroup className="flex-nowrap">
                     <CFormInput
                       placeholder={Strings.Common.FILTER}
@@ -236,6 +361,30 @@ export default function Officer() {
                     </CInputGroupText>
                   </CInputGroup>
                 </CCol>
+                {loggedUser.right.scope === 0 && (
+                  <CCol xs={12} sm={4} className="mt-1">
+                    <ReactSelect
+                      // value={
+                      //   !findParams.type
+                      //     ? null
+                      //     : type.filter((el) => el.value === findParams.type).length > 0
+                      //     ? type.filter((el) => el.value === findParams.type)[0]
+                      //     : null
+                      // }
+                      options={organ}
+                      placeholder="Chọn tổ chức"
+                      onChange={(selectedItem) => handleOnChangeSelectOrgan(selectedItem)}
+                      styles={{
+                        menu: (provided) => ({
+                          ...provided,
+                          zIndex: 999999,
+                        }),
+                      }}
+                      isClearable
+                      isMulti
+                    />
+                  </CCol>
+                )}
                 <CCol className="text-end mt-1">
                   <CButtonGroup role="group">
                     {loggedUser?.right[Strings.Common.DELETE_CATEGORIES] &&
@@ -275,12 +424,15 @@ export default function Officer() {
                     onChangeRowsPerPage={handlePerRowsChange}
                     onChangePage={handlePageChange}
                     paginationTotalRows={store.total}
-                    paginationPerPage={store.rowsPerPage}
-                    paginationDefaultPage={store.page}
+                    paginationPerPage={
+                      parseInt(searchParams.get('rowsPerPage')) || store.rowsPerPage
+                    }
+                    paginationDefaultPage={parseInt(searchParams.get('page')) || store.page}
                     onSelectedRowsChange={handleRowSelected}
                     clearSelectedRows={toggleCleared}
                     progressPending={loading}
                     expandableRows={true}
+                    selectableRowDisabled={(row) => loggedUser._id === row._id}
                   />
                 </CCol>
               </CRow>
@@ -309,9 +461,7 @@ export default function Officer() {
             onChange={(e) => updateAdd({ text: e.target.value })}
           ></CFormTextarea>
           <CFormText component="span">
-            <div
-              dangerouslySetInnerHTML={{ __html: Strings.Officer.Common.DESCRIPTION }}
-            ></div>
+            <div dangerouslySetInnerHTML={{ __html: Strings.Officer.Common.DESCRIPTION }}></div>
           </CFormText>
           <CFormLabel>{Strings.Form.FieldName.FILE_CSV(Strings.Officer.NAME)}</CFormLabel>
           <CFormInput type="file" onChange={(e) => updateAdd({ file: e.target.files[0] })} />

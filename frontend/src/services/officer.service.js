@@ -8,9 +8,9 @@ class OfficerService extends BaseService {
     })
     return result
   }
-  async getMany(limit = 10, pageNumber = 1, filter = '') {
+  async getMany(limit = 10, pageNumber = 1, filter = '', params = '') {
     const result = await this.api.get({
-      path: Constants.ApiPath.GET_OFFICERS(limit, pageNumber, filter),
+      path: Constants.ApiPath.GET_OFFICERS(limit, pageNumber, filter, params),
     })
     return result
   }

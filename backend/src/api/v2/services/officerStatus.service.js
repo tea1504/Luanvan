@@ -1,19 +1,25 @@
 require("dotenv").config();
 const Constants = require("../constants");
-const officerStatusModel = require("../models/officerStatus.model");
+const model = require("../models/officerStatus.model");
 const { parse } = require("csv-parse/sync");
 
 var officerStatusService = {
-  /**
-   * @param {number} size
-   * @param {number} page
-   * @param {string} filter
-   * @returns {import("../interfaces").ResponseResult}
-   */
+  getList: async (userID = "") => {
+    try {
+      const result = await model.find({ deleted: false }, "name description");
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.GET_200(Constants.String.OfficerStatus._),
+        data: result,
+      };
+    } catch (error) {
+      return showError(error);
+    }
+  },
   getOfficerStatuses: async (limit = 10, pageNumber = 1, filter = "") => {
     try {
       const result = {};
-      const totalOfficerStatus = await officerStatusModel.countDocuments({
+      const totalOfficerStatus = await model.countDocuments({
         deleted: false,
       });
       let startIndex = (pageNumber - 1) * limit;
@@ -32,7 +38,7 @@ var officerStatusService = {
         };
       }
       result.rowsPerPage = limit;
-      result.data = await officerStatusModel
+      result.data = await model
         .find({
           deleted: false,
           $or: [
@@ -64,7 +70,7 @@ var officerStatusService = {
    */
   getOfficerStatus: async (id) => {
     try {
-      const type = await officerStatusModel.findOne({
+      const type = await model.findOne({
         _id: id,
         deleted: false,
       });
@@ -100,12 +106,12 @@ var officerStatusService = {
     }
   },
   /**
-   * @param {import("../interfaces").OfficerStatusModel} officerStatus
+   * @param {import("../interfaces").model} officerStatus
    * @returns {import("../interfaces").ResponseResult}
    */
   post: async (officerStatus) => {
     try {
-      const officerStatusName = await officerStatusModel.findOne({
+      const officerStatusName = await model.findOne({
         name: officerStatus.name,
         deleted: false,
       });
@@ -116,7 +122,7 @@ var officerStatusService = {
             Constants.String.OfficerStatus.NAME
           ),
         };
-      const newOfficerStatus = await officerStatusModel.create(officerStatus);
+      const newOfficerStatus = await model.create(officerStatus);
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.POST_200(
@@ -161,7 +167,7 @@ var officerStatusService = {
         var item = { name: (records[i][0] + "").trim() };
         if (records[i][1]) item.description = (records[i][1] + "").trim();
         if (records[i][2]) item.color = (records[i][2] + "").trim();
-        const itemName = await officerStatusModel.findOne({
+        const itemName = await model.findOne({
           name: item.name,
           deleted: false,
         });
@@ -173,7 +179,7 @@ var officerStatusService = {
             ),
             data: list,
           };
-        const newItem = await officerStatusModel.create(item);
+        const newItem = await model.create(item);
         list.push(newItem);
       }
       return {
@@ -206,12 +212,12 @@ var officerStatusService = {
   },
   /**
    * @param {string} id
-   * @param {import("../interfaces").OfficerStatusModel} officerStatus
+   * @param {import("../interfaces").model} officerStatus
    * @returns {import("../interfaces").ResponseResult}
    */
   putOfficerStatus: async (id, officerStatus) => {
     try {
-      const findOfficerStatus = await officerStatusModel.findOne({
+      const findOfficerStatus = await model.findOne({
         _id: id,
         deleted: false,
       });
@@ -222,7 +228,7 @@ var officerStatusService = {
             Constants.String.OfficerStatus._
           ),
         };
-      const officerStatusName = await officerStatusModel.findOne({
+      const officerStatusName = await model.findOne({
         _id: { $ne: id },
         name: officerStatus.name,
         deleted: false,
@@ -234,11 +240,11 @@ var officerStatusService = {
             Constants.String.OfficerStatus.NAME
           ),
         };
-      await officerStatusModel.findOneAndUpdate(
+      await model.findOneAndUpdate(
         { _id: id, deleted: false },
         officerStatus
       );
-      const result = await officerStatusModel.findOne({ _id: id });
+      const result = await model.findOne({ _id: id });
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.PUT_200(
@@ -276,7 +282,7 @@ var officerStatusService = {
    */
   deleteOfficerStatus: async (id) => {
     try {
-      const deletedOfficerStatus = await officerStatusModel.findOneAndUpdate(
+      const deletedOfficerStatus = await model.findOneAndUpdate(
         { _id: id, deleted: false },
         { deleted: true }
       );
@@ -317,7 +323,7 @@ var officerStatusService = {
    */
   deleteOfficerStatuses: async (ids) => {
     try {
-      const deletedOfficerStatuses = await officerStatusModel.updateMany(
+      const deletedOfficerStatuses = await model.updateMany(
         { _id: { $in: ids }, deleted: false },
         { deleted: true }
       );

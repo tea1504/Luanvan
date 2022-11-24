@@ -15,6 +15,7 @@ var organizationService = {
         {
           deleted: false,
           $or: [{ inside: true }, { organ: user.organ }],
+          _id: { $ne: user.organ },
         },
         "name code"
       );

@@ -88,10 +88,8 @@ var incomingOfficialDispatchService = {
       if (params.dueStartDate) {
         between.dueDate = {
           $gte: parseInt(params.dueStartDate),
-          $lte: parseInt(params.dueEndDate),
         };
         delete params.dueStartDate;
-        delete params.dueEndDate;
       }
       if (params.arrivalNumber < 1) params.arrivalNumber = null;
       if (params.typeMulti) {
@@ -1001,7 +999,7 @@ var incomingOfficialDispatchService = {
             Lời nhắn: ${message}
         </span>
         <div>
-          <a href="http://localhost:3000/#/van-ban-den/chi-tiet/${IOD._id}">${IOD.arrivalNumber}</a>
+          <a href="http://localhost:3000/#/login?back=/van-ban-den/chi-tiet/${IOD._id}">${IOD.arrivalNumber}</a>
         </div>
 `,
       };

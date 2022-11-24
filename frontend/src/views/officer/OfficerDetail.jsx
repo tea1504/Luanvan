@@ -217,9 +217,9 @@ export default function OfficerDetail() {
                       className="m-0 p-0"
                       onClick={() => {
                         navigate(
-                          Screens.RIGHT_DETAIL(
-                            `${Helpers.toSlug(state.right.name)}.${state.right._id}`,
-                          ),
+                          Screens.RIGHT_DETAIL({
+                            path: `${Helpers.toSlug(state.right.name)}.${state.right._id}`,
+                          }),
                         )
                       }}
                     >

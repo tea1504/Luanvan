@@ -66,7 +66,7 @@ export default function OfficerCreateOrUpdate() {
     file: {},
     avatarTemp: null,
     avatar: null,
-    organ: null,
+    organ: loggedUser.organ._id,
     right: null,
     status: null,
   })
@@ -196,8 +196,8 @@ export default function OfficerCreateOrUpdate() {
     try {
       dispatch(setLoading(true))
       setOrgan([])
-      const result = await organizationService.getMany(10000, 1)
-      result.data.data.data.map((el) => {
+      const result = await organizationService.getList()
+      result.data.data.map((el) => {
         var item = { value: el._id, label: `${el.name} (${el.code})` }
         setOrgan((prevState) => [...prevState, item])
       })
@@ -231,8 +231,8 @@ export default function OfficerCreateOrUpdate() {
     try {
       dispatch(setLoading(true))
       setRight([])
-      const result = await rightService.getMany(10000, 1)
-      result.data.data.data.map((el) => {
+      const result = await rightService.getList()
+      result.data.data.map((el) => {
         var item = { value: el._id, label: el.name }
         setRight((prevState) => [...prevState, item])
       })
@@ -266,8 +266,8 @@ export default function OfficerCreateOrUpdate() {
     try {
       dispatch(setLoading(true))
       setStatus([])
-      const result = await officerStatusService.getMany(10000, 1)
-      result.data.data.data.map((el) => {
+      const result = await officerStatusService.getList()
+      result.data.data.map((el) => {
         var item = { value: el._id, label: `${el.name} - ${Helpers.htmlDecode(el.description)}` }
         setStatus((prevState) => [...prevState, item])
       })
@@ -700,37 +700,40 @@ export default function OfficerCreateOrUpdate() {
                     {error.right && Strings.Form.Validation[error.right](Strings.Right.NAME)}
                   </CFormFeedback>
                 </CCol>
-                <CCol xs={12} md={6}>
-                  <CFormLabel
-                    htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Organization.CODE)}
-                  >
-                    {Strings.Organization.NAME}{' '}
-                    <Required mes={Strings.Form.Validation.REQUIRED()} />
-                  </CFormLabel>
-                  <Select
-                    id={Helpers.makeID(Strings.Officer.CODE, Strings.Organization.CODE)}
-                    value={
-                      organ.filter((el) => el.value === state.organ).length > 0
-                        ? organ.filter((el) => el.value === state.organ)[0]
-                        : null
-                    }
-                    options={organ}
-                    placeholder={Strings.Officer.Common.SELECT_ORGAN}
-                    onChange={(selectedItem) => updateState({ organ: selectedItem.value })}
-                    styles={{
-                      control: (provided, state) => ({
-                        ...provided,
-                        borderColor: error.organ
-                          ? Constants.Styles.ERROR_COLOR
-                          : Constants.Styles.BORDER_COLOR,
-                      }),
-                    }}
-                  />
-                  <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
-                    {error.organ && Strings.Form.Validation[error.organ](Strings.Organization.NAME)}
-                  </CFormFeedback>
-                </CCol>
-                <CCol xs={12} md={6}>
+                {loggedUser.right.scope === 0 && (
+                  <CCol xs={12} md={6}>
+                    <CFormLabel
+                      htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Organization.CODE)}
+                    >
+                      {Strings.Organization.NAME}{' '}
+                      <Required mes={Strings.Form.Validation.REQUIRED()} />
+                    </CFormLabel>
+                    <Select
+                      id={Helpers.makeID(Strings.Officer.CODE, Strings.Organization.CODE)}
+                      value={
+                        organ.filter((el) => el.value === state.organ).length > 0
+                          ? organ.filter((el) => el.value === state.organ)[0]
+                          : null
+                      }
+                      options={organ}
+                      placeholder={Strings.Officer.Common.SELECT_ORGAN}
+                      onChange={(selectedItem) => updateState({ organ: selectedItem.value })}
+                      styles={{
+                        control: (provided, state) => ({
+                          ...provided,
+                          borderColor: error.organ
+                            ? Constants.Styles.ERROR_COLOR
+                            : Constants.Styles.BORDER_COLOR,
+                        }),
+                      }}
+                    />
+                    <CFormFeedback style={Constants.Styles.INVALID_FROM_FEEDBACK}>
+                      {error.organ &&
+                        Strings.Form.Validation[error.organ](Strings.Organization.NAME)}
+                    </CFormFeedback>
+                  </CCol>
+                )}
+                <CCol xs={12} md={loggedUser.right.scope === 0 ? 6 : 12}>
                   <CFormLabel
                     htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.OfficerStatus.CODE)}
                   >

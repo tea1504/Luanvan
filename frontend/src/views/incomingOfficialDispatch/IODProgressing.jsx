@@ -41,9 +41,13 @@ import withReactContent from 'sweetalert2-react-content'
 import ckEditorConfig from 'src/configs/ckEditor.config'
 import { CKEditor } from '@ckeditor/ckeditor5-react'
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
-import { FaEraser } from 'react-icons/fa'
+import { FaEraser, FaInfoCircle, FaMailBulk } from 'react-icons/fa'
+import { HiDocumentDuplicate } from 'react-icons/hi'
+import ReactSelect from 'react-select'
+import OrganizationService from 'src/services/organization.service'
 
 const service = new IODService()
+const organizationService = new OrganizationService()
 const MySwal = withReactContent(Swal)
 export default function IODProgressing() {
   const dispatch = useDispatch()
@@ -69,6 +73,8 @@ export default function IODProgressing() {
   const [listSendEmail, setListSendEmail] = useState([])
   const [message, setMessage] = useState('')
   const [date, setDate] = useState(0)
+  const [organization, setOrganization] = useState('')
+  const [organ, setOrgan] = useState([])
 
   const showError = (error) => {
     switch (error.status) {
@@ -101,18 +107,20 @@ export default function IODProgressing() {
     }
   }
 
-  const getState = async (date = '') => {
+  const getState = async (date = '', organ = '') => {
     try {
       dispatch(setLoading(true))
       let d = ''
       if (date) {
-        const temp = new Date()
-        temp.setDate(temp.getDate() + 1)
-        const tomorrow = temp.getTime() - 1
-        temp.setDate(temp.getDate() - date - 1)
-        const past = temp.getTime()
-        d += '&dueStartDate=' + past
-        d += '&dueEndDate=' + tomorrow
+        const nextDate = new Date()
+        nextDate.setDate(nextDate.getDate() + parseInt(date))
+        console.log(nextDate, parseInt(date))
+        d +=
+          '&dueStartDate=' +
+          new Date(nextDate.getFullYear(), nextDate.getMonth(), nextDate.getDate()).getTime()
+      }
+      if (organ) {
+        d += '&organMulti=' + organ
       }
       const result = await service.getMany(10000, 1, '', 'statusMulti=70726f6772657373696e6730' + d)
       navigate({
@@ -120,6 +128,22 @@ export default function IODProgressing() {
         search: `?${d}`,
       })
       setState(result.data.data.data)
+      dispatch(setLoading(false))
+    } catch (error) {
+      dispatch(setLoading(false))
+      showError(error)
+    }
+  }
+
+  const getOrganization = async () => {
+    try {
+      dispatch(setLoading(true))
+      setOrgan([])
+      const result = await organizationService.getList()
+      result.data.data.map((el) => {
+        var item = { value: el._id, label: `${el.name} (${el.code})` }
+        setOrgan((prevState) => [...prevState, item])
+      })
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
@@ -158,13 +182,23 @@ export default function IODProgressing() {
   }
 
   const onChangeDate = (e) => {
-    setDate((prev) => e.target.value)
-    getState(e.target.value)
+    setDate(e.target.value)
+    getState(e.target.value, organization)
   }
 
   const onChangeDateClear = () => {
-    setDate((prev) => '')
-    getState()
+    setDate('')
+    getState('', organization)
+  }
+
+  const handleOnChangeSelectOrgan = (selectedItem) => {
+    if (selectedItem.length !== 0) {
+      getState(date, selectedItem.map((el) => el.value).join(','))
+      setOrganization(selectedItem.map((el) => el.value).join(','))
+    } else {
+      getState(date, '')
+      setOrganization('')
+    }
   }
 
   const renderTraceHeaderList = () => {
@@ -204,32 +238,67 @@ export default function IODProgressing() {
   }
 
   const init = async () => {
-    await getState()
+    const p = parseInt(searchParams.get('dueStartDate'))
+    if (p) {
+      let now = new Date()
+      let d = new Date(p)
+      await getState(d.getDate() - now.getDate())
+      setDate(d.getDate() - now.getDate())
+    } else await getState()
+    await getOrganization()
   }
+
   useEffect(() => {
     init()
   }, [])
+
   return (
     <CContainer fluid>
       <CCard>
         <CCardBody>
-          <CInputGroup className="flex-nowrap">
-            <CFormInput
-              type="number"
-              min={0}
-              placeholder="Nhập số ngày đến hạn"
-              value={date}
-              onChange={onChangeDate}
-              onFocus={(e) => e.target.select()}
-            />
-            <CInputGroupText
-              id="addon-wrapping"
-              style={{ cursor: 'pointer' }}
-              onClick={onChangeDateClear}
-            >
-              <FaEraser />
-            </CInputGroupText>
-          </CInputGroup>
+          <CRow>
+            <CCol>
+              <CInputGroup className="flex-nowrap">
+                <CFormInput
+                  type="number"
+                  min={0}
+                  placeholder="Nhập số ngày đến hạn"
+                  value={date}
+                  onChange={onChangeDate}
+                  onFocus={(e) => e.target.select()}
+                />
+                <CInputGroupText
+                  id="addon-wrapping"
+                  style={{ cursor: 'pointer' }}
+                  onClick={onChangeDateClear}
+                >
+                  <FaEraser />
+                </CInputGroupText>
+              </CInputGroup>
+            </CCol>
+            <CCol>
+              <ReactSelect
+                // value={
+                //   !findParams.type
+                //     ? null
+                //     : type.filter((el) => el.value === findParams.type).length > 0
+                //     ? type.filter((el) => el.value === findParams.type)[0]
+                //     : null
+                // }
+                options={organ}
+                placeholder="Chọn tổ chức"
+                onChange={(selectedItem) => handleOnChangeSelectOrgan(selectedItem)}
+                styles={{
+                  menu: (provided) => ({
+                    ...provided,
+                    zIndex: 999999,
+                  }),
+                }}
+                isClearable
+                isMulti
+              />
+            </CCol>
+          </CRow>
           <CTable>
             <CTableHead>
               <CTableRow>
@@ -277,18 +346,32 @@ export default function IODProgressing() {
                       })}
                     </CTableDataCell>
                     <CTableDataCell className="text-center">
-                      <CButtonGroup>
-                        <CButton variant="outline" onClick={() => handleOnCLickTraceButton(ind)}>
-                          Xem quá trình xử lý
-                        </CButton>
+                      <CTooltip content="Xem chi tiết">
                         <CButton
-                          variant="outline"
-                          color="warning"
+                          className="m-1"
+                          onClick={() => navigate(Screens.IOD_DETAIL(state[ind]._id))}
+                        >
+                          <FaInfoCircle style={{ color: 'whitesmoke' }} />
+                        </CButton>
+                      </CTooltip>
+                      <CTooltip content="Xem quá trình xử lý">
+                        <CButton
+                          className="m-1"
+                          color="info"
+                          onClick={() => handleOnCLickTraceButton(ind)}
+                        >
+                          <HiDocumentDuplicate style={{ color: 'whitesmoke' }} />
+                        </CButton>
+                      </CTooltip>
+                      <CTooltip content="Gửi email nhắc nhở">
+                        <CButton
+                          className="m-1"
+                          color="success"
                           onClick={() => handleOnClickEmailButton(ind)}
                         >
-                          Gửi email nhắc nhở
+                          <FaMailBulk style={{ color: 'whitesmoke' }} />
                         </CButton>
-                      </CButtonGroup>
+                      </CTooltip>
                     </CTableDataCell>
                   </CTableRow>
                 ))}

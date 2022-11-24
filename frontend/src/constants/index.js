@@ -91,6 +91,7 @@ const Constants = {
     // Right
     GET_RIGHTS: (limit = 10, pageNumber = 1, filter = '') =>
       `/rights?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
+    GET_LIST_RIGHTS: `/rights/list`,
     GET_RIGHT: (id) => `/rights/` + id,
     GET_MAX_CODE: `/rights/max-code`,
     CREATE_RIGHT: '/rights',
@@ -112,8 +113,8 @@ const Constants = {
     DELETE_ORGANIZATIONS: '/organizations',
 
     // Organization
-    GET_OFFICERS: (limit = 5, pageNumber = 1, filter = '') =>
-      `/officers?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
+    GET_OFFICERS: (limit = 5, pageNumber = 1, filter = '', params = '') =>
+      `/officers?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}&${params}`,
     GET_LIST_OFFICERS: `/officers/list`,
     GET_OFFICERS_BY_ORGAN_ID: (id = '', limit = 10, pageNumber = 1, filter = '') =>
       `/officers/organ/${id}?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
@@ -184,6 +185,7 @@ const Constants = {
     // Officer Status
     GET_OFFICER_STATUSES: (limit = 10, pageNumber = 1, filter = '') =>
       `/officer-statuses?limit=${limit}&pageNumber=${pageNumber}&filter=${filter}`,
+    GET_LIST_OFFICER_STATUSES: `/officer-statuses/list`,
     GET_OFFICER_STATUS: (id) => `/rights/` + id,
     CREATE_OFFICER_STATUS: '/officer-statuses',
     UPDATE_OFFICER_STATUS: (id) => '/officer-statuses/' + id,

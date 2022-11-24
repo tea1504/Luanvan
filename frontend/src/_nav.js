@@ -142,6 +142,17 @@ const _nav = [
   {
     component: CNavItem,
     name: {
+      vi: vn.Officer.NAME,
+      en: en.Officer.NAME,
+    },
+    role: [1],
+    right: Strings.Common.READ_CATEGORIES,
+    to: Screens.OFFICER,
+    icon: <FaUser className="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: {
       vi: vn.Common.REPORT,
       en: en.Common.REPORT,
     },
@@ -257,68 +268,6 @@ const _nav = [
     right: Strings.Common.READ_CATEGORIES,
     to: Screens.TYPE,
     icon: <FaFile className="nav-icon" />,
-  },
-  {
-    component: CNavTitle,
-    name: {
-      vi: 'TEST',
-      en: "Admin's functions",
-    },
-    role: [0],
-  },
-  {
-    component: CNavGroup,
-    name: {
-      vi: 'Chức năng 1',
-      en: 'Function 1',
-    },
-    role: [0],
-    to: '/cn1',
-    icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
-    items: [
-      {
-        component: CNavItem,
-        name: {
-          vi: 'Tiểu chức năng 1',
-          en: 'Sub function 1',
-        },
-        role: [0],
-        to: '/cn1/cn11',
-      },
-      {
-        component: CNavItem,
-        name: {
-          vi: 'Tiểu chức năng 2',
-          en: 'Sub function 2',
-        },
-        role: [0],
-        to: '/cn1/cn12',
-      },
-    ],
-  },
-  {
-    component: CNavItem,
-    name: {
-      vi: 'Widgets',
-      en: 'Widgets',
-    },
-    role: [0],
-    to: '/widgets',
-    icon: <CIcon icon={cilCalculator} customClassName="nav-icon" />,
-    badge: {
-      color: 'info',
-      text: 'NEW',
-    },
-  },
-  {
-    component: CNavItem,
-    icon: <CIcon icon={cilBook} customClassName="nav-icon" />,
-    name: {
-      vi: vn.Book.NAME,
-      en: en.Book.NAME,
-    },
-    role: [0],
-    to: Screens.BOOK,
   },
 ]
 

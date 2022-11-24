@@ -1,14 +1,33 @@
 require("dotenv").config();
 const Constants = require("../constants");
+const officerModel = require("../models/officer.model");
 const model = require("./../models/right.model");
 
 var rightService = {
-  /**
-   * @param {number} size
-   * @param {number} page
-   * @param {string} filter
-   * @returns {import("./../interfaces").ResponseResult}
-   */
+  getList: async (userID = "") => {
+    try {
+      const user = await officerModel.findById(userID);
+      const result = await model.find(
+        {
+          deleted: false,
+        },
+        "name"
+      );
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: Constants.String.Message.GET_200(
+          Constants.String.Right._
+        ),
+        data: result,
+      };
+    } catch (error) {
+      return {
+        status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
+        message: Constants.String.Message.ERR_500,
+        data: { error: error.message },
+      };
+    }
+  },
   getMany: async (limit = 10, pageNumber = 1, filter = "") => {
     try {
       const result = {};
@@ -154,10 +173,7 @@ var rightService = {
           status: Constants.ApiCode.NOT_ACCEPTABLE,
           message: Constants.String.Message.UNIQUE(Constants.String.Right.NAME),
         };
-      await model.findOneAndUpdate(
-        { _id: id, deleted: false },
-        data
-      );
+      await model.findOneAndUpdate({ _id: id, deleted: false }, data);
       const result = await model.findOne({ _id: id });
       return {
         status: Constants.ApiCode.SUCCESS,

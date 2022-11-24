@@ -24,9 +24,11 @@ const officerController = {
     try {
       const { pageNumber, limit, filter } = req.query;
       const result = await service.getMany(
+        req.userID,
         parseInt(limit),
         parseInt(pageNumber),
-        filter
+        filter,
+        req.query
       );
       return res.status(result.status).json(result);
     } catch (error) {

@@ -2,6 +2,12 @@ import Constants from 'src/constants'
 import BaseService from './base.service'
 
 class RightService extends BaseService {
+  async getList() {
+    const result = await this.api.get({
+      path: Constants.ApiPath.GET_LIST_RIGHTS,
+    })
+    return result
+  }
   async getMany(limit = 10, pageNumber = 1, filter = '') {
     const result = await this.api.get({
       path: Constants.ApiPath.GET_RIGHTS(limit, pageNumber, filter),
@@ -14,7 +20,7 @@ class RightService extends BaseService {
     })
     return result
   }
-  async getMaxCode(){
+  async getMaxCode() {
     const result = await this.api.get({
       path: Constants.ApiPath.GET_MAX_CODE,
     })
@@ -50,7 +56,7 @@ class RightService extends BaseService {
   async deleteMany(ids) {
     const result = await this.api.delete({
       path: Constants.ApiPath.DELETE_RIGHTS,
-      data: {ids}
+      data: { ids },
     })
     return result
   }

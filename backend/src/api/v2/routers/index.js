@@ -52,7 +52,6 @@ route.use(
 route.use(
   Constants.ApiPath.Right.ROOT,
   authMiddleware,
-  adminMiddleware,
   rightRouter
 );
 route.use(
