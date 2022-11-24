@@ -85,6 +85,14 @@ var incomingOfficialDispatchService = {
         delete params.issuedStartDate;
         delete params.issuedEndDate;
       }
+      if (params.dueStartDate) {
+        between.dueDate = {
+          $gte: parseInt(params.dueStartDate),
+          $lte: parseInt(params.dueEndDate),
+        };
+        delete params.dueStartDate;
+        delete params.dueEndDate;
+      }
       if (params.arrivalNumber < 1) params.arrivalNumber = null;
       if (params.typeMulti) {
         between.type = { $in: params.typeMulti.split(",") };
@@ -121,6 +129,7 @@ var incomingOfficialDispatchService = {
       }
       const khongMat = await securityModel.findOne({ name: "Không" });
       const result = {};
+      console.log(between);
       const total = await model.countDocuments({
         importer: { $in: [...listUser].map((el) => el._id) },
         deleted: false,
@@ -976,7 +985,35 @@ var incomingOfficialDispatchService = {
       return showError(error);
     }
   },
-
+  sendEmail: async (listUser = [], message = "", IOD = {}) => {
+    try {
+      const listOfficer = await officerModel.find({
+        _id: { $in: listUser },
+      });
+      const listEmail = listOfficer.map((el) => el.emailAddress);
+      var mailOptions = {
+        from: process.env.MAIL_USER,
+        to: listEmail.join(", "),
+        subject: "email_title",
+        html: `<img src="https://imggroup.com.vn/Content/images/logo-img.png" height="100"/>
+        <br/>
+        <span style="width: 100%; font-family: Tahoma,Geneva, sans-serif;">
+            Lời nhắn: ${message}
+        </span>
+        <div>
+          <a href="http://localhost:3000/#/van-ban-den/chi-tiet/${IOD._id}">${IOD.arrivalNumber}</a>
+        </div>
+`,
+      };
+      await transporter.sendMail(mailOptions);
+      return {
+        status: Constants.ApiCode.SUCCESS,
+        message: "Gửi thông báo thành công",
+      };
+    } catch (error) {
+      return showError(error);
+    }
+  },
   report: async (userID = "", start = 0, end = 0) => {
     try {
       const startDate = new Date(parseInt(start));

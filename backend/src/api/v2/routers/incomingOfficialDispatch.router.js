@@ -86,6 +86,10 @@ route.post(
   upload.array("file"),
   controller.postOne
 );
+route.post(
+  Constants.ApiPath.IncomingOfficialDispatch.SEND_EMAIL,
+  controller.sendEmail
+);
 route.put(
   Constants.ApiPath.IncomingOfficialDispatch.ID,
   upload.array("file"),

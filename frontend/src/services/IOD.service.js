@@ -173,6 +173,13 @@ class IODService extends BaseService {
     })
     return result
   }
+  async sendEmail(listUser, message, IOD) {
+    const result = await this.api.post({
+      path: Constants.ApiPath.SEND_EMAIL_IOD,
+      data: { listUser, message, IOD },
+    })
+    return result
+  }
 }
 
 export default IODService

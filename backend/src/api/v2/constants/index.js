@@ -99,6 +99,7 @@ const Constants = {
       REFUSE: "/refuse/:id",
       ROOT: "/incoming-official-dispatch",
       SLASH: "/",
+      SEND_EMAIL: "/send-email",
       REPORT: "/report",
       REPORT_YEAR: "/report/year",
       REPORT_PROGRESSING: "/report/progressing",

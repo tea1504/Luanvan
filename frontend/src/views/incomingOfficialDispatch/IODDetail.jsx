@@ -150,7 +150,18 @@ export default function IODDetail() {
       const s = store.find((el) => el._id === id)
       if (!s) {
         await getStateFromServer(id)
-      } else updateState(s)
+      } else {
+        updateState(s)
+        document.title = Strings.IncomingOfficialDispatch.Title.DETAIL(
+          Helpers.getMaVanBan(
+            s.code,
+            s.organ.code,
+            s.type.notation,
+            s.issuedDate,
+            localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
+          ),
+        )
+      }
     } else {
       await getStateFromServer(id)
     }
@@ -161,6 +172,15 @@ export default function IODDetail() {
       dispatch(setLoading(true))
       const result = await service.getOne(id)
       updateState(result.data.data)
+      document.title = Strings.IncomingOfficialDispatch.Title.DETAIL(
+        Helpers.getMaVanBan(
+          result.data.data.code,
+          result.data.data.organ.code,
+          result.data.data.type.notation,
+          result.data.data.issuedDate,
+          localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
+        ),
+      )
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
@@ -324,15 +344,6 @@ export default function IODDetail() {
   }
 
   useEffect(() => {
-    document.title = Strings.IncomingOfficialDispatch.Title.DETAIL(
-      Helpers.getMaVanBan(
-        state.code,
-        state.organ.code,
-        state.type.notation,
-        state.issuedDate,
-        localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
-      ),
-    )
     const list = id.split('.')
     getState(list[list.length - 1])
   }, [])

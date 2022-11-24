@@ -365,6 +365,20 @@ var incomingOfficialDispatchController = {
    * @param {import("express").Response} res
    * @param {import("express").RequestHandler} next
    */
+  sendEmail: async (req, res, next) => {
+    try {
+      const { listUser, IOD, message } = req.body;
+      const result = await service.sendEmail(listUser, message, IOD);
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  },
+  /**
+   * @param {import("express").Request} req
+   * @param {import("express").Response} res
+   * @param {import("express").RequestHandler} next
+   */
   report: async (req, res, next) => {
     try {
       const { end, start } = req.query;

@@ -29,7 +29,6 @@ const showError = (error) => {
     default:
       return {
         status: Constants.ApiCode.INTERNAL_SERVER_ERROR,
-        // message: Constants.String.Message.ERR_500,
         message: error.message,
         data: { error: error.message },
       };
