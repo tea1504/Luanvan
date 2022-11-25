@@ -25,6 +25,7 @@ const ActionButton = ({ data }) => {
   const { func = Screens.ODT_LIST } = useParams()
   const loggedUser = useSelector((state) => state.user.user)
   const store = useSelector((state) => state.ODT)
+  const formatCodeOD = useSelector((state) => state.config.formatCodeOD)
   const language = useSelector((state) => state.config.language)
   Strings.setLanguage(language)
   const navigate = useNavigate()
@@ -188,7 +189,7 @@ const ActionButton = ({ data }) => {
                       loggedUser.organ.code,
                       data.type.notation,
                       data.issuedDate,
-                      localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
+                      formatCodeOD,
                     ),
                   )}.${data._id}`,
                 ),
@@ -214,7 +215,7 @@ const ActionButton = ({ data }) => {
                       loggedUser.organ.code,
                       data.type.notation,
                       data.issuedDate,
-                      localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
+                      formatCodeOD,
                     ),
                   )}.${data._id}`,
                 ),
@@ -258,7 +259,7 @@ const ActionButton = ({ data }) => {
                         loggedUser.organ.code,
                         data.type.notation,
                         data.issuedDate,
-                        localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
+                        formatCodeOD,
                       ),
                     )}.${data._id}`,
                   ),
@@ -285,7 +286,7 @@ const ActionButton = ({ data }) => {
                         loggedUser.organ.code,
                         data.type.notation,
                         data.issuedDate,
-                        localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
+                        formatCodeOD,
                       ),
                     )}.${data._id}`,
                   ),

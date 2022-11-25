@@ -109,6 +109,10 @@ const Screens = {
   // user
   OFFICER_INFO: '/nguoi-dung',
   USER_CHANGE_PASSWORD: '/nguoi-dung/doi-mat-khau',
+
+  // config
+  CONFIG: '/cau-hinh-he-thong',
+
   // =========================================================================
   // Public
   // =========================================================================

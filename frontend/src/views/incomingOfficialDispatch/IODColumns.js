@@ -9,8 +9,8 @@ export default [
   {
     name: '#',
     selector: (row, index) => index + 1,
-    maxWidth: '100px',
     right: true,
+    maxWidth: '50px',
   },
   {
     name: Strings.Form.FieldName.ARRIVAL_DATE,
@@ -21,6 +21,7 @@ export default [
         day: '2-digit',
       }),
     sortable: true,
+    maxWidth: '130px',
   },
   {
     name: Strings.Form.FieldName.ISSUED_DATE(),
@@ -31,6 +32,7 @@ export default [
         day: '2-digit',
       }),
     sortable: true,
+    maxWidth: '130px',
   },
   {
     name: Strings.Form.FieldName.ARRIVAL_NUMBER,
@@ -52,13 +54,12 @@ export default [
   },
   {
     name: Strings.Form.FieldName.SUBJECT(),
-    cell: (row) => row.subject,
+    cell: (row) => Helpers.trimString(row.subject, 40),
     sortable: true,
-    minWidth: '400px',
   },
   {
     name: Strings.Form.FieldName.ORGANIZATION_IOD,
-    cell: (row) => row.organ.name,
+    cell: (row) => Helpers.trimString(row.organ.name, 40),
     sortable: true,
   },
   {
@@ -81,8 +82,7 @@ export default [
   {
     name: Strings.Common.ACTION,
     cell: (row) => <ActionButton data={row} />,
-    // center: true,
-    maxWidth: '300px',
-    minWidth: '200px',
+    center: true,
+    width: '300px',
   },
 ]

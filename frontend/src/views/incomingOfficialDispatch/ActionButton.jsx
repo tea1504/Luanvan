@@ -13,6 +13,7 @@ import Constants from 'src/constants'
 import Helpers from 'src/commons/helpers'
 import IODService from 'src/services/IOD.service'
 import { FaHandshake, FaInfoCircle, FaPenSquare, FaTasks, FaTrash } from 'react-icons/fa'
+import { AiFillMessage } from 'react-icons/ai'
 import { useEffect } from 'react'
 import StatusService from 'src/services/status.service'
 import { setLoading } from 'src/store/slice/config.slice'
@@ -25,6 +26,7 @@ const ActionButton = ({ data }) => {
   const { func = Screens.IOD_LIST } = useParams()
   const loggedUser = useSelector((state) => state.user.user)
   const store = useSelector((state) => state.IOD)
+  const formatCodeOD = useSelector((state) => state.config.formatCodeOD)
   const language = useSelector((state) => state.config.language)
   Strings.setLanguage(language)
   const navigate = useNavigate()
@@ -207,7 +209,7 @@ const ActionButton = ({ data }) => {
                       data.organ.code,
                       data.type.notation,
                       data.issuedDate,
-                      localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
+                      formatCodeOD,
                     ),
                   )}.${data._id}`,
                 ),
@@ -233,7 +235,7 @@ const ActionButton = ({ data }) => {
                       data.organ.code,
                       data.type.notation,
                       data.issuedDate,
-                      localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
+                      formatCodeOD,
                     ),
                   )}.${data._id}`,
                 ),
@@ -261,60 +263,100 @@ const ActionButton = ({ data }) => {
         </CButton>
       )}
       {loggedUser.right[Strings.Common.APPROVE_OD] &&
-        ['PENDING'].includes(data.status.name) &&
-        data.approver.code === loggedUser.code && (
-          <CTooltip content={Strings.Common.APPROVE}>
-            <CButton
-              size="sm"
-              color="success"
-              className="m-1"
-              onClick={() =>
-                navigate(
-                  Screens.IOD_APPROVE(
-                    `${Helpers.toSlug(
-                      Helpers.getMaVanBan(
-                        data.code,
-                        data.organ.code,
-                        data.type.notation,
-                        data.issuedDate,
-                        localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
-                      ),
-                    )}.${data._id}`,
-                  ),
-                )
-              }
-            >
-              <FaTasks style={{ color: 'whitesmoke' }} />
-            </CButton>
-          </CTooltip>
-        )}
+      ['PENDING'].includes(data.status.name) &&
+      data.approver.code === loggedUser.code ? (
+        <CTooltip content={Strings.Common.APPROVE}>
+          <CButton
+            size="sm"
+            color="success"
+            className="m-1"
+            onClick={() =>
+              navigate(
+                Screens.IOD_APPROVE(
+                  `${Helpers.toSlug(
+                    Helpers.getMaVanBan(
+                      data.code,
+                      data.organ.code,
+                      data.type.notation,
+                      data.issuedDate,
+                      formatCodeOD,
+                    ),
+                  )}.${data._id}`,
+                ),
+              )
+            }
+          >
+            <FaTasks style={{ color: 'whitesmoke' }} />
+          </CButton>
+        </CTooltip>
+      ) : (
+        <CButton size="sm" color="dark" className="m-1" disabled>
+          <FaTasks style={{ color: 'whitesmoke' }} />
+        </CButton>
+      )}
       {['PROGRESSING'].includes(data.status.name) &&
-        data.handler.filter((el) => el.code === loggedUser.code).length !== 0 && (
-          <CTooltip content={Strings.Common.HANDLE}>
-            <CButton
-              size="sm"
-              color="primary"
-              className="m-1"
-              onClick={() =>
-                navigate(
-                  Screens.IOD_HANDLE(
-                    `${Helpers.toSlug(
-                      Helpers.getMaVanBan(
-                        data.code,
-                        data.organ.code,
-                        data.type.notation,
-                        data.issuedDate,
-                        localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
-                      ),
-                    )}.${data._id}`,
-                  ),
-                )
-              }
-            >
-              <FaHandshake style={{ color: 'whitesmoke' }} />
-            </CButton>
-          </CTooltip>
-        )}
+      data.handler.filter((el) => el.code === loggedUser.code).length !== 0 ? (
+        <CTooltip content={Strings.Common.HANDLE}>
+          <CButton
+            size="sm"
+            color="primary"
+            className="m-1"
+            onClick={() =>
+              navigate(
+                Screens.IOD_HANDLE(
+                  `${Helpers.toSlug(
+                    Helpers.getMaVanBan(
+                      data.code,
+                      data.organ.code,
+                      data.type.notation,
+                      data.issuedDate,
+                      formatCodeOD,
+                    ),
+                  )}.${data._id}`,
+                ),
+              )
+            }
+          >
+            <FaHandshake style={{ color: 'whitesmoke' }} />
+          </CButton>
+        </CTooltip>
+      ) : (
+        <CButton size="sm" color="dark" className="m-1" disabled>
+          <FaHandshake style={{ color: 'whitesmoke' }} />
+        </CButton>
+      )}
+      {loggedUser.right[Strings.Common.APPROVE_OD] &&
+      loggedUser.right[Strings.Common.CREATE_OD] &&
+      ['APPROVED', 'PROGRESSED'].includes(data.status.name) &&
+      [data.approver.code, data.importer.code].includes(loggedUser.code) ? (
+        <CTooltip content={Strings.Common.IMPLEMENT}>
+          <CButton
+            size="sm"
+            color="primary"
+            onClick={() =>
+              navigate(
+                Screens.IOD_DETAIL(
+                  `${Helpers.toSlug(
+                    Helpers.getMaVanBan(
+                      data.code,
+                      data.organ.code,
+                      data.type.notation,
+                      data.issuedDate,
+                      formatCodeOD,
+                    ),
+                  )}.${data._id}`,
+                ),
+              )
+            }
+          >
+            <AiFillMessage style={{ color: 'whitesmoke' }} />
+          </CButton>
+        </CTooltip>
+      ) : (
+        <CButton size="sm" color="dark" disabled>
+          <AiFillMessage style={{ color: 'whitesmoke' }} />
+        </CButton>
+      )}
     </div>
   )
 }

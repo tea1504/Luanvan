@@ -64,6 +64,7 @@ export default function ODTDetail() {
   let token = useSelector((state) => state.user.token)
   if (Helpers.isNullOrEmpty(token)) token = localStorage.getItem(Constants.StorageKeys.ACCESS_TOKEN)
   let loading = useSelector((state) => state.config.loading)
+  const formatCodeOD = useSelector((state) => state.config.formatCodeOD)
   const language = useSelector((state) => state.config.language)
   Strings.setLanguage(language)
 
@@ -330,7 +331,7 @@ export default function ODTDetail() {
         state.organ.code,
         state.type.notation,
         state.issuedDate,
-        localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
+        formatCodeOD,
       ),
     )
     const list = id.split('.')
@@ -349,7 +350,7 @@ export default function ODTDetail() {
                 loggedUser.organ.code,
                 state.type.notation,
                 state.issuedDate,
-                localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
+                formatCodeOD,
               )}
             </CCardHeader>
             <CCardBody>
@@ -382,7 +383,7 @@ export default function ODTDetail() {
                       loggedUser.organ.code,
                       state.type.notation,
                       state.issuedDate,
-                      localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
+                      formatCodeOD,
                     )})`}</CTableDataCell>
                   </CTableRow>
                   <CTableRow>
@@ -704,7 +705,7 @@ export default function ODTDetail() {
                                   state.organ.code,
                                   state.type.notation,
                                   state.issuedDate,
-                                  localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
+                                  formatCodeOD,
                                 ),
                               )}.${state._id}`,
                             ),

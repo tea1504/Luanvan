@@ -35,6 +35,7 @@ import {
   FaRegFilePdf,
   FaVectorSquare,
 } from 'react-icons/fa'
+import { GiCancel } from 'react-icons/gi'
 import { useDispatch } from 'react-redux'
 import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -64,6 +65,7 @@ export default function IODDetail() {
   let token = useSelector((state) => state.user.token)
   if (Helpers.isNullOrEmpty(token)) token = localStorage.getItem(Constants.StorageKeys.ACCESS_TOKEN)
   let loading = useSelector((state) => state.config.loading)
+  const formatCodeOD = useSelector((state) => state.config.formatCodeOD)
   const language = useSelector((state) => state.config.language)
   Strings.setLanguage(language)
 
@@ -158,7 +160,7 @@ export default function IODDetail() {
             s.organ.code,
             s.type.notation,
             s.issuedDate,
-            localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
+            formatCodeOD,
           ),
         )
       }
@@ -178,7 +180,7 @@ export default function IODDetail() {
           result.data.data.organ.code,
           result.data.data.type.notation,
           result.data.data.issuedDate,
-          localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
+          formatCodeOD,
         ),
       )
       dispatch(setLoading(false))
@@ -386,7 +388,7 @@ export default function IODDetail() {
                       state.organ.code,
                       state.type.notation,
                       state.issuedDate,
-                      localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
+                      formatCodeOD,
                     )})`}</CTableDataCell>
                   </CTableRow>
                   <CTableRow>
@@ -685,15 +687,17 @@ export default function IODDetail() {
                         <CTableHeaderCell
                           className="py-2"
                           style={{ minWidth: '150px' }}
-                          rowSpan={state.handler.length}
+                          rowSpan={state.handler.length === 0 ? 1 : state.handler.length}
                         >
                           {Strings.Form.FieldName.HANDLER()}
                         </CTableHeaderCell>
-                        {state.handler.length !== 0 && (
+                        {state.handler.length !== 0 ? (
                           <CTableDataCell className="py-2" colSpan={3}>
                             {state.handler[0].code} | {state.handler[0].lastName}{' '}
                             {state.handler[0].firstName} ({state.handler[0].position})
                           </CTableDataCell>
+                        ) : (
+                          <CTableDataCell className="py-2" colSpan={3}></CTableDataCell>
                         )}
                       </CTableRow>
                       {state.handler.map((el, ind) => {
@@ -735,53 +739,92 @@ export default function IODDetail() {
             </CCardBody>
             <CCardFooter>
               <CRow>
-                {loggedUser.right[Strings.Common.APPROVE_OD] &&
+                <CCol className="my-1">
+                  {loggedUser.right[Strings.Common.APPROVE_OD] &&
                   ['PENDING'].includes(state.status.name) &&
-                  state.approver.code === loggedUser.code && (
-                    <CCol>
-                      <CButton
-                        className="w-100"
-                        color="success"
-                        onClick={() =>
-                          navigate(
-                            Screens.IOD_APPROVE(
-                              `${Helpers.toSlug(
-                                Helpers.getMaVanBan(
-                                  state.code,
-                                  state.organ.code,
-                                  state.type.notation,
-                                  state.issuedDate,
-                                  localStorage.getItem(Constants.StorageKeys.FORMAT_CODE_OD),
-                                ),
-                              )}.${state._id}`,
-                            ),
-                          )
-                        }
-                      >
-                        {Strings.Common.APPROVE}
-                      </CButton>
-                    </CCol>
+                  state.approver.code === loggedUser.code ? (
+                    <CButton
+                      className="w-100"
+                      color="success"
+                      onClick={() =>
+                        navigate(
+                          Screens.IOD_APPROVE(
+                            `${Helpers.toSlug(
+                              Helpers.getMaVanBan(
+                                state.code,
+                                state.organ.code,
+                                state.type.notation,
+                                state.issuedDate,
+                                formatCodeOD,
+                              ),
+                            )}.${state._id}`,
+                          ),
+                        )
+                      }
+                    >
+                      {Strings.Common.APPROVE}
+                    </CButton>
+                  ) : (
+                    <CButton className="w-100" color="dark" disabled>
+                      {Strings.Common.APPROVE}
+                    </CButton>
                   )}
-                {loggedUser.right[Strings.Common.APPROVE_OD] &&
+                </CCol>
+                <CCol className="my-1">
+                  {loggedUser.right[Strings.Common.APPROVE_OD] &&
                   loggedUser.right[Strings.Common.CREATE_OD] &&
                   ['APPROVED', 'PROGRESSED'].includes(state.status.name) &&
-                  [state.approver.code, state.importer.code].includes(loggedUser.code) && (
-                    <CCol>
-                      <CButton
-                        className="w-100"
-                        color="success"
-                        onClick={() => {
-                          updateVisible({ implement: true })
-                        }}
-                      >
-                        {Strings.Common.IMPLEMENT}
-                      </CButton>
-                    </CCol>
+                  [state.approver.code, state.importer.code].includes(loggedUser.code) ? (
+                    <CButton
+                      className="w-100"
+                      color="success"
+                      onClick={() => {
+                        updateVisible({ implement: true })
+                      }}
+                    >
+                      {Strings.Common.IMPLEMENT}
+                    </CButton>
+                  ) : (
+                    <CButton className="w-100" color="dark" disabled>
+                      {Strings.Common.IMPLEMENT}
+                    </CButton>
                   )}
-                {loggedUser.right[Strings.Common.APPROVE_OD] &&
+                </CCol>
+                <CCol className="my-1">
+                  {['PROGRESSING'].includes(state.status.name) &&
+                  state.handler.filter((el) => el.code === loggedUser.code).length !== 0 ? (
+                    <CButton
+                      color="primary"
+                      className="w-100"
+                      onClick={() =>
+                        navigate(
+                          Screens.IOD_HANDLE(
+                            `${Helpers.toSlug(
+                              Helpers.getMaVanBan(
+                                state.code,
+                                state.organ.code,
+                                state.type.notation,
+                                state.issuedDate,
+                                formatCodeOD,
+                              ),
+                            )}.${state._id}`,
+                          ),
+                        )
+                      }
+                    >
+                      {Strings.Common.HANDLE}
+                    </CButton>
+                  ) : (
+                    <CButton color="dark" className="w-100" disabled>
+                      {Strings.Common.HANDLE}
+                    </CButton>
+                  )}
+                </CCol>
+                <CCol className="my-1">
+                  {loggedUser.right[Strings.Common.APPROVE_OD] &&
                   ['APPROVED', 'PROGRESSED', 'PROGRESSING'].includes(state.status.name) &&
-                  state.approver.code === loggedUser.code && (
-                    <CCol>
+                  state.approver.code === loggedUser.code ? (
+                    <CTooltip content={Strings.Common.APPROVE_CANCEL}>
                       <CButton
                         className="w-100"
                         color="danger"
@@ -791,9 +834,14 @@ export default function IODDetail() {
                       >
                         {Strings.Common.APPROVE_CANCEL}
                       </CButton>
-                    </CCol>
+                    </CTooltip>
+                  ) : (
+                    <CButton className="w-100" color="dark" disabled>
+                      {Strings.Common.APPROVE_CANCEL}
+                    </CButton>
                   )}
-                <CCol>
+                </CCol>
+                <CCol className="my-1">
                   <CButton
                     className="w-100"
                     color="secondary"

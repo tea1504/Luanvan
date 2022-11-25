@@ -91,7 +91,7 @@ export default function IODCreateOrUpdate() {
 
   const [state, setState] = useState({
     code: 0,
-    issuedDate: 0,
+    issuedDate: new Date(),
     subject: '',
     type: null,
     language: null,
@@ -99,7 +99,7 @@ export default function IODCreateOrUpdate() {
     description: '',
     signerInfoName: '',
     signerInfoPosition: '',
-    dueDate: 0,
+    dueDate: new Date(new Date().getTime() + 1 * 24 * 60 * 60 * 1000),
     priority: null,
     security: null,
     organ: null,
@@ -450,7 +450,7 @@ export default function IODCreateOrUpdate() {
     return flag
   }
 
-  const handleSubmitForm = async (e) => {
+  const handleSubmitFormContinue = async (e) => {
     e.preventDefault()
     updateError({
       code: null,
@@ -476,7 +476,7 @@ export default function IODCreateOrUpdate() {
         dispatch(setLoading(true))
         if (!id) {
           await service.createOne(state)
-          MySwal.fire({
+          await MySwal.fire({
             title: Strings.Common.SUCCESS,
             icon: 'success',
             text: Strings.Message.Create.SUCCESS,
@@ -503,7 +503,7 @@ export default function IODCreateOrUpdate() {
           })
         } else {
           await service.updateOne(id, state)
-          MySwal.fire({
+          await MySwal.fire({
             title: Strings.Common.SUCCESS,
             icon: 'success',
             text: Strings.Message.Update.SUCCESS,
@@ -516,6 +516,54 @@ export default function IODCreateOrUpdate() {
       }
     }
     setLink('')
+  }
+
+  const handleSubmitFormExit = async (e) => {
+    e.preventDefault()
+    updateError({
+      code: null,
+      issuedDate: null,
+      subject: null,
+      type: null,
+      language: null,
+      pageAmount: null,
+      description: null,
+      signerInfoName: null,
+      signerInfoPosition: null,
+      dueDate: null,
+      priority: null,
+      security: null,
+      organ: null,
+      approver: null,
+      handler: null,
+      file: null,
+      traceHeaderList: null,
+    })
+    if (validate()) {
+      try {
+        dispatch(setLoading(true))
+        if (!id) {
+          await service.createOne(state)
+          await MySwal.fire({
+            title: Strings.Common.SUCCESS,
+            icon: 'success',
+            text: Strings.Message.Create.SUCCESS,
+          })
+        } else {
+          await service.updateOne(id, state)
+          await MySwal.fire({
+            title: Strings.Common.SUCCESS,
+            icon: 'success',
+            text: Strings.Message.Update.SUCCESS,
+          })
+        }
+        dispatch(setLoading(false))
+        navigate(-1)
+      } catch (error) {
+        dispatch(setLoading(false))
+        showError(error)
+      }
+    }
   }
 
   const handelOnClickResetButton = async () => {
@@ -552,7 +600,7 @@ export default function IODCreateOrUpdate() {
 
   const handleKeypress = (e) => {
     if (e.charCode === 13) {
-      handleSubmitForm(e)
+      handleSubmitFormContinue(e)
     }
   }
 
@@ -808,6 +856,7 @@ export default function IODCreateOrUpdate() {
                     placeholder={Strings.Form.FieldName.ISSUED_DATE(
                       Strings.IncomingOfficialDispatch.NAME,
                     )}
+                    max={Helpers.formatDateForInput(new Date())}
                     value={Helpers.formatDateForInput(state.issuedDate)}
                     onChange={(e) =>
                       updateState({ issuedDate: new Date(e.target.value).getTime() })
@@ -844,6 +893,7 @@ export default function IODCreateOrUpdate() {
                     value={state.code}
                     onChange={(e) => updateState({ code: parseInt(e.target.value) })}
                     onKeyPress={handleKeypress}
+                    onFocus={(e) => e.target.select()}
                   />
                   <CFormFeedback invalid>
                     {error.code &&
@@ -1049,6 +1099,7 @@ export default function IODCreateOrUpdate() {
                     value={state.signerInfoName}
                     onChange={(e) => updateState({ signerInfoName: e.target.value })}
                     onKeyPress={handleKeypress}
+                    onFocus={(e) => e.target.select()}
                   />
                   <CFormFeedback invalid>
                     {error.signerInfoName &&
@@ -1085,6 +1136,7 @@ export default function IODCreateOrUpdate() {
                     value={state.signerInfoPosition}
                     onChange={(e) => updateState({ signerInfoPosition: e.target.value })}
                     onKeyPress={handleKeypress}
+                    onFocus={(e) => e.target.select()}
                   />
                   <CFormFeedback invalid>
                     {error.signerInfoPosition &&
@@ -1120,6 +1172,7 @@ export default function IODCreateOrUpdate() {
                     value={state.pageAmount}
                     onChange={(e) => updateState({ pageAmount: parseInt(e.target.value) })}
                     onKeyPress={handleKeypress}
+                    onFocus={(e) => e.target.select()}
                   />
                   <CFormFeedback invalid>
                     {error.pageAmount &&
@@ -1148,6 +1201,9 @@ export default function IODCreateOrUpdate() {
                     )}
                     placeholder={Strings.Form.FieldName.DUE_DATE(
                       Strings.IncomingOfficialDispatch.NAME,
+                    )}
+                    min={Helpers.formatDateForInput(
+                      new Date(new Date().getTime() + 1 * 24 * 60 * 60 * 1000),
                     )}
                     value={Helpers.formatDateForInput(state.dueDate)}
                     onChange={(e) => updateState({ dueDate: new Date(e.target.value).getTime() })}
@@ -1257,12 +1313,17 @@ export default function IODCreateOrUpdate() {
             </CCardBody>
             <CCardFooter>
               <CRow>
-                <CCol md={4} className="mt-1">
-                  <CButton className="w-100" disabled={loading} onClick={handleSubmitForm}>
+                <CCol className="mt-1">
+                  <CButton className="w-100" disabled={loading} onClick={handleSubmitFormContinue}>
+                    {loading && <CSpinner size="sm" />} {Strings.Common.SUBMIT_CONTINUE}
+                  </CButton>
+                </CCol>
+                <CCol className="mt-1">
+                  <CButton className="w-100" disabled={loading} onClick={handleSubmitFormExit}>
                     {loading && <CSpinner size="sm" />} {Strings.Common.SUBMIT}
                   </CButton>
                 </CCol>
-                <CCol md={4} className="mt-1">
+                <CCol className="mt-1">
                   <CButton
                     className="w-100"
                     disabled={loading}

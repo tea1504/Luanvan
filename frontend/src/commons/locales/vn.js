@@ -61,6 +61,7 @@ export default {
     SEARCH: 'Tìm kiếm',
     SEND_EMAIL: 'Gửi email',
     SETTING: 'Cài đặt',
+    SUBMIT_CONTINUE: 'Lưu thông tin và tiếp tục',
     SUBMIT: 'Lưu thông tin',
     SUBMIT_NEXT: 'Lưu và tiếp tục',
     SUCCESS: 'Thành công',

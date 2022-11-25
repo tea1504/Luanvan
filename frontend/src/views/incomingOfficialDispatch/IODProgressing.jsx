@@ -45,9 +45,11 @@ import { FaEraser, FaInfoCircle, FaMailBulk } from 'react-icons/fa'
 import { HiDocumentDuplicate } from 'react-icons/hi'
 import ReactSelect from 'react-select'
 import OrganizationService from 'src/services/organization.service'
+import StatusService from 'src/services/status.service'
 
 const service = new IODService()
 const organizationService = new OrganizationService()
+const statusService = new StatusService()
 const MySwal = withReactContent(Swal)
 export default function IODProgressing() {
   const dispatch = useDispatch()
@@ -73,8 +75,14 @@ export default function IODProgressing() {
   const [listSendEmail, setListSendEmail] = useState([])
   const [message, setMessage] = useState('')
   const [date, setDate] = useState(0)
-  const [organization, setOrganization] = useState('')
   const [organ, setOrgan] = useState([])
+  const [findParams, setFindParams] = useState({
+    date: '',
+    status: '',
+    organization: '',
+  })
+  const updateFindParams = (newState) =>
+    setFindParams((prevState) => ({ ...prevState, ...newState }))
 
   const showError = (error) => {
     switch (error.status) {
@@ -107,14 +115,13 @@ export default function IODProgressing() {
     }
   }
 
-  const getState = async (date = '', organ = '') => {
+  const getState = async (date = '', organ = '', status = '') => {
     try {
       dispatch(setLoading(true))
       let d = ''
       if (date) {
         const nextDate = new Date()
         nextDate.setDate(nextDate.getDate() + parseInt(date))
-        console.log(nextDate, parseInt(date))
         d +=
           '&dueStartDate=' +
           new Date(nextDate.getFullYear(), nextDate.getMonth(), nextDate.getDate()).getTime()
@@ -122,7 +129,7 @@ export default function IODProgressing() {
       if (organ) {
         d += '&organMulti=' + organ
       }
-      const result = await service.getMany(10000, 1, '', 'statusMulti=70726f6772657373696e6730' + d)
+      const result = await service.getMany(10000, 1, '', 'statusMulti=' + status + d)
       navigate({
         pathname: Screens.OD_REPORT_IOD_REPORT_PROCESSING,
         search: `?${d}`,
@@ -138,12 +145,34 @@ export default function IODProgressing() {
   const getOrganization = async () => {
     try {
       dispatch(setLoading(true))
-      setOrgan([])
+      setOrgan((prev) => [])
       const result = await organizationService.getList()
       result.data.data.map((el) => {
         var item = { value: el._id, label: `${el.name} (${el.code})` }
         setOrgan((prevState) => [...prevState, item])
       })
+      dispatch(setLoading(false))
+    } catch (error) {
+      dispatch(setLoading(false))
+      showError(error)
+    }
+  }
+
+  const getStatus = async () => {
+    try {
+      dispatch(setLoading(true))
+      const result = await statusService.getList()
+      const PROGRESSING = result.data.data.filter((el) => (el.name = 'PROGRESSING'))[0]
+      updateFindParams({ status: PROGRESSING._id })
+      const p = parseInt(searchParams.get('dueStartDate'))
+      const o = searchParams.get('organMulti') || ''
+      updateFindParams({ organization: o })
+      if (p) {
+        let now = new Date()
+        let d = new Date(p)
+        await getState(d.getDate() - now.getDate(), o, PROGRESSING._id)
+        updateFindParams({ date: d.getDate() - now.getDate() })
+      } else await getState('', o, PROGRESSING._id)
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
@@ -182,22 +211,22 @@ export default function IODProgressing() {
   }
 
   const onChangeDate = (e) => {
-    setDate(e.target.value)
-    getState(e.target.value, organization)
+    updateFindParams({ date: e.target.value })
+    getState(e.target.value, findParams.organization, findParams.status)
   }
 
   const onChangeDateClear = () => {
-    setDate('')
-    getState('', organization)
+    updateFindParams({ date: '' })
+    getState('', findParams.organization, findParams.status)
   }
 
   const handleOnChangeSelectOrgan = (selectedItem) => {
     if (selectedItem.length !== 0) {
-      getState(date, selectedItem.map((el) => el.value).join(','))
-      setOrganization(selectedItem.map((el) => el.value).join(','))
+      getState(findParams.date, selectedItem.map((el) => el.value).join(','), findParams.status)
+      updateFindParams({ organization: selectedItem.map((el) => el.value).join(',') })
     } else {
-      getState(date, '')
-      setOrganization('')
+      getState(findParams.date, '', findParams.status)
+      updateFindParams({ organization: '' })
     }
   }
 
@@ -238,13 +267,7 @@ export default function IODProgressing() {
   }
 
   const init = async () => {
-    const p = parseInt(searchParams.get('dueStartDate'))
-    if (p) {
-      let now = new Date()
-      let d = new Date(p)
-      await getState(d.getDate() - now.getDate())
-      setDate(d.getDate() - now.getDate())
-    } else await getState()
+    await getStatus()
     await getOrganization()
   }
 
@@ -263,7 +286,7 @@ export default function IODProgressing() {
                   type="number"
                   min={0}
                   placeholder="Nhập số ngày đến hạn"
-                  value={date}
+                  value={findParams.date}
                   onChange={onChangeDate}
                   onFocus={(e) => e.target.select()}
                 />
@@ -278,13 +301,14 @@ export default function IODProgressing() {
             </CCol>
             <CCol>
               <ReactSelect
-                // value={
-                //   !findParams.type
-                //     ? null
-                //     : type.filter((el) => el.value === findParams.type).length > 0
-                //     ? type.filter((el) => el.value === findParams.type)[0]
-                //     : null
-                // }
+                value={
+                  !findParams.organization
+                    ? null
+                    : organ.filter((el) => findParams.organization.split(',').includes(el.value))
+                        .length > 0
+                    ? organ.filter((el) => findParams.organization.split(',').includes(el.value))
+                    : null
+                }
                 options={organ}
                 placeholder="Chọn tổ chức"
                 onChange={(selectedItem) => handleOnChangeSelectOrgan(selectedItem)}

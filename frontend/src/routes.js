@@ -57,6 +57,7 @@ const ODTHandle = React.lazy(() => import('./views/officialDispatchTravel/ODTHan
 const ODTReport = React.lazy(() => import('./views/officialDispatchTravel/ODTReport'))
 const ODTStatistic = React.lazy(() => import('./views/officialDispatchTravel/ODTStatistic'))
 const ODReport = React.lazy(() => import('./views/officialDispatch/ODReport'))
+const Config = React.lazy(() => import('./views/config/Config'))
 const User = React.lazy(() => import('./views/user/User'))
 const UserChangePassword = React.lazy(() => import('./views/user/UserChangePassword'))
 
@@ -482,6 +483,13 @@ const routes = [
     role: [0, 1],
   },
   */
+  {
+    path: Screens.CONFIG,
+    name: { vi: vn.Common.APPROVE, en: en.Common.APPROVE },
+    element: Config,
+    role: [0, 1],
+    right: Strings.Common.APPROVE_OD,
+  },
 ]
 
 export default routes

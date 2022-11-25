@@ -20,6 +20,7 @@ import {
   FaUserCog,
   FaUserShield,
 } from 'react-icons/fa'
+import { AiFillSetting } from 'react-icons/ai'
 import Strings from './constants/strings'
 
 const _nav = [
@@ -160,6 +161,17 @@ const _nav = [
     right: Strings.Common.CREATE_OD,
     to: Screens.OD_REPORT,
     icon: <FaChartArea className="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: {
+      vi: 'Cấu hình hệ thống',
+      en: en.Common.REPORT,
+    },
+    role: [0, 1],
+    right: Strings.Common.CREATE_OD,
+    to: Screens.CONFIG,
+    icon: <AiFillSetting className="nav-icon" />,
   },
   {
     component: CNavTitle,

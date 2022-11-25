@@ -74,6 +74,7 @@ export default function IODHandle() {
   let token = useSelector((state) => state.user.token)
   if (Helpers.isNullOrEmpty(token)) token = localStorage.getItem(Constants.StorageKeys.ACCESS_TOKEN)
   let loading = useSelector((state) => state.config.loading)
+  const formatCodeOD = useSelector((state) => state.config.formatCodeOD)
   const language = useSelector((state) => state.config.language)
   Strings.setLanguage(language)
 
