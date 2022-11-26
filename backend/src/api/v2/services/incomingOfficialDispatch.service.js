@@ -126,24 +126,44 @@ var incomingOfficialDispatchService = {
         delete params.importer;
       }
       const khongMat = await securityModel.findOne({ name: "Không" });
+      const ninStatus = await statusModel.find({
+        name: { $in: ["LATE", "PENDING", "PROGRESSING", "REFUSE"] },
+      });
+      console.log(
+        "nin",
+        ninStatus.map((el) => el._id)
+      );
       const result = {};
-      console.log(between);
-      const total = await model.countDocuments({
+      const condition = {
         importer: { $in: [...listUser].map((el) => el._id) },
         deleted: false,
         ...params,
         ...between,
-        $or: [
-          { security: khongMat._id.toString() },
-          { importer: userID },
-          { handler: { $all: [mongoose.Types.ObjectId(userID)] } },
-          { approver: userID },
+        $and: [
+          {
+            $or: [
+              {
+                $and: [
+                  { security: khongMat._id.toString() },
+                  {
+                    status: { $nin: ninStatus.map((el) => el._id.toString()) },
+                  },
+                ],
+              },
+              { importer: userID },
+              { handler: { $all: [mongoose.Types.ObjectId(userID)] } },
+              { approver: userID },
+            ],
+          },
+          {
+            $or: [
+              { subject: { $regex: filter } },
+              { description: { $regex: filter } },
+            ],
+          },
         ],
-        $or: [
-          { subject: { $regex: filter } },
-          { description: { $regex: filter } },
-        ],
-      });
+      };
+      const total = await model.countDocuments(condition);
       let startIndex = (pageNumber - 1) * limit;
       let endIndex = pageNumber * limit;
       result.total = total;
@@ -161,22 +181,7 @@ var incomingOfficialDispatchService = {
       }
       result.rowsPerPage = limit;
       result.data = await model
-        .find({
-          importer: { $in: [...listUser].map((el) => el._id) },
-          deleted: false,
-          ...params,
-          ...between,
-          $or: [
-            { security: khongMat._id.toString() },
-            { importer: userID },
-            { handler: { $all: [mongoose.Types.ObjectId(userID)] } },
-            { approver: userID },
-          ],
-          $or: [
-            { subject: { $regex: filter } },
-            { description: { $regex: filter } },
-          ],
-        })
+        .find(condition)
         .populate("type")
         .populate("language")
         .populate("priority")

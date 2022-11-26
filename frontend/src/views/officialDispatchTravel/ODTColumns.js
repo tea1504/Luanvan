@@ -54,7 +54,6 @@ export default [
       </div>
     ),
     sortable: true,
-    minWidth: '500px',
   },
   {
     name: Strings.Form.FieldName.STATUS(),

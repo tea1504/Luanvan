@@ -118,7 +118,6 @@ var officialDispatchTravelService = {
         between.importer = { $in: params.importer.split(",") };
         delete params.importer;
       }
-      console.log(between);
       const khongMat = await securityModel.findOne({ name: "Không" });
       const result = {};
       const total = await model.countDocuments({

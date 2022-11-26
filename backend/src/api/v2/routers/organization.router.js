@@ -39,8 +39,6 @@ route.get(
 );
 route.get(
   Constants.ApiPath.Organization.ID,
-  admin,
-  readCategories,
   organizationController.getOne
 );
 route.post(

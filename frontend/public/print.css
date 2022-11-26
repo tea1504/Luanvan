@@ -1,6 +1,8 @@
 @page {
   size: A4 landscape;
-  /* size: A4; */
+  @top-center {
+    content: '1234';
+  }
 }
 
 @page :left {
@@ -9,25 +11,6 @@
 
 @page :right {
   margin: 2cm 3cm 2cm 3.5cm;
-}
-
-@page :first {
-}
-
-@page :blank {
-  @top-center {
-    content: 'This page is intentionally left blank.';
-  }
-}
-
-@page: right {
-  @bottom-left {
-    margin: 10pt 0 30pt 0;
-    border-top: 0.25pt solid #666;
-    content: 'My book';
-    font-size: 9pt;
-    color: #333;
-  }
 }
 
 body {

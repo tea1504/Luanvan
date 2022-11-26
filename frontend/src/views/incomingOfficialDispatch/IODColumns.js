@@ -36,7 +36,7 @@ export default [
   },
   {
     name: Strings.Form.FieldName.ARRIVAL_NUMBER,
-    selector: (row) => row.arrivalNumber,
+    selector: (row) => row.arrivalNumber??"Chưa cấp số",
     sortable: true,
     maxWidth: '50px',
   },
