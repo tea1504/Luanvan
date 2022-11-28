@@ -576,9 +576,9 @@ var officialDispatchService = {
     }
   },
 
-  predict: async (x, y, w, h, page, multiPage, savePath) => {
+  predict: async (x, y, w, h, page, multi, savePath, isOD) => {
     try {
-      console.log(x, y, w, h, page, multiPage);
+      console.log(`${x},${y},${w},${h},${page},${multi},${isOD === "true" ? "1" : "0"},?`);
       const content =
         `@RELATION dataset
 
@@ -586,16 +586,18 @@ var officialDispatchService = {
 @ATTRIBUTE y REAL
 @ATTRIBUTE w REAL
 @ATTRIBUTE h REAL
-@ATTRIBUTE page {0,1,2}
-@ATTRIBUTE mutilpage {0,1}
-@ATTRIBUTE type {0,1,2,3,4,5,6,7,8}
+@ATTRIBUTE page {0,1}
+@ATTRIBUTE multi {0,1}
+@ATTRIBUTE od {0,1}
+@ATTRIBUTE type {1,2,3,4,5,6,7,8,9}
 
 @DATA
-` + `${x},${y},${w},${h},${page},${multiPage},?`;
+` + `${x},${y},${w},${h},${page},${multi},${isOD === "true" ? "1" : "0"},?`;
       fs.writeFileSync(savePath + "/t.arff", content);
       const result = execSync(
-        `java -cp weka.jar weka.classifiers.trees.J48 -p 7 -l d.model -T ${savePath}/t.arff`
+        `java -cp weka.jar weka.classifiers.trees.J48 -p 7 -l model20221128.model -T ${savePath}/t.arff`
       );
+      console.log(result.toString());
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.GET_200(),

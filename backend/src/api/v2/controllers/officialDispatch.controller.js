@@ -16,26 +16,7 @@ var officialDispatch = {
       }
       res.setHeader("Content-Type", "text/html");
       const file = req.file;
-      const { totalPage = 1 } = req.body;
-      // const resultPredict = {
-      //   0: "",
-      //   1: "",
-      //   2: "BỘ GIÁO DỤC VÀ ĐÀO TẠO\norganization 11\n\n",
-      //   3: "Sô: 4118 /QĐ-1\n\n",
-      //   4: "Can Tho, ngay ^* thang 02 nam 2022\n\n",
-      //   5: "HIỆU TRƯỚNG TRƯỜNG ĐẠI HỌC CÀN THƠ\n\n",
-      //   6: "",
-      //   7: "TL„-HIEU TRUONG\nTRUONG DRBONG DAO TAO\nNguyeEi Minh Tri\n",
-      //   8:
-      //     "QUYÉẾT ĐỊNH\n" +
-      //     "V/v khen thưởng sinh viên\n" +
-      //     "\n" +
-      //     "Nơi nhận:\n" +
-      //     "- Như Điêu 3:\n" +
-      //     "-Tửú: VT.P.CTSV.\n" +
-      //     "\n",
-      //   9: "",
-      // };
+      const { totalPage = 1, isOD } = req.body;
       const resultPredict = {
         0: "",
         1: "",
@@ -60,8 +41,6 @@ var officialDispatch = {
         8: [],
         9: [],
       };
-
-      // let result = { status: 0, data: null, message: "" };
 
       const pathFile = file.path.substring(0, file.path.lastIndexOf("."));
       const savePath = path.join(__dirname, "./../../../../", pathFile);
@@ -216,9 +195,10 @@ var officialDispatch = {
             coordinates[j].y,
             coordinates[j].width,
             coordinates[j].height,
-            i === 0 ? 0 : 2,
+            i === 0 ? 0 : 1,
             pathTemp.length - 1,
-            savePath
+            savePath,
+            isOD
           );
           let predict = result.data
             .toString()
@@ -229,7 +209,7 @@ var officialDispatch = {
             checkError = true;
             break;
           }
-          if (!["0", "1", "6"].includes(predict)) {
+          if (!["1", "6"].includes(predict)) {
             let addMask = result.data;
             result = await service.saveImg(
               addMask,
@@ -273,7 +253,7 @@ var officialDispatch = {
         res.write(`|${count++}/${max}`);
       }
 
-      // fs.unlinkSync(file.path);
+      fs.unlinkSync(file.path);
       // fs.rmdirSync(savePath, { recursive: true, force: true });
       res.write("#");
 

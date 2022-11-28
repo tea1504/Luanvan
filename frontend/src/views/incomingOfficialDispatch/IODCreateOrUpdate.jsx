@@ -1390,7 +1390,7 @@ export default function IODCreateOrUpdate() {
         onClose={() => {
           updateVisible({ choose: false })
         }}
-        // fullscreen
+        fullscreen
       >
         <CModalHeader>Kết quả trích xuất</CModalHeader>
         <CModalBody>

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import {
   CButton,
   CCol,
+  CFormCheck,
   CFormInput,
   CFormLabel,
   CFormText,
@@ -43,6 +44,7 @@ function IODUploadFile({
   const [process, setProcess] = useState({})
   const [value, setValue] = useState(0)
   const [totalPage, setTotalPage] = useState(1)
+  const [isOD, setIsOD] = useState(false)
 
   const renderFile = () => {
     return (
@@ -90,7 +92,7 @@ function IODUploadFile({
       dispatch(setLoading(true))
       const result = await service.api.postFormData({
         path: Constants.ApiPath.POST_PROCESS_OD,
-        data: { file: state.file[process.code], totalPage: totalPage },
+        data: { file: state.file[process.code], totalPage: totalPage, isOD: isOD },
         config: {
           onDownloadProgress: (progressEvent) => {
             var str = progressEvent.currentTarget.response
@@ -165,32 +167,44 @@ function IODUploadFile({
       <CCol xs={12} className="my-1">
         {!Helpers.isObjectEmpty(process) && state.fileTemp.length !== 0 && (
           <CRow>
-            <CCol xs={12}>
-              <CFormLabel>Số trang của văn bản</CFormLabel>
-              <CFormInput
-                type="number"
-                value={totalPage}
-                min={1}
-                onChange={(e) => setTotalPage(e.target.value)}
-              />
-              <CFormText>Số trang được hiểu là từ trang đầu đến phần có chữ ký</CFormText>
-            </CCol>
-            <CCol xs={12} className="mt-3">
-              {!loading && (
-                <CButton className="w-100" onClick={handleClickButton}>
-                  {Strings.Common.PROCESS}
-                </CButton>
-              )}
-              {loading && (
-                <CButton className="w-100" disabled={true}>
-                  <CSpinner size="sm" /> {Strings.Common.PROCESSING}
-                </CButton>
-              )}
-            </CCol>
-            <CCol xs={12} className="mt-3">
-              <div style={{ height: '45vh' }}>
+            <CCol xs={12} sm={6} className="mt-3">
+              <div style={{ height: '65vh' }}>
                 <ODPreview data={process.path} />
               </div>
+            </CCol>
+            <CCol xs={12} sm={6}>
+              <CRow>
+                <CCol xs={12} className="mt-3">
+                  <CFormLabel>Số trang của văn bản</CFormLabel>
+                  <CFormInput
+                    type="number"
+                    value={totalPage}
+                    min={1}
+                    onChange={(e) => setTotalPage(e.target.value)}
+                  />
+                  <CFormText>Số trang được hiểu là từ trang đầu đến phần có chữ ký</CFormText>
+                </CCol>
+                <CCol xs={12} className="mt-3">
+                  <CFormCheck
+                    label="văn bản là công văn"
+                    id="CV"
+                    checked={isOD}
+                    onChange={() => setIsOD(!isOD)}
+                  />
+                </CCol>
+                <CCol xs={12} className="mt-3">
+                  {!loading && (
+                    <CButton className="w-100" onClick={handleClickButton}>
+                      {Strings.Common.PROCESS}
+                    </CButton>
+                  )}
+                  {loading && (
+                    <CButton className="w-100" disabled={true}>
+                      <CSpinner size="sm" /> {Strings.Common.PROCESSING}
+                    </CButton>
+                  )}
+                </CCol>
+              </CRow>
             </CCol>
           </CRow>
         )}
