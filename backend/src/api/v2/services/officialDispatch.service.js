@@ -14,7 +14,7 @@ const typeModel = require("../models/type.model");
 const languageModel = require("../models/language.model");
 
 const worker = Tesseract.createWorker({
-  logger: (m) => console.log(m),
+  // logger: (m) => console.log(m),
 });
 
 const dom = new JSDOM();
@@ -27,34 +27,41 @@ global.HTMLImageElement = Image;
 const mm2px = 12;
 
 var officialDispatchService = {
-  processOD: async (userID, resultPredict, pageAmount, linkImage, savePath) => {
+  processOD: async (
+    userID,
+    resultPredict,
+    pageAmount,
+    linkImage,
+    savePath,
+    isOD
+  ) => {
     const user = await officerModel.findById(userID);
+    const cv = await typeModel.findOne({ name: "Công văn" });
     const vn = await languageModel.findOne({ notation: "vn" });
-    console.log(resultPredict);
+    // console.log(resultPredict);
     let _organ = officialDispatchService.getOrgan(resultPredict[2]);
-    let _code = officialDispatchService.getCode(resultPredict[3]);
+    let _code = officialDispatchService.getCode(
+      resultPredict[3] + resultPredict[9],
+      isOD
+    );
     let _date = officialDispatchService.getDate(resultPredict[4]);
     let _type = officialDispatchService.getTypeSubject(resultPredict[5]);
     let _signer = officialDispatchService.getSigner(resultPredict[7]);
     let _send = officialDispatchService.getSend(resultPredict[8]);
-    console.log(
-      _code.data,
-      _organ.data,
-      _type.data,
-      _date.data,
-      _send.data,
-      _signer.data
-    );
     const organFromName =
       await officialDispatchService.findOrganizationFromName(_organ.data.organ);
     const organFromCode =
       await officialDispatchService.findOrganizationFromCode(_code.data.organ);
-    const typeFromName = await officialDispatchService.findTypeFromName(
-      _type.data.type
-    );
-    const typeFromCode = await officialDispatchService.findTypeFromCode(
-      _code.data.type
-    );
+    let typeFromName = null;
+    let typeFromCode = null;
+    if (isOD === "false") {
+      typeFromCode = await officialDispatchService.findTypeFromCode(
+        _code.data.type
+      );
+      typeFromName = await officialDispatchService.findTypeFromName(
+        _type.data.type
+      );
+    }
     const timeFromDate = officialDispatchService.createDate(_date.data);
     const signerName = officialDispatchService.findSignerName(_signer.data);
     const signerPosition = officialDispatchService.findSignerPosition(
@@ -69,8 +76,8 @@ var officialDispatchService = {
         issuedDate: timeFromDate.getTime(),
         subject: _type.data.subject,
         subjectFromCode: _code.data.subject,
-        typeFromCode: typeFromCode,
-        typeFromName: typeFromName,
+        typeFromCode: isOD === "false" ? typeFromCode : cv,
+        typeFromName: isOD === "false" ? typeFromName : cv,
         language: vn._id.toString(),
         pageAmount: pageAmount,
         signerInfoName: signerName,
@@ -78,15 +85,15 @@ var officialDispatchService = {
         organFromCode: organFromCode,
         organFromName: organFromName,
         predict: {
-          code: linkImage[3],
+          code: [...linkImage[3], ...linkImage[9]],
           issuedDate: linkImage[4],
           subject: linkImage[5],
-          subjectFromCode: linkImage[3],
+          subjectFromCode: [...linkImage[3], ...linkImage[9]],
           typeFromCode: linkImage[3],
           typeFromName: linkImage[5],
           signerInfoName: linkImage[7],
           signerInfoPosition: linkImage[7],
-          organFromCode: linkImage[3],
+          organFromCode: [...linkImage[3], ...linkImage[9]],
           organFromName: linkImage[2],
         },
       },
@@ -156,6 +163,7 @@ var officialDispatchService = {
         rand = r;
         organSelectedFromCode = el;
       }
+      // console.log(el.code, organCode, r);
     });
     if (organSelectedFromCode) return organSelectedFromCode;
     else return null;
@@ -205,7 +213,7 @@ var officialDispatchService = {
     return rand > 0 ? rand : 0;
   },
 
-  getCode: (str = "") => {
+  getCode: (str = "", isOD = "true") => {
     try {
       let result = { code: "", type: "", organ: "", subject: "" };
       const temp = str.split("\n").filter((el) => el.length > 0);
@@ -219,9 +227,10 @@ var officialDispatchService = {
       if (arr) {
         result.code = arr[1];
         const temp = arr[2].replace(/\d+\/(.+)/, "$1").split("-");
-        result.organ = temp[temp.length - 1];
+        result.organ = temp[isOD === "true" ? 0 : temp.length - 1];
         if (temp.length > 1) result.type = temp[0];
       }
+      // console.log("RESULT", result);
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.GET_200(),
@@ -378,7 +387,7 @@ var officialDispatchService = {
     try {
       const canvas = createCanvas();
       cv.imshow(canvas, img);
-      console.log(savePath + fileName + type);
+      // console.log(savePath + fileName + type);
       fs.writeFileSync(
         savePath + fileName + type,
         canvas.toBuffer("image/jpeg")
@@ -578,7 +587,9 @@ var officialDispatchService = {
 
   predict: async (x, y, w, h, page, multi, savePath, isOD) => {
     try {
-      console.log(`${x},${y},${w},${h},${page},${multi},${isOD === "true" ? "1" : "0"},?`);
+      // console.log(
+      //   `${x},${y},${w},${h},${page},${multi},${isOD === "true" ? "1" : "0"},?`
+      // );
       const content =
         `@RELATION dataset
 
@@ -595,9 +606,9 @@ var officialDispatchService = {
 ` + `${x},${y},${w},${h},${page},${multi},${isOD === "true" ? "1" : "0"},?`;
       fs.writeFileSync(savePath + "/t.arff", content);
       const result = execSync(
-        `java -cp weka.jar weka.classifiers.trees.J48 -p 7 -l model20221128.model -T ${savePath}/t.arff`
+        `java -cp weka.jar weka.classifiers.trees.J48 -p 0 -l model20221128.model -T ${savePath}/t.arff`
       );
-      console.log(result.toString());
+      // console.log(result.toString());
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.GET_200(),
@@ -611,7 +622,7 @@ var officialDispatchService = {
   ocr: async (src) => {
     try {
       const result = await Tesseract.recognize(src, "vie");
-      console.log(result.data.text);
+      // console.log(result.data.text);
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.GET_200(),

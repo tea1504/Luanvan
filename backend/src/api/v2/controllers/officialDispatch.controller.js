@@ -11,6 +11,7 @@ var officialDispatch = {
    */
   processOD: async (req, res, next) => {
     try {
+      console.time('doSomething')
       function sleep(ms) {
         return new Promise((r) => setTimeout(r, ms));
       }
@@ -41,14 +42,14 @@ var officialDispatch = {
         8: [],
         9: [],
       };
+      const tk = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
       const pathFile = file.path.substring(0, file.path.lastIndexOf("."));
       const savePath = path.join(__dirname, "./../../../../", pathFile);
       fs.mkdirSync(pathFile);
 
-      let max = 0,
+      let max = 100,
         count = 1;
-      max = 1 + 15 * totalPage + 30;
 
       const imgFromPDF = await service.pdfToImg(totalPage, savePath, file);
       if (imgFromPDF.status !== 200) {
@@ -183,7 +184,6 @@ var officialDispatch = {
           break;
         }
         let coordinates = result.data;
-        max = max - 30 + coordinates.length;
         await sleep(1);
         res.write(`|${count++}/${max}`);
 
@@ -203,7 +203,8 @@ var officialDispatch = {
           let predict = result.data
             .toString()
             .split(" ")
-            .filter((el) => el.length > 0)[14][2];
+            .filter((el) => el.length > 0)[13][2];
+          tk[predict]++;
           result = await service.addMask(imgOriginal, coordinates[j]);
           if (result.status !== 200) {
             checkError = true;
@@ -213,9 +214,9 @@ var officialDispatch = {
             let addMask = result.data;
             result = await service.saveImg(
               addMask,
-              `/${coordinates[j].x}_${coordinates[j].y}_${
+              `/${predict}_${coordinates[j].x}_${coordinates[j].y}_${
                 coordinates[j].x + coordinates[j].width
-              }_${coordinates[j].y + coordinates[j].height}_${predict}`,
+              }_${coordinates[j].y + coordinates[j].height}`,
               ".jpg",
               savePath
             );
@@ -248,15 +249,16 @@ var officialDispatch = {
           resultPredict,
           totalPage,
           linkImage,
-          savePath
+          savePath,
+          isOD
         );
         res.write(`|${count++}/${max}`);
       }
-
+      // console.log(tk);
       fs.unlinkSync(file.path);
       // fs.rmdirSync(savePath, { recursive: true, force: true });
       res.write("#");
-
+      console.timeEnd('doSomething')
       return res.status(result.status).end(JSON.stringify(result));
     } catch (error) {
       return next(error);
