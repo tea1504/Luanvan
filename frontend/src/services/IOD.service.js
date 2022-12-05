@@ -149,9 +149,9 @@ class IODService extends BaseService {
     })
     return result
   }
-  async getStatisticYearMonth(year) {
+  async getStatistic(start, end, step) {
     const result = await this.api.get({
-      path: Constants.ApiPath.STATISTIC_IOD_YEAR_MONTH(year),
+      path: Constants.ApiPath.STATISTIC_IOD(start, end, step),
     })
     return result
   }

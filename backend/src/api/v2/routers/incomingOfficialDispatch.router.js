@@ -42,9 +42,9 @@ route.get(
   controller.getStatisticCurrentWeek
 );
 route.get(
-  Constants.ApiPath.IncomingOfficialDispatch.STATISTIC_YEAR_MONTH,
+  Constants.ApiPath.IncomingOfficialDispatch.STATISTIC,
   createOD,
-  controller.getStatisticYearPerMonth
+  controller.getStatistic
 );
 route.get(
   Constants.ApiPath.IncomingOfficialDispatch.STATISTIC_MONTH_DATE,

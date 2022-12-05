@@ -12,6 +12,8 @@ import {
   CDropdownItem,
   CDropdownMenu,
   CDropdownToggle,
+  CFormInput,
+  CFormLabel,
   CPlaceholder,
   CRow,
   CWidgetStatsA,
@@ -24,7 +26,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import Helpers from 'src/commons/helpers'
 import Constants from 'src/constants'
 import Strings from 'src/constants/strings'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { createSearchParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useEffect } from 'react'
 import { useState } from 'react'
 import Swal from 'sweetalert2'
@@ -33,6 +35,8 @@ import Screens from 'src/constants/screens'
 import { setLoading } from 'src/store/slice/config.slice'
 import { CChartBar, CChartLine } from '@coreui/react-chartjs'
 import { FaArrowDown, FaArrowUp, FaUps } from 'react-icons/fa'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
 
 const service = new IODService()
 const MySwal = withReactContent(Swal)
@@ -46,11 +50,15 @@ export default function IODStatistic() {
   Strings.setLanguage(language)
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
-  const [year, setYear] = useState([])
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
-  const [month, setMonth] = useState(0)
+  const [findParams, setFindParams] = useState({})
+  const updateFindParams = (newState) =>
+    setFindParams((prevState) => ({ ...prevState, ...newState }))
   const [total, setTotal] = useState(0)
-  const [active, setActive] = useState({ month: false, year: true })
+  const [datePicker, setDatePicker] = useState({
+    start: new Date().getTime() - 1000 * 60 * 60 * 24 * 365,
+    end: new Date().getTime(),
+  })
+  const [step, setStep] = useState(30)
 
   const chartRef = useRef()
 
@@ -293,51 +301,13 @@ export default function IODStatistic() {
     }
   }
 
-  const getEndDate = (year, month) => {
-    let date = new Date(year, month + 1, 1)
-    date.setDate(date.getDate() - 1)
-    return date
-  }
-
-  const getStatistic = async (mode = 'year', year = 0, month = 0, week = 0) => {
+  const getStatistic = async (start = new Date(), end = new Date(), step = 30) => {
     try {
       dispatch(setLoading(true))
       setTotal((prevState) => 0)
-      switch (mode) {
-        case 'year':
-          {
-            const result = await service.getStatisticYearMonth(year)
-            updateState({
-              labels: new Array(12).fill(0).map((el, ind) => 'Tháng ' + (ind + 1)),
-            })
-            let data = new Array(12).fill(0)
-            result.data.data.map((el, ind) => {
-              data[el._id - 1] += el.count
-              setTotal((prev) => prev + data[el._id - 1])
-            })
-            updateState({ datasets: state.datasets.map((el) => ({ ...el, data: data })) })
-          }
-          break
-        case 'month':
-          {
-            const result = await service.getStatisticMonthDay(year, month)
-            updateState({
-              labels: new Array(getEndDate(year, month - 1).getDate())
-                .fill(0)
-                .map((el, ind) => 'Ngày ' + (ind + 1)),
-            })
-            let data = new Array(getEndDate(year, month - 1).getDate()).fill(0)
-            result.data.data.map((el, ind) => {
-              data[el._id - 1] += el.count
-              setTotal((prev) => prev + data[el._id - 1])
-            })
-            updateState({ datasets: state.datasets.map((el) => ({ ...el, data: data })) })
-          }
-          break
-
-        default:
-          break
-      }
+      const result = await service.getStatistic(start, end, step)
+      updateState(result.data.data)
+      setTotal(result.data.data.datasets[0].data.reduce((total, num) => total + num, 0))
       dispatch(setLoading(false))
     } catch (error) {
       dispatch(setLoading(false))
@@ -436,26 +406,56 @@ export default function IODStatistic() {
     }
   }
 
-  const getYearReport = async () => {
+  const handleOnChangeIssuedDate = (dates) => {
+    const [start, end] = dates
+    setDatePicker({ start, end })
+    navigate({
+      pathname: Screens.OD_REPORT_IOD_STATISTIC,
+      search: `?${createSearchParams({
+        start: start.getTime(),
+        end: end.getTime(),
+        step: step,
+      })}`,
+    })
+  }
+
+  const validate = () => {
+    if (Helpers.isNullOrEmpty(datePicker.start) || Helpers.isNullOrEmpty(datePicker.end)) {
+      MySwal.fire({
+        title: Strings.Message.COMMON_ERROR,
+        icon: 'error',
+        html: 'Bạn chưa chọn ngày',
+      })
+      return false
+    } else if (Helpers.isNullOrEmpty(step)) {
+      MySwal.fire({
+        title: Strings.Message.COMMON_ERROR,
+        icon: 'error',
+        html: 'Bạn chưa chọn số ngày',
+      })
+      return false
+    }
+    return true
+  }
+
+  const handleOnCLickStatistic = async () => {
     try {
-      dispatch(setLoading(true))
-      setYear((prevState) => [])
-      const result = await service.getYearReport()
-      result.data.data
-        .sort((a, b) => a._id - b._id)
-        .map((el) => {
-          setYear((prevState) => [...prevState, { label: el._id, value: el._id }])
-        })
-      dispatch(setLoading(false))
+      if (validate()) {
+        await getStatistic(datePicker.start.getTime(), datePicker.end.getTime(), step)
+      }
     } catch (error) {
-      dispatch(setLoading(false))
       showError(error)
     }
   }
 
   const init = async () => {
-    await getStatistic('year', selectedYear)
-    await getYearReport()
+    const _start = parseInt(searchParams.get('start')) || datePicker.start
+    const _end = parseInt(searchParams.get('end')) || datePicker.end
+    const _step = parseInt(searchParams.get('step')) || step
+    setDatePicker({ start: _start, end: _end })
+    setStep(_step)
+    console.log(_start, _end, _step)
+    await getStatistic(_start, _end, _step)
     await getIODCurrentWeek()
     await getIODStatusCurrentWeek()
   }
@@ -588,7 +588,7 @@ export default function IODStatistic() {
                   </span>
                 </>
               }
-              title="Số văn bản đến bị từ chối hôm nay"
+              title="Số văn bản đến bị trễ hạn xử lý"
               chart={
                 <CChartBar
                   className="mt-3 mx-3"
@@ -617,67 +617,76 @@ export default function IODStatistic() {
                 <CCardTitle>
                   <CRow>
                     <CCol>
-                      <h3>Thống kê số văn bản nhận tổng số {total} văn bản</h3>
-                      {active.year && <CCardSubtitle>Trong năm {selectedYear}</CCardSubtitle>}
-                      {active.month && (
-                        <CCardSubtitle>
-                          Trong tháng {month} năm {selectedYear}
-                        </CCardSubtitle>
-                      )}
+                      <h3>Thống kê số văn bản nhận </h3>
+                      <CCardSubtitle>
+                        Tổng số {total} văn bản từ{' '}
+                        {Helpers.formatDateFromString(datePicker.start, {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                        })}{' '}
+                        đến{' '}
+                        {Helpers.formatDateFromString(datePicker.end, {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                        })}
+                      </CCardSubtitle>
                     </CCol>
                     <CCol className="text-end">
-                      <CButtonGroup>
-                        <CButton
-                          variant={active.date ? '' : 'outline'}
-                          onClick={() => {
-                            setActive({ month: false, year: false })
-                          }}
-                        >
-                          Tuần
-                        </CButton>
-                        <CDropdown>
-                          <CDropdownToggle variant={active.month ? '' : 'outline'}>
-                            Tháng
-                          </CDropdownToggle>
-                          <CDropdownMenu>
-                            {new Array(12).fill(0).map((el, ind) => (
-                              <CDropdownItem
-                                active={ind + 1 === month}
-                                key={ind}
-                                style={{ cursor: 'pointer' }}
-                                onClick={() => {
-                                  setActive({ month: true, year: false })
-                                  setMonth(ind + 1)
-                                  getStatistic('month', selectedYear, ind + 1)
-                                }}
-                              >
-                                {ind + 1}
-                              </CDropdownItem>
-                            ))}
-                          </CDropdownMenu>
-                        </CDropdown>
-                        <CDropdown>
-                          <CDropdownToggle variant={active.year ? '' : 'outline'}>
-                            Năm
-                          </CDropdownToggle>
-                          <CDropdownMenu>
-                            {year.map((el, ind) => (
-                              <CDropdownItem
-                                active={el.value === selectedYear}
-                                key={ind}
-                                style={{ cursor: 'pointer' }}
-                                onClick={() => {
-                                  setActive({ month: false, year: true })
-                                  setSelectedYear(el.value)
-                                  getStatistic('year', el.value)
-                                }}
-                              >
-                                {el.label}
-                              </CDropdownItem>
-                            ))}
-                          </CDropdownMenu>
-                        </CDropdown>
-                      </CButtonGroup>
+                      <CRow>
+                        <CCol xs={12} sm={3} className="mt-1">
+                          <CFormLabel>Chọn ngày : </CFormLabel>
+                        </CCol>
+                        <CCol xs={12} sm={9} className="mt-1">
+                          <DatePicker
+                            id={Helpers.makeID(
+                              Strings.IncomingOfficialDispatch.CODE,
+                              Helpers.propName(String, Strings.Form.FieldName.ARRIVAL_DATE),
+                            )}
+                            selected={datePicker.start}
+                            onChange={handleOnChangeIssuedDate}
+                            startDate={datePicker.start}
+                            endDate={datePicker.end}
+                            selectsRange
+                            customInput={<CFormInput />}
+                            withPortal
+                            dateFormat="dd/MM/yyyy"
+                            showMonthDropdown
+                            maxDate={new Date()}
+                            isClearable
+                            placeholderText={Strings.Form.FieldName.ARRIVAL_DATE}
+                            autoComplete="off"
+                          />
+                        </CCol>
+                        <CCol xs={12} sm={3} className="mt-1">
+                          <CFormLabel>Số ngày : </CFormLabel>
+                        </CCol>
+                        <CCol xs={12} sm={9} className="mt-1">
+                          <CFormInput
+                            type="number"
+                            value={step}
+                            min={1}
+                            onChange={(e) => {
+                              setStep(e.target.value)
+                              navigate({
+                                pathname: Screens.OD_REPORT_IOD_STATISTIC,
+                                search: `?${createSearchParams({
+                                  start: datePicker.start.getTime(),
+                                  end: datePicker.end.getTime(),
+                                  step: e.target.value,
+                                })}`,
+                              })
+                            }}
+                            onFocus={(e) => e.target.select()}
+                          />
+                        </CCol>
+                        <CCol className="mt-1">
+                          <CButton className="w-100" onClick={handleOnCLickStatistic}>
+                            Thống kê
+                          </CButton>
+                        </CCol>
+                      </CRow>
                     </CCol>
                   </CRow>
                 </CCardTitle>

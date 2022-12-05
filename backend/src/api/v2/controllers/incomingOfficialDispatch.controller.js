@@ -406,12 +406,14 @@ var incomingOfficialDispatchController = {
    * @param {import("express").Response} res
    * @param {import("express").RequestHandler} next
    */
-  getStatisticYearPerMonth: async (req, res, next) => {
+  getStatistic: async (req, res, next) => {
     try {
-      const { year } = req.query;
-      const result = await service.getStatisticYearPerMonth(
+      const { start, end, step } = req.query;
+      const result = await service.getStatistic(
         req.userID,
-        parseInt(year)
+        parseInt(start),
+        parseInt(end),
+        parseInt(step)
       );
       return res.status(result.status).json(result);
     } catch (error) {

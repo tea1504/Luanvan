@@ -149,8 +149,8 @@ const Constants = {
     SEND_EMAIL_IOD: `/incoming-official-dispatch/send-email`,
     REPORT_IOD: (start, end) => `/incoming-official-dispatch/report?start=${start}&end=${end}`,
     REPORT_YEAR_IOD: `/incoming-official-dispatch/report/year`,
-    STATISTIC_IOD_YEAR_MONTH: (year) =>
-      `/incoming-official-dispatch/statistic/year-month?year=${year}`,
+    STATISTIC_IOD: (start, end, step) =>
+      `/incoming-official-dispatch/statistic?start=${start}&end=${end}&step=${step}`,
     STATISTIC_IOD_MONTH_DATE: (year, month) =>
       `/incoming-official-dispatch/statistic/month-date?year=${year}&month=${month}`,
     STATISTIC_IOD_CURRENT_WEEK: `/incoming-official-dispatch/statistic/current-week`,

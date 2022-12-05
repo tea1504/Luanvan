@@ -46,9 +46,7 @@ const Helpers = {
     }
   ) => {
     var date = new Date(dateString);
-    const language = localStorage.getItem(Constants.StorageKeys.LANGUAGE);
-    if (language) return date.toLocaleDateString(language, options);
-    return date.toLocaleDateString(Constants.DefaultLanguage, options);
+    return date.toLocaleDateString("vi", options);
   },
 };
 

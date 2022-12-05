@@ -103,7 +103,7 @@ const Constants = {
       REPORT: "/report",
       REPORT_YEAR: "/report/year",
       REPORT_PROGRESSING: "/report/progressing",
-      STATISTIC_YEAR_MONTH: "/statistic/year-month",
+      STATISTIC: "/statistic",
       STATISTIC_MONTH_DATE: "/statistic/month-date",
       STATISTIC_YEAR_MONTH_TYPE: "/statistic/type/year-month",
       STATISTIC_MONTH_DATE_TYPE: "/statistic/type/month-date",

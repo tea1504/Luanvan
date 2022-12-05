@@ -10,6 +10,7 @@ const securityModel = require("../models/security.model");
 const { default: mongoose } = require("mongoose");
 const showError = require("./error.service");
 const organizationModel = require("../models/organization.model");
+const Helpers = require("../commons/helpers");
 var transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -1128,7 +1129,7 @@ var incomingOfficialDispatchService = {
     }
   },
 
-  getStatisticYearPerMonth: async (userID = "", year = 2022) => {
+  getStatistic: async (userID = "", start = 0, end = 0, step) => {
     try {
       const user = await officerModel.findById(userID, { deleted: false });
       if (!user)
@@ -1140,31 +1141,50 @@ var incomingOfficialDispatchService = {
         deleted: false,
         organ: user.organ,
       });
-      const result = await model.aggregate([
-        {
-          $project: {
-            importer: "$importer",
-            year: { $year: "$arrivalDate" },
-            month: { $month: "$arrivalDate" },
-          },
-        },
-        {
-          $match: {
+      const dateStart = new Date(start);
+      const dateEnd = new Date(end);
+      let result = [];
+      let labels = [];
+      for (var d = dateStart; d <= dateEnd; d.setDate(d.getDate() + step)) {
+        let e = new Date(d);
+        e.setDate(e.getDate() + step);
+        if (e > dateEnd) e = dateEnd;
+        labels.push(
+          Helpers.formatDateFromString(d, {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          }) + " - " +
+            Helpers.formatDateFromString(e, {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+            })
+        );
+        const temp = await model
+          .find({
             importer: { $in: [...listUser].map((el) => el._id) },
-            year: year,
-          },
-        },
-        {
-          $group: {
-            _id: "$month",
-            count: { $count: {} },
-          },
-        },
-      ]);
+            arrivalDate: {
+              $gte: d,
+              $lte: e,
+            },
+          })
+          .countDocuments();
+        result.push(temp);
+      }
       return {
         status: Constants.ApiCode.SUCCESS,
         message: Constants.String.Message.GET_200(Constants.String.IOD._),
-        data: result,
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "Số văn bản nhận được",
+              backgroundColor: "#3e95cd",
+              data: result,
+            },
+          ],
+        },
       };
     } catch (error) {
       return showError(error);
