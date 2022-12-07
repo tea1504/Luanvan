@@ -11,7 +11,8 @@ var officialDispatch = {
    */
   processOD: async (req, res, next) => {
     try {
-      console.time('doSomething')
+      console.log("doSomething");
+      console.time("doSomething");
       function sleep(ms) {
         return new Promise((r) => setTimeout(r, ms));
       }
@@ -48,7 +49,7 @@ var officialDispatch = {
       const savePath = path.join(__dirname, "./../../../../", pathFile);
       fs.mkdirSync(pathFile);
 
-      let max = 100,
+      let max = 60,
         count = 1;
 
       const imgFromPDF = await service.pdfToImg(totalPage, savePath, file);
@@ -258,7 +259,7 @@ var officialDispatch = {
       fs.unlinkSync(file.path);
       // fs.rmdirSync(savePath, { recursive: true, force: true });
       res.write("#");
-      console.timeEnd('doSomething')
+      console.timeEnd("doSomething");
       return res.status(result.status).end(JSON.stringify(result));
     } catch (error) {
       return next(error);
