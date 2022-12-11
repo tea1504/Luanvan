@@ -539,7 +539,6 @@ export default function ODTCreateOrUpdate() {
   }
 
   const handleInputFileOnChange = (e) => {
-    console.log(e)
     const file = Array.from(e.target.files)
     updateState({
       file: [...state.file, ...file],
@@ -559,13 +558,11 @@ export default function ODTCreateOrUpdate() {
   }
 
   const handleDeleteFile = (file) => {
-    console.log(file.path)
     URL.revokeObjectURL(file.path)
     updateState({
       fileTemp: [...state.file]
         .filter((el, ind) => ind != file.code)
         .map((el, ind) => {
-          console.log(el)
           return {
             name: el.name,
             size: el.size,
@@ -575,7 +572,6 @@ export default function ODTCreateOrUpdate() {
         }),
       file: state.file.filter((el, ind) => ind != file.code),
     })
-    console.log('---------------------------------')
   }
 
   const extension = (name) => {

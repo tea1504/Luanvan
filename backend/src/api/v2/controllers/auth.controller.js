@@ -50,7 +50,6 @@ const authController = {
    * @param {import("express").RequestHandler} next
    */
   putInfo: async (req, res, next) => {
-    console.log(req.file);
     const { emailAddress, firstName, lastName, phoneNumber } = req.body;
     if (!emailAddress)
       return res.status(Constants.ApiCode.BAD_REQUEST).json({
@@ -93,7 +92,6 @@ const authController = {
       );
       return res.status(result.status).json(result);
     } catch (error) {
-      console.log(error);
       return next(error);
     }
   },

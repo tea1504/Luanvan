@@ -151,7 +151,6 @@ var securityController = {
   deleteSecurities: async (req, res, next) => {
     try {
       const { ids } = req.body;
-      console.log(ids);
       const result = await securityService.deleteSecurities(ids);
       return res.status(result.status).json(result);
     } catch (error) {

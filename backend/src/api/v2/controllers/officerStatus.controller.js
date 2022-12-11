@@ -156,7 +156,6 @@ var officerStatusController = {
   deleteOfficerStatuses: async (req, res, next) => {
     try {
       const { ids } = req.body;
-      console.log(ids);
       const result = await service.deleteOfficerStatuses(ids);
       return res.status(result.status).json(result);
     } catch (error) {

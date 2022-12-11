@@ -73,7 +73,6 @@ var officerService = {
     params = {}
   ) => {
     try {
-      console.log(params);
       const user = await officerModel.findById(userID).populate("right");
       const condition = {
         deleted: false,

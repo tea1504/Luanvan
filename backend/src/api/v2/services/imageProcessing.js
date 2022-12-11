@@ -6,7 +6,6 @@ const fs = require("fs");
 const saveImg = (img, fileName, type, savePath) => {
   const canvas = createCanvas();
   cv.imshow(canvas, img);
-  console.log(savePath + fileName + type);
   fs.writeFileSync(savePath + fileName + type, canvas.toBuffer("image/jpeg"));
 };
 
@@ -83,7 +82,6 @@ const threshold = (src, threshold, max) => {
 };
 
 const run = async (src) => {
-  console.log("src", src);
   const savePath = src.substring(0, src.lastIndexOf("/") + 1);
   const dom = new JSDOM();
   global.document = dom.window.document;

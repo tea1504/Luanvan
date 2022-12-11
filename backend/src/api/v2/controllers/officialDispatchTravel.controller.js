@@ -256,12 +256,6 @@ var officialDispatchTravelController = {
       const list = id.split(".");
       const files = req.files;
       var { newHandler, done, command, sendEmail } = req.body;
-      console.log("newHandler", newHandler);
-      console.log("done", done);
-      console.log("command", command);
-      console.log("sendEmail", sendEmail);
-      console.log("files", files);
-
       const result = await service.handle(
         list[list.length - 1],
         req.userID,
@@ -273,8 +267,6 @@ var officialDispatchTravelController = {
         },
         files
       );
-
-      console.log("result", result);
       return res.status(result.status).json(result);
     } catch (error) {
       return next(error);

@@ -454,7 +454,6 @@ export default function IODStatistic() {
     const _step = parseInt(searchParams.get('step')) || step
     setDatePicker({ start: _start, end: _end })
     setStep(_step)
-    console.log(_start, _end, _step)
     await getStatistic(_start, _end, _step)
     await getIODCurrentWeek()
     await getIODStatusCurrentWeek()

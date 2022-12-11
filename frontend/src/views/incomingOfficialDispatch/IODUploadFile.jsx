@@ -102,7 +102,6 @@ function IODUploadFile({
           },
         },
       })
-      console.log(JSON.parse(result.data.substring(result.data.indexOf('#') + 1)).data);
       updateData(JSON.parse(result.data.substring(result.data.indexOf('#') + 1)).data)
       dispatch(setLoading(false))
     } catch (error) {

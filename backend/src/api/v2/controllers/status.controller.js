@@ -149,7 +149,6 @@ var statusController = {
   deleteStatuses: async (req, res, next) => {
     try {
       const { ids } = req.body;
-      console.log(ids);
       const result = await statusService.deleteStatuses(ids);
       return res.status(result.status).json(result);
     } catch (error) {

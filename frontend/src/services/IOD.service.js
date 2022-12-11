@@ -96,7 +96,7 @@ class IODService extends BaseService {
     var formData = new FormData()
     Object.keys(data).forEach((el) => data[el] === null && delete data[el])
     for (const [key, value] of Object.entries(data)) {
-      if (key == 'newHandler' || key == 'newFile') {
+      if (key == 'newHandler' || key == 'newFile' || key == 'sendEmail') {
         Array.from(value).map((el) => {
           formData.append(key, el)
         })

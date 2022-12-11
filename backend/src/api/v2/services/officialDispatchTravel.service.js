@@ -411,7 +411,6 @@ var officialDispatchTravelService = {
           }
         });
       }
-      console.log(data);
       const result = await model.create(data);
       return {
         status: Constants.ApiCode.SUCCESS,
@@ -449,7 +448,6 @@ var officialDispatchTravelService = {
     try {
       if (!data.fileTemp) data.fileTemp = [];
       else data.fileTemp = data.fileTemp.split(",");
-      console.log(data);
       const user = await officerModel.findById(userID, { deleted: false });
       if (!user)
         return {
@@ -943,7 +941,6 @@ var officialDispatchTravelService = {
     try {
       const startDate = new Date(parseInt(start));
       const endDate = new Date(parseInt(end));
-      console.log(startDate, endDate);
       const user = await officerModel.findById(userID, { deleted: false });
       if (!user)
         return {

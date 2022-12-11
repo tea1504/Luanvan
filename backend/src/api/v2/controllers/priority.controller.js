@@ -151,7 +151,6 @@ var priorityController = {
   deletePriorities: async (req, res, next) => {
     try {
       const { ids } = req.body;
-      console.log(ids);
       const result = await priorityService.deletePriorities(ids);
       return res.status(result.status).json(result);
     } catch (error) {

@@ -227,7 +227,6 @@ var officialDispatch = {
               checkError = true;
               break;
             }
-            // console.log(result);
             linkImage[predict].push({
               link: link.substring(link.indexOf("temp")),
               ocr: result.data,
@@ -256,7 +255,6 @@ var officialDispatch = {
         );
         res.write(`|${count++}/${max}`);
       }
-      // console.log(tk);
       fs.unlinkSync(file.path);
       // fs.rmdirSync(savePath, { recursive: true, force: true });
       res.write("#");

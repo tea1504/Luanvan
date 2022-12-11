@@ -130,10 +130,6 @@ var incomingOfficialDispatchService = {
       const ninStatus = await statusModel.find({
         name: { $in: ["LATE", "PENDING", "PROGRESSING", "REFUSE"] },
       });
-      console.log(
-        "nin",
-        ninStatus.map((el) => el._id)
-      );
       const result = {};
       const condition = {
         importer: { $in: [...listUser].map((el) => el._id) },
@@ -432,7 +428,6 @@ var incomingOfficialDispatchService = {
           }
         });
       }
-      console.log(data);
       const result = await model.create(data);
       return {
         status: Constants.ApiCode.SUCCESS,
@@ -675,8 +670,8 @@ var incomingOfficialDispatchService = {
     files = []
   ) => {
     try {
-      data.sendEmail = data.sendEmail.split(",");
       if (!data.command) data.command = "";
+      if (!data.sendEmail) data.sendEmail = [];
       if (!data.newHandler) data.newHandler = [];
       else if (
         typeof data.newHandler === "string" ||
@@ -745,10 +740,6 @@ var incomingOfficialDispatchService = {
         _id: { $in: [...data.sendEmail, ...data.newHandler] },
       });
       const listEmail = listOfficer.map((el) => el.emailAddress);
-      console.log(listEmail, data.newHandler, [
-        ...data.sendEmail,
-        ...data.newHandler,
-      ]);
       if (listEmail.length !== 0) {
         var mailOptions = {
           from: process.env.MAIL_USER,
@@ -1154,7 +1145,8 @@ var incomingOfficialDispatchService = {
             year: "numeric",
             month: "2-digit",
             day: "2-digit",
-          }) + " - " +
+          }) +
+            " - " +
             Helpers.formatDateFromString(e, {
               year: "numeric",
               month: "2-digit",

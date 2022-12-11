@@ -10,7 +10,6 @@ var that = (module.exports = {
    * @returns {import("./../interfaces").userLoginResult}
    */
   login: async (username, password) => {
-    console.log(username, password);
     const user = await _user.findOne({ userName: username });
     if (!user) return { code: 404, data: "Không tìm thấy người dùng" };
     const result = await bcrypt.compare(password, user.userPassword);
