@@ -305,7 +305,7 @@ export default function IODStatistic() {
     try {
       dispatch(setLoading(true))
       setTotal((prevState) => 0)
-      const result = await service.getStatistic(start, end, step)
+      const result = await service.getStatistic(start, end + 24 * 60 * 60 * 1000 - 1, step)
       updateState(result.data.data)
       setTotal(result.data.data.datasets[0].data.reduce((total, num) => total + num, 0))
       dispatch(setLoading(false))
@@ -408,7 +408,8 @@ export default function IODStatistic() {
 
   const handleOnChangeIssuedDate = (dates) => {
     const [start, end] = dates
-    setDatePicker({ start, end })
+    console.log(new Date(start), new Date(end))
+    setDatePicker({ start: start, end: end })
     navigate({
       pathname: Screens.OD_REPORT_IOD_STATISTIC,
       search: `?${createSearchParams({

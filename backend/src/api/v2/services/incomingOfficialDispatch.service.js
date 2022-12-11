@@ -1134,6 +1134,7 @@ var incomingOfficialDispatchService = {
       });
       const dateStart = new Date(start);
       const dateEnd = new Date(end);
+      console.log(dateStart, dateEnd);
       let result = [];
       let labels = [];
       for (var d = dateStart; d <= dateEnd; d.setDate(d.getDate() + step)) {

@@ -655,9 +655,9 @@ export default function IODApproval() {
         scrollable
       >
         <CModalHeader>{Strings.Common.ASSIGNMENT}</CModalHeader>
-        <CModalBody>
+        <CModalBody style={{ height: '85vh' }}>
           <CFormLabel htmlFor={Helpers.makeID(Strings.Officer.CODE, Strings.Priority.CODE)}>
-            {Strings.Form.FieldName.PRIORITY(Strings.IncomingOfficialDispatch.NAME)}{' '}
+            Chọn cán bộ xử lý
           </CFormLabel>
           <Select
             id={Helpers.makeID(Strings.Officer.CODE, Strings.Priority.CODE)}

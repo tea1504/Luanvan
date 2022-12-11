@@ -398,6 +398,7 @@ export default function IODHandle() {
     try {
       if (validate()) {
         dispatch(setLoading(true))
+        console.log('STATE', state)
         const result = await service.handle(id, state)
         updateState({
           ...result.data.data,
@@ -423,8 +424,25 @@ export default function IODHandle() {
 
   const handleDone = async () => {
     try {
-      updateState({ done: true })
-      await handle()
+      if (validate()) {
+        dispatch(setLoading(true))
+        const result = await service.handle(id, { ...state, done: true })
+        updateState({
+          ...result.data.data,
+          command: '',
+          newHandler: [],
+          done: false,
+          sendEmail: [],
+        })
+        dispatch(setLoading(false))
+        await MySwal.fire({
+          title: Strings.Message.Handle.TITLE,
+          icon: 'success',
+          text: Strings.Message.Handle.SUCCESS,
+          confirmButtonText: Strings.Common.OK,
+        })
+        navigate(-1)
+      }
     } catch (error) {
       dispatch(setLoading(false))
       showError(error)
