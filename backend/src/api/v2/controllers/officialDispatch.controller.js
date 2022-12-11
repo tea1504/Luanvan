@@ -227,7 +227,7 @@ var officialDispatch = {
               checkError = true;
               break;
             }
-            console.log(result);
+            // console.log(result);
             linkImage[predict].push({
               link: link.substring(link.indexOf("temp")),
               ocr: result.data,

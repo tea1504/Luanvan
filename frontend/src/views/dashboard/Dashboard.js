@@ -194,34 +194,35 @@ const Dashboard = () => {
             <CCol xs={12}>
               <CCard className="shadow-lg">
                 <CCardBody>
-                  <CRow xs={{ cols: 1 }} md={{ cols: 3 }} lg={{ cols: 5 }}>
+                  <CRow xs={{ cols: 1 }} md={{ cols: 4 }}>
                     {func.map((el, ind) => {
-                      return (
-                        <CCol key={ind}>
-                          <CWidgetStatsD
-                            onMouseEnter={handleMouseEnter}
-                            onMouseLeave={handleMouseLeave}
-                            onClick={() => navigate(el.to, { replace: true })}
-                            className={'mb-3 ' + el.color}
-                            style={{ cursor: 'pointer' }}
-                            {...el}
-                            values={[{ value: el.value }]}
-                          />
-                        </CCol>
-                      )
+                      if (Helpers.isNullOrEmpty(el.right) || loggedUser.right[el.right])
+                        return (
+                          <CCol key={ind}>
+                            <CWidgetStatsD
+                              onMouseEnter={handleMouseEnter}
+                              onMouseLeave={handleMouseLeave}
+                              onClick={() => navigate(el.to, { replace: true })}
+                              className={'mb-3 ' + el.color}
+                              style={{ cursor: 'pointer' }}
+                              {...el}
+                              values={[{ value: el.value }]}
+                            />
+                          </CCol>
+                        )
                     })}
                   </CRow>
                 </CCardBody>
               </CCard>
             </CCol>
           </CRow>
-          <CRow className="mt-1">
+          <CRow className="mt-3">
             <CCol xs={12}>
-              <Calendar
-                value={new Date()}
-                locale={language}
-                className="shadow-lg border-0 p-3 w-100"
-              />
+              <CCard className="shadow-lg">
+                <CCardBody>
+                  <Calendar value={new Date()} locale={language} className="border-0 p-3 w-100" />
+                </CCardBody>
+              </CCard>
             </CCol>
           </CRow>
         </CCol>

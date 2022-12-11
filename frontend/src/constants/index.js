@@ -8,7 +8,7 @@ const Constants = {
 
   Api: {
     BASE_URL: `${DOMAIN}/v2/`,
-    TIMEOUT: 60 * 1000,
+    TIMEOUT: 600 * 1000,
   },
 
   /**
